@@ -8,3 +8,4 @@ title: ガイド一覧
 - [GitHub 基本ガイド](github-guide)
 - [Jekyllテーマ一覧](jekyll-themes)
 - [カスタムドメイン設定ガイド](custom-domain)
+- [DNS・ドメイン完全ガイド](dns-guide)
