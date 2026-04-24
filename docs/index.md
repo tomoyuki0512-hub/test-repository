@@ -11,3 +11,4 @@ title: ガイド一覧
 - [DNS・ドメイン完全ガイド](dns-guide)
 - [自作サーバーでWebサイトを公開する方法](self-hosting-guide)
 - [GitHub PagesでJavaScriptを使う](github-pages-js)
+- [問い合わせページの作り方](contact-guide)
