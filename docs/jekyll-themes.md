@@ -199,6 +199,22 @@ theme: jekyll-theme-time-machine
 
 ## プレビューを確認したい場合
 
-各テーマの見た目はGitHubの公式テーマページで確認できる：
+各テーマはGitHub上のリポジトリでプレビューを確認できる。
+それぞれのリポジトリのREADMEにスクリーンショットが掲載されている。
 
-[https://pages.github.com/themes/](https://pages.github.com/themes/)
+| テーマ | リポジトリ |
+|---|---|
+| cayman | https://github.com/pages-themes/cayman |
+| minima | https://github.com/jekyll/minima |
+| minimal | https://github.com/pages-themes/minimal |
+| primer | https://github.com/pages-themes/primer |
+| slate | https://github.com/pages-themes/slate |
+| hacker | https://github.com/pages-themes/hacker |
+| midnight | https://github.com/pages-themes/midnight |
+| architect | https://github.com/pages-themes/architect |
+| modernist | https://github.com/pages-themes/modernist |
+| merlot | https://github.com/pages-themes/merlot |
+| dinky | https://github.com/pages-themes/dinky |
+| leap-day | https://github.com/pages-themes/leap-day |
+| tactile | https://github.com/pages-themes/tactile |
+| time-machine | https://github.com/pages-themes/time-machine |
