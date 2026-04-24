@@ -98,6 +98,23 @@ git config --global user.email "xxxxxxxx@users.noreply.github.com"
 
 ---
 
+## カスタムドメイン
+
+GitHub Pagesにデフォルト以外の独自ドメインを設定できる。
+
+```
+デフォルト： https://ユーザー名.github.io/リポジトリ名/
+カスタム：   https://www.mysite.com/
+```
+
+- ドメインはお名前.com等のサービスで年間約1,000〜2,000円で取得
+- 無料プランでも使用可能（Publicリポジトリに限る）
+- GitHubが無料でHTTPS（SSL）を提供してくれる
+
+詳細な設定手順は [カスタムドメイン設定ガイド](custom-domain) を参照。
+
+---
+
 ## アカウントの削除方法
 
 ### 削除手順
