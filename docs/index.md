@@ -9,3 +9,4 @@ title: ガイド一覧
 - [Jekyllテーマ一覧](jekyll-themes)
 - [カスタムドメイン設定ガイド](custom-domain)
 - [DNS・ドメイン完全ガイド](dns-guide)
+- [自作サーバーでWebサイトを公開する方法](self-hosting-guide)
