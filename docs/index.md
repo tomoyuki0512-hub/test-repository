@@ -13,3 +13,4 @@ title: ガイド一覧
 - [GitHub PagesでJavaScriptを使う](github-pages-js)
 - [問い合わせページの作り方](contact-guide)
 - [Claude Codeでアプリ開発する方法](claude-code-dev-guide)
+- [Claude Codeアプリ開発 応用編（Docker・CI/CD・スタック選定）](claude-code-dev-guide-advanced)
