@@ -1,0 +1,299 @@
+---
+title: Claude Codeで結果をすぐにプレビューする方法
+---
+
+# Claude Codeで結果をすぐにプレビューする方法
+
+Claude Code（CLI）にはClaudeウェブ版のような「アーティファクトビューア」はない。
+しかし以下の方法で、ファイル作成後すぐに結果を確認・自動化できる。
+
+---
+
+## 方法の比較
+
+| 方法 | 自動化 | ファイル変更で自動リロード | 向いている用途 |
+|---|---|---|---|
+| `open` コマンドで即ブラウザ起動 | ○ | ✗ | 1回確認したいとき |
+| `browser-sync` | ○ | **○** | HTML/CSS/JS開発 |
+| `live-server` | ○ | **○** | HTML/CSS/JS開発 |
+| VS Code Live Preview | △（手動） | ○ | VS Code使用時 |
+| フレームワークのdev server | ○ | ○（HMR） | React/Next.js/Rails等 |
+| Claude Code Hooks | ○ | △ | 全自動化したいとき |
+
+---
+
+## 方法1：作成後すぐブラウザで開く（最もシンプル）
+
+Claude Codeにこの指示を出すだけで、ファイル作成後に自動でブラウザが開く。
+
+### 指示テンプレート
+
+```
+index.htmlを作成したら、最後に以下のコマンドでブラウザで開いてください。
+
+# Mac
+open index.html
+
+# Windows
+start index.html
+
+# Linux
+xdg-open index.html
+```
+
+### 自動化された指示例（コピペ用）
+
+```
+シンプルな飲食店のトップページHTMLを作成してください。
+作成後、自動でブラウザで開くコマンドも実行してください（OSはMacです）。
+```
+
+---
+
+## 方法2：browser-sync（ファイル変更で自動リロード・おすすめ）
+
+`browser-sync` はファイルを保存するたびにブラウザを自動でリロードするツール。
+Claude Codeがファイルを編集するたびに画面が自動更新される。
+
+### インストール不要で即使える
+
+```bash
+# HTMLファイルがあるフォルダで実行
+npx browser-sync start --server --files "**/*.html,**/*.css,**/*.js"
+```
+
+実行すると：
+- ブラウザが自動で開く
+- `http://localhost:3000` でアクセスできる
+- HTMLやCSSを変更するたびにブラウザが自動リロードされる
+
+### Claude Codeへの指示テンプレート
+
+```
+以下をお願いします：
+1. [作りたいもの] のHTMLファイルを作成してください
+2. 作成後に `npx browser-sync start --server --files "**"` を実行してください
+3. 私がブラウザで確認したらフィードバックを伝えます
+```
+
+### ポートを変えたい場合
+
+```bash
+npx browser-sync start --server --files "**" --port 4000
+```
+
+---
+
+## 方法3：live-server（シンプル版）
+
+```bash
+npx live-server
+```
+
+- `index.html` を自動で開く
+- ファイル変更で自動リロード
+- デフォルトポートは8080
+
+### Claude Codeへの指示テンプレート
+
+```
+[作りたいもの]のHTMLを作成して、`npx live-server` で起動してください。
+```
+
+---
+
+## 方法4：Claude Code Hooksで完全自動化
+
+Claude Codeの **Hooks機能** を使うと、「ファイルを書き込むたびに自動でブラウザリロード」を設定できる。
+
+### Hooksとは
+
+Claude Codeのツール実行前後に、自動でシェルコマンドを実行できる仕組み。
+
+```
+ファイルを書き込む（Write/Edit）
+    ↓ PostToolUseフック発動
+browser-sync が自動リロード
+    ↓
+ブラウザが最新の状態を表示
+```
+
+### 設定方法
+
+プロジェクトの `.claude/settings.json` に以下を追記する：
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'ファイルが更新されました'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### より実用的な設定例（browser-syncと組み合わせ）
+
+**Step 1：browser-syncをバックグラウンドで起動しておく**
+
+```bash
+npx browser-sync start --server --files "**" &
+```
+
+**Step 2：`.claude/settings.json` を設定**
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "touch .reload-trigger"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 方法5：フレームワーク別のdev server（変更が即反映）
+
+各フレームワークには **HMR（ホットモジュールリプレースメント）** という、コード変更を保存するとブラウザに即反映される機能がある。
+
+### フレームワーク別の起動コマンドと指示テンプレート
+
+#### React / Vite
+
+```bash
+npm run dev
+# → http://localhost:5173 が自動で開く
+```
+
+**指示テンプレート：**
+```
+Vite + ReactのプロジェクトでTodoアプリを作ってください。
+`npm run dev` でサーバーを起動して、私がブラウザで確認します。
+コードを変更するたびに自動でブラウザに反映されます。
+```
+
+---
+
+#### Next.js
+
+```bash
+npm run dev
+# → http://localhost:3000 が開く
+```
+
+**指示テンプレート：**
+```
+Next.jsで飲食店のトップページを作ってください。
+`npm run dev` を起動して、ブラウザで確認できる状態にしてください。
+```
+
+---
+
+#### Ruby on Rails
+
+```bash
+rails server
+# → http://localhost:3000 が開く
+```
+
+**指示テンプレート：**
+```
+Railsで[機能]を実装してください。
+`rails server` を起動して確認できる状態にしてください。
+```
+
+---
+
+#### FastAPI（Swagger UIで即確認）
+
+```bash
+uvicorn main:app --reload
+# → http://localhost:8000/docs でSwagger UIが開く
+```
+
+**指示テンプレート：**
+```
+FastAPIで[API]を作ってください。
+`uvicorn main:app --reload` を起動して、
+http://localhost:8000/docs でAPIを確認できる状態にしてください。
+```
+
+> FastAPIはSwagger UIが自動生成されるため、APIの動作確認がブラウザ上でGUIで行える。
+
+---
+
+## 自動化のための指示テンプレート集
+
+### パターン1：HTMLを作ってすぐ確認（Mac）
+
+```
+以下の手順で進めてください：
+1. [内容]のHTMLファイルを作成する
+2. `npx browser-sync start --server --files "**"` を実行する
+3. ブラウザが開いたら私に教えてください
+```
+
+### パターン2：修正のたびに確認したい（開発中）
+
+```
+browser-syncをバックグラウンドで起動してください：
+`npx browser-sync start --server --files "**" &`
+
+その後、[内容]を実装してください。
+ファイルを保存するたびにブラウザが自動リロードされます。
+```
+
+### パターン3：複数ファイルを作りながら確認
+
+```
+以下のファイル構成でランディングページを作成してください：
+- index.html
+- style.css
+- script.js
+
+作成後に `npx live-server` を起動し、
+ブラウザで確認できる状態にしてください。
+修正依頼は画面を見ながら伝えます。
+```
+
+### パターン4：APIとフロントエンドを同時に確認
+
+```
+バックエンド（FastAPI）とフロントエンド（Vanilla JS）を作成してください。
+
+起動手順：
+1. バックエンド: `uvicorn main:app --reload` （ポート8000）
+2. フロントエンド: `npx live-server --port=5500`
+
+CORS設定も忘れずに行ってください。
+```
+
+---
+
+## まとめ：状況別おすすめ
+
+| 状況 | おすすめ | コマンド |
+|---|---|---|
+| HTMLを1回確認したい | `open` コマンド | `open index.html` |
+| HTML/CSS開発で常に確認したい | browser-sync | `npx browser-sync start --server --files "**"` |
+| フレームワーク開発中 | dev server | `npm run dev` / `rails server` 等 |
+| API開発 | FastAPI + Swagger UI | `uvicorn main:app --reload` → `/docs` |
+| 完全自動化したい | Claude Code Hooks | `.claude/settings.json` に設定 |
