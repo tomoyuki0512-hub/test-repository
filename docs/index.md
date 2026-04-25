@@ -16,3 +16,4 @@ title: ガイド一覧
 - [Claude Codeアプリ開発 応用編（Docker・CI/CD・スタック選定）](claude-code-dev-guide-advanced)
 - [Claude Codeで結果をすぐにプレビューする方法](preview-guide)
 - [WebフレームワークとはなにかまたExpress・Railsとは](framework-basics)
+- [APIの種類・特徴・歴史 完全ガイド](api-guide)
