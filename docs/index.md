@@ -12,3 +12,4 @@ title: ガイド一覧
 - [自作サーバーでWebサイトを公開する方法](self-hosting-guide)
 - [GitHub PagesでJavaScriptを使う](github-pages-js)
 - [問い合わせページの作り方](contact-guide)
+- [Claude Codeでアプリ開発する方法](claude-code-dev-guide)
