@@ -369,3 +369,44 @@ CORS設定も忘れずに行ってください。
 | フレームワーク開発中 | dev server | `npm run dev` / `rails server` 等 |
 | API開発 | FastAPI + Swagger UI | `uvicorn main:app --reload` → `/docs` |
 | 完全自動化したい | Claude Code Hooks | `.claude/settings.json` に設定 |
+
+---
+
+## `npx serve .` との併用について
+
+### 基本：併用しない
+
+`browser-sync` と `live-server` は**サーバー機能も内蔵している**ため、`npx serve .` の代わりになる。同時に起動するとポートが競合する。
+
+```
+npx serve .    → サーバーのみ（自動リロードなし）
+browser-sync   → サーバー＋自動リロード（serve の上位互換）
+live-server    → サーバー＋自動リロード（serve の上位互換）
+```
+
+### 例外：プロキシモードなら併用できる
+
+`browser-sync` には既存サーバーの前に挟む **プロキシモード** がある。
+Express・FastAPI・Railsなど**自前のサーバーが既にある場合**に使える。
+
+```bash
+# ① 既存サーバーを起動（例：npx serve .）
+npx serve . --listen 3001
+
+# ② browser-syncをプロキシとして前に挟む
+npx browser-sync start --proxy "localhost:3001" --files "**"
+```
+
+```
+ブラウザ → browser-sync（:3000）→ npx serve（:3001）
+                ↑
+         ファイル変更を検知して自動リロードを追加
+```
+
+### 状況別まとめ
+
+| 状況 | 使うもの |
+|---|---|
+| HTMLだけの静的サイト | `browser-sync` か `live-server` 単体でOK（serve不要） |
+| Expressなど自前サーバーあり | `自前サーバー` ＋ `browser-sync --proxy` |
+| FastAPI・Railsのバックエンド | サーバー自体にホットリロードあり（`--reload` 等） |
