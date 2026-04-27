@@ -4,10 +4,14 @@ title: ガイド一覧
 
 # ガイド一覧
 
+## GitHub・Git
+
+- [Git コマンド一覧](git-commands.md)
+- [GitHub 基本ガイド](github-guide.md)
+
 ## GitHub Pages・サイト公開
 
 - [ローカルサーバーの起動方法](local-server-guide.md)
-- [GitHub 基本ガイド](github-guide.md)
 - [Jekyllテーマ一覧](jekyll-themes.md)
 - [カスタムドメイン設定ガイド](custom-domain.md)
 - [DNS・ドメイン完全ガイド](dns-guide.md)
