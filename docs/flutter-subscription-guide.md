@@ -128,103 +128,118 @@ Google Play Billing Library 5以降は「ベースプラン」＋「オファー
 
 ### 3-1. `in_app_purchase`（Flutter公式）
 
+- **最新バージョン（2026年4月時点）：** 3.2.3
+- **pub.dev：** Flutter Favorite 認定パッケージ
+
 **概要**
 
-Flutterチームが公式メンテナンスするパッケージ。iOS（StoreKit / StoreKit2）とAndroid（Google Play Billing Library）の両方をひとつのAPIで扱えます。
+Flutterチームが公式メンテナンスするパッケージ。iOS（StoreKit2）とAndroid（Google Play Billing Library）を統一APIで扱えます。プラットフォーム固有のAPIが必要な場合は、`store_kit_wrappers`（iOS）・`billing_client_wrappers`（Android）でより細かい制御も可能です。
 
 **特徴**
 
 - 外部サービスへの依存なし
-- pub.dev の Flutter Favorite
-- 低レベルAPIのため、実装量はやや多い
+- 低レベルAPIのため、実装量はやや多め（購入状態の管理・エラーハンドリングを自前で行う）
 - サブスクリプション管理・分析機能は自前実装が必要
+- 将来的な外部依存を排除したい場合に最適
 
 **向いているケース**
 
 - バックエンドが既にあり、レシート検証を自前で行える
 - RevenueCat 等の外部サービスへの依存を避けたい
-- シンプルなプラン構成（1〜2プラン程度）
+- プラン構成がシンプル（1〜3プラン程度）
 
-**セットアップ概要（pubspec.yaml）**
+**セットアップ（pubspec.yaml）**
 
 ```yaml
 dependencies:
-  in_app_purchase: ^3.2.0
+  in_app_purchase: ^3.2.3
 ```
 
 **iOS 追加設定**
 
-`ios/Runner/Info.plist` に特別な設定は不要ですが、App Store Connect でのプロダクト登録と、Capabilities の「In-App Purchase」有効化が必要です。
+Xcode の Signing & Capabilities で「In-App Purchase」を有効化し、App Store Connect でサブスクリプションプロダクトを登録する必要があります。
 
 **Android 追加設定**
 
-`android/app/build.gradle` の `minSdkVersion` を 21 以上にする必要があります。Google Play Console でのプロダクト登録も必要です。
+`android/app/build.gradle` の `minSdk` を 21 以上に設定し、Google Play Console でサブスクリプションプロダクトを登録します。`AndroidManifest.xml` への `BILLING` パーミッション追加は不要（パッケージが自動で処理）。
 
 **購入フロー（概要）**
 
-1. `InAppPurchase.instance.queryProductDetails(ids)` でプロダクト情報を取得
-2. `InAppPurchase.instance.buyNonConsumable(purchaseParam)` で購入リクエスト
-3. `InAppPurchase.instance.purchaseStream` で購入状態の変化をリッスン
-4. `PurchaseStatus.purchased` を検知して権利を付与
-5. `InAppPurchase.instance.completePurchase(purchase)` で購入完了を通知
+```
+1. InAppPurchase.instance.queryProductDetails({productId}) でプロダクト情報を取得
+2. InAppPurchase.instance.buyNonConsumable(PurchaseParam) で購入リクエスト
+3. InAppPurchase.instance.purchaseStream をリッスンして購入状態の変化を受け取る
+4. PurchaseStatus.purchased を検知 → 権利を付与
+5. InAppPurchase.instance.completePurchase(purchase) で購入完了を通知（必須）
+```
+
+**注意点：** `completePurchase()` を呼ばないと Android では購入がキャンセル扱いになります（3日以内に呼ばないと自動キャンセル）。
 
 ---
 
 ### 3-2. `purchases_flutter`（RevenueCat）
 
+- **最新バージョン（2026年4月時点）：** 8.x系
+- **対応最小バージョン：** iOS 13.0+、Android SDK 21+
+
 **概要**
 
-RevenueCat が提供するサードパーティSDK。IAPの複雑な処理を抽象化し、サブスクリプション管理・分析・Webhook 等の機能をクラウドで提供します。
+RevenueCat が提供するサードパーティSDK。IAPの複雑な処理を抽象化し、サブスクリプション管理・分析・Webhook 等の機能をクラウドで提供します。バックエンドなしでも権利管理が完結するのが最大の強みです。
 
 **特徴**
 
-- iOS / Android の差異を吸収したシンプルなAPI
-- 購入履歴・権利管理をRevenueCatのサーバーが担当
-- ダッシュボードでリアルタイム収益分析が可能
-- Webhook でバックエンドへのイベント通知が可能
-- バックエンドなしでも権利管理が完結
+- iOS / Android の差異を吸収したシンプルなAPI（プラットフォームごとの実装分岐が不要）
+- 購入履歴・権利管理・レシート検証をRevenueCatのサーバーが担当
+- ダッシュボードでリアルタイムの収益・チャーン分析が可能
+- Webhook でサブスクリプションイベントをバックエンドへ通知可能
+- entitlement（権利）の概念で複数プランを一元管理
 
 **向いているケース**
 
 - バックエンドを持たない、または最小限にしたい
-- 複数プラン・プロモーション管理が複雑になる見込み
-- 収益分析・チャーン分析を行いたい
-- 将来的に複数プラットフォームへ展開予定
+- 複数プランやプロモーション管理が複雑になる見込み
+- 収益分析・チャーン分析をしたい
+- 実装工数を削減したい
 
-**RevenueCat の料金プラン**
+**RevenueCat の料金（2026年時点）**
 
-| プラン | 月間アクティブユーザー | 料金 |
-|---|---|---|
-| Free | 〜10,000 MAU | 無料 |
-| Starter | 10,000〜 | $99/月〜 |
-| Pro | 大規模 | 要問合せ |
+| 月間売上（MTR） | 料金 |
+|---|---|
+| $2,500 以下 | **無料**（本番環境でフル機能利用可） |
+| $2,500 超の部分 | **1%**（例：MTR $10,000 なら $75/月） |
+| エンタープライズ | ボリューム割引あり（要問合せ） |
 
-**セットアップ概要（pubspec.yaml）**
+無料枠でも SDK・レシート検証・REST API・Webhook・ダッシュボードがすべて使えます。
+
+**セットアップ（pubspec.yaml）**
 
 ```yaml
 dependencies:
-  purchases_flutter: ^7.0.0
+  purchases_flutter: ^8.0.0
 ```
 
 **購入フロー（概要）**
 
-1. `Purchases.configure(PurchasesConfiguration(apiKey))` で初期化
-2. `Purchases.getOfferings()` でプロダクト一覧を取得
-3. `Purchases.purchasePackage(package)` で購入
-4. `CustomerInfo` から entitlement（権利）の有無を確認して機能を解放
+```
+1. Purchases.configure(PurchasesConfiguration(apiKey)) でSDK初期化
+2. Purchases.getOfferings() でプロダクト一覧（Offering）を取得
+3. Purchases.purchasePackage(package) で購入
+4. CustomerInfo.entitlements.active でentitlementの有無を確認 → 機能を解放
+```
 
 ---
 
 ### パッケージ選択基準
 
-| 判断軸 | `in_app_purchase` | `purchases_flutter` |
+| 判断軸 | `in_app_purchase` | `purchases_flutter`（RevenueCat） |
 |---|---|---|
 | バックエンドの有無 | 自前実装が必要 | 不要（RevenueCatが管理） |
 | プランの複雑さ | シンプルなら問題なし | 複雑なプランも管理しやすい |
-| 分析・ダッシュボード | 不要or自前 | RevenueCatが提供 |
-| 外部依存 | なし | RevenueCatに依存 |
+| 分析・ダッシュボード | 不要 or 自前実装 | RevenueCatが提供 |
+| 外部サービス依存 | なし | RevenueCatに依存 |
 | 実装コスト | やや高め | 低い |
-| コスト | 無料 | MAUが増えると有料 |
+| コスト | 無料 | 月間売上$2,500超から1%課金 |
+| iOS/Android の差異吸収 | 部分的（コード分岐が必要な場合も） | ほぼ完全に吸収 |
 
 ---
 
