@@ -369,45 +369,112 @@ dependencies:
 
 ---
 
-## 6. バックエンド要件（レシート検証）
+## 6. バックエンド要件（購入検証）
 
-### レシート検証とは
+### 6-1. 購入検証とは
 
-購入完了時にプラットフォームから発行されるレシート（証明書）を、サーバー側でプラットフォームのAPIを使って検証する仕組みです。不正な購入を防ぐために重要です。
+購入完了時にプラットフォームからアプリに渡されるトークン・トランザクション情報を、バックエンドサーバー側でプラットフォームの公式APIを使って確認する仕組みです。クライアント側の情報は改ざんできるため、サーバーリソースへのアクセス制御が必要な場合には必須です。
 
-### 検証が必要なケース
+### 6-2. 検証が必要なケース
 
-| ケース | 検証要否 |
+| ケース | 検証要否 | 理由 |
+|---|---|---|
+| アプリ内のみで権利管理（オフライン機能の開放等） | 不要 | クライアントの信頼で完結 |
+| APIやサーバーリソースへのアクセス制御 | **必要** | 不正利用を防ぐ必要がある |
+| 複数デバイスでの権利同期 | **必要** | サーバーが正とならないといけない |
+| ユーザーアカウントとサブスク状態の紐付け | **必要** | 自前アカウントシステムと連携 |
+| 不正利用・リセール防止 | **必要** | — |
+
+### 6-3. iOS のサーバーサイド検証（App Store Server API）
+
+#### ⚠️ 旧 `verifyReceipt` は deprecated
+
+旧来の `/verifyReceipt` エンドポイントはAppleが非推奨とし、**App Store Server API への移行が必須**です。
+
+#### 新しい検証フロー（App Store Server API）
+
+```
+1. アプリが transactionId（またはoriginalTransactionId）をバックエンドへ送信
+2. バックエンドがJWT（JSON Web Token）を使ってApp Store Server APIへリクエスト
+   - エンドポイント: GET /inApps/v1/subscriptions/{originalTransactionId}
+3. AppleからJWS（JSON Web Signature）形式の署名付きレスポンスを受け取る
+4. バックエンドがJWSの署名を検証し、サブスクリプションの有効期限・状態を確認
+5. 権利をユーザーに付与
+```
+
+#### リアルタイム通知（App Store Server Notifications V2）
+
+Appleからのサブスクリプションイベント（更新・解約・課金失敗等）をリアルタイムでバックエンドに通知する仕組みです。
+
+| イベント例 | 用途 |
 |---|---|
-| アプリ内のみで権利管理（オフライン利用） | 不要 |
-| サーバーリソースへのアクセス制御が必要 | **必要** |
-| 複数デバイス・複数プラットフォームで共通アカウント | **必要** |
-| 不正利用を厳密に防ぎたい | **必要** |
+| `SUBSCRIBED` | 新規購入 |
+| `DID_RENEW` | 自動更新成功 |
+| `DID_FAIL_TO_RENEW` | 課金失敗（督促期間） |
+| `EXPIRED` | サブスクリプション失効 |
+| `REFUND` | 返金 |
 
-### サーバーサイド検証の仕組み
+**重要：** `originalTransactionId` をDBに保存すること。これがサブスクリプションのライフサイクル全体（更新・解約・アップグレード等）の追跡キーになります。
 
-**iOS（App Store Server API）**
-1. アプリがレシートをバックエンドに送信
-2. バックエンドが Apple の App Store Server API に問い合わせ
-3. 検証結果（有効・無効・有効期限）を受け取る
-4. 権利（entitlement）をユーザーに付与
+---
 
-**Android（Google Play Developer API）**
-1. アプリが `purchaseToken` をバックエンドに送信
-2. バックエンドが Google Play Developer API に問い合わせ
-3. サブスクリプションの状態を確認
-4. 権利をユーザーに付与
+### 6-4. Android のサーバーサイド検証（Google Play Developer API）
 
-### RevenueCat を使う場合
+#### 検証フロー
 
-RevenueCat がレシート検証・権利管理をすべて担当するため、**バックエンドは不要**になります。バックエンドが必要な場合も、Webhook を通じてRevenueCatからイベント通知を受け取る形で実装できます。
+```
+1. アプリが purchaseToken をバックエンドへ送信
+2. バックエンドがサービスアカウント（OAuth2）でGoogle Play Developer APIを認証
+3. subscriptionsV2.get エンドポイントへリクエスト
+   - GET https://androidpublisher.googleapis.com/androidpublisher/v3/applications
+     /{packageName}/purchases/subscriptionsv2/tokens/{token}
+4. サブスクリプションの状態（ACTIVE/EXPIRED等）・有効期限を確認
+5. 権利をユーザーに付与
+```
 
-### entitlement（権利）管理の考え方
+**注意：** 旧 `subscriptions.get` より **`subscriptionsv2.get` が推奨**です（Billing Library 5以降の新しいサブスクリプション構造に対応）。
 
-「ユーザーがどの機能・コンテンツにアクセスできるか」を管理する概念です。
+#### リアルタイム通知（Real-Time Developer Notifications / RTDN）
 
-- `in_app_purchase` の場合：購入状態をアプリまたは自前バックエンドで管理
-- RevenueCat の場合：RevenueCatのダッシュボード上でentitlementを定義し、SDKで参照するだけで管理可能
+Google Cloud Pub/Sub を使ってバックエンドがサブスクリプションイベントを受信できます。
+
+| 通知タイプ例 | 用途 |
+|---|---|
+| `SUBSCRIPTION_PURCHASED` | 新規購入 |
+| `SUBSCRIPTION_RENEWED` | 自動更新成功 |
+| `SUBSCRIPTION_ON_HOLD` | 課金失敗で保留中 |
+| `SUBSCRIPTION_CANCELED` | 解約 |
+| `SUBSCRIPTION_EXPIRED` | 失効 |
+
+---
+
+### 6-5. RevenueCat を使う場合
+
+RevenueCat がレシート検証・権利管理・通知処理をすべて担当するため、**自前バックエンドは不要**になります。
+
+```
+アプリ（RevenueCat SDK）
+  │ 購入時に自動でRevenueCatサーバーへ送信
+  ▼
+RevenueCat（検証・権利管理）
+  │ Webhook で必要なイベントをバックエンドへ通知（任意）
+  ▼
+自前バックエンド（任意）
+```
+
+バックエンドが既存する場合も、RevenueCat Webhookからのイベントを受け取るだけで済むため実装コストを大幅に削減できます。
+
+---
+
+### 6-6. entitlement（権利）管理の考え方
+
+「ユーザーがどの機能・コンテンツにアクセスできるか」を示す概念です。
+
+| パターン | 管理方法 |
+|---|---|
+| `in_app_purchase` ＋ 自前バックエンド | DB に `originalTransactionId` / `purchaseToken` とサブスク状態を保存し、APIアクセス時に確認 |
+| `in_app_purchase` ＋ アプリ内のみ | プラットフォームSDKにその都度問い合わせて状態を取得（サーバー不要だが複数デバイス管理は困難） |
+| RevenueCat | ダッシュボードでentitlementを定義し、SDKの `CustomerInfo.entitlements.active` を参照するだけ |
 
 ---
 
