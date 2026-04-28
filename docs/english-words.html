@@ -22,21 +22,22 @@
       padding: 6px 12px; border-radius: 4px; border: none;
       font-size: 0.9rem; width: 200px;
     }
-    main { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+    main { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
     .count { color: #666; font-size: 0.85rem; margin-bottom: 12px; }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 10px;
     }
     .card {
-      background: #fff; border-radius: 6px; padding: 14px 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: default;
+      background: #fff; border-radius: 6px; padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .word { font-size: 1rem; font-weight: bold; color: #24292e; }
-    .freq { font-size: 0.72rem; color: #999; margin-top: 4px; }
+    .word { font-size: 1.1rem; font-weight: bold; color: #24292e; }
+    .pron { font-size: 0.82rem; color: #888; margin-top: 3px; font-style: italic; }
+    .meaning { font-size: 0.9rem; color: #444; margin-top: 8px; line-height: 1.4; }
+    .freq { font-size: 0.72rem; color: #999; margin-top: 10px; }
     .freq span { background: #e8f0fe; color: #0366d6; padding: 1px 6px; border-radius: 10px; }
-    .hidden { display: none; }
   </style>
 </head>
 <body>
@@ -54,99 +55,99 @@
 </main>
 <script>
 const words = [
-  { word: "API",            freq: 90 },
-  { word: "Authentication", freq: 12 },
-  { word: "Authorization",  freq: 8  },
-  { word: "Backend",        freq: 15 },
-  { word: "Branch",         freq: 12 },
-  { word: "Build",          freq: 15 },
-  { word: "Cache",          freq: 8  },
-  { word: "CDN",            freq: 5  },
-  { word: "CLI",            freq: 10 },
-  { word: "Client",         freq: 20 },
-  { word: "Clone",          freq: 5  },
-  { word: "Cloud",          freq: 10 },
-  { word: "Cluster",        freq: 5  },
-  { word: "Commit",         freq: 15 },
-  { word: "Component",      freq: 15 },
-  { word: "Configuration",  freq: 15 },
-  { word: "Connection",     freq: 15 },
-  { word: "Container",      freq: 8  },
-  { word: "Cookie",         freq: 5  },
-  { word: "Database",       freq: 25 },
-  { word: "Debug",          freq: 5  },
-  { word: "Delete",         freq: 15 },
-  { word: "Deploy",         freq: 15 },
-  { word: "Dependency",     freq: 8  },
-  { word: "Development",    freq: 20 },
-  { word: "DNS",            freq: 15 },
-  { word: "Docker",         freq: 15 },
-  { word: "Domain",         freq: 20 },
-  { word: "Encryption",     freq: 5  },
-  { word: "Endpoint",       freq: 20 },
-  { word: "Environment",    freq: 8  },
-  { word: "Error",          freq: 20 },
-  { word: "Export",         freq: 5  },
-  { word: "Extension",      freq: 5  },
-  { word: "Feature",        freq: 15 },
-  { word: "Fetch",          freq: 8  },
-  { word: "Fork",           freq: 5  },
-  { word: "Framework",      freq: 20 },
-  { word: "Frontend",       freq: 15 },
-  { word: "Function",       freq: 15 },
-  { word: "Header",         freq: 10 },
-  { word: "Host",           freq: 15 },
-  { word: "HTML",           freq: 20 },
-  { word: "HTTP",           freq: 40 },
-  { word: "Index",          freq: 8  },
-  { word: "Install",        freq: 15 },
-  { word: "Integration",    freq: 5  },
-  { word: "Interface",      freq: 10 },
-  { word: "Issue",          freq: 10 },
-  { word: "JavaScript",     freq: 30 },
-  { word: "Library",        freq: 10 },
-  { word: "Log",            freq: 8  },
-  { word: "Merge",          freq: 8  },
-  { word: "Method",         freq: 15 },
-  { word: "Middleware",     freq: 5  },
-  { word: "Migration",      freq: 5  },
-  { word: "Module",         freq: 10 },
-  { word: "Network",        freq: 10 },
-  { word: "Node",           freq: 8  },
-  { word: "Package",        freq: 10 },
-  { word: "Parameter",      freq: 8  },
-  { word: "Password",       freq: 8  },
-  { word: "Payload",        freq: 5  },
-  { word: "Performance",    freq: 10 },
-  { word: "Pipeline",       freq: 5  },
-  { word: "Plugin",         freq: 5  },
-  { word: "Port",           freq: 10 },
-  { word: "Production",     freq: 8  },
-  { word: "Protocol",       freq: 10 },
-  { word: "Proxy",          freq: 5  },
-  { word: "Push",           freq: 10 },
-  { word: "Query",          freq: 15 },
-  { word: "Refactor",       freq: 5  },
-  { word: "Repository",     freq: 15 },
-  { word: "Request",        freq: 35 },
-  { word: "Response",       freq: 30 },
-  { word: "Route",          freq: 12 },
-  { word: "Schema",         freq: 10 },
-  { word: "Script",         freq: 10 },
-  { word: "Server",         freq: 35 },
-  { word: "Service",        freq: 20 },
-  { word: "Session",        freq: 10 },
-  { word: "SSL",            freq: 3  },
-  { word: "Staging",        freq: 5  },
-  { word: "Template",       freq: 8  },
-  { word: "Token",          freq: 12 },
-  { word: "Transaction",    freq: 10 },
-  { word: "URL",            freq: 10 },
-  { word: "Validation",     freq: 8  },
-  { word: "Version",        freq: 12 },
-  { word: "Webhook",        freq: 5  },
-  { word: "Workflow",       freq: 8  },
-  { word: "YAML",           freq: 5  },
+  { word: "API",            pron: "/ˌeɪ piː ˈaɪ/",          meaning: "アプリケーション間のやり取りの仕組み",              freq: 90 },
+  { word: "Authentication", pron: "/ɔːˌθentɪˈkeɪʃən/",      meaning: "本人確認・ログイン認証",                          freq: 12 },
+  { word: "Authorization",  pron: "/ˌɔːθəraɪˈzeɪʃən/",      meaning: "権限の確認・アクセス許可",                        freq: 8  },
+  { word: "Backend",        pron: "/ˈbækend/",               meaning: "サーバー側の処理・ロジック",                      freq: 15 },
+  { word: "Branch",         pron: "/bræntʃ/",                meaning: "開発の分岐ライン",                                freq: 12 },
+  { word: "Build",          pron: "/bɪld/",                  meaning: "ソースコードを実行可能な形に変換すること",         freq: 15 },
+  { word: "Cache",          pron: "/kæʃ/",                   meaning: "データを一時保存して高速化する仕組み",             freq: 8  },
+  { word: "CDN",            pron: "/ˌsiː diː ˈen/",          meaning: "コンテンツを世界中から高速配信するネットワーク",   freq: 5  },
+  { word: "CLI",            pron: "/ˌsiː el ˈaɪ/",           meaning: "コマンドラインで操作するインターフェース",         freq: 10 },
+  { word: "Client",         pron: "/ˈklaɪənt/",              meaning: "サービスを利用する側（ブラウザなど）",            freq: 20 },
+  { word: "Clone",          pron: "/kloʊn/",                 meaning: "リモートリポジトリをローカルにコピーする",         freq: 5  },
+  { word: "Cloud",          pron: "/klaʊd/",                 meaning: "インターネット経由で利用するサービス・インフラ",   freq: 10 },
+  { word: "Cluster",        pron: "/ˈklʌstər/",              meaning: "複数サーバーをまとめたグループ",                  freq: 5  },
+  { word: "Commit",         pron: "/kəˈmɪt/",                meaning: "変更内容をGitに記録する",                         freq: 15 },
+  { word: "Component",      pron: "/kəmˈpoʊnənt/",           meaning: "UIの部品・構成要素",                              freq: 15 },
+  { word: "Configuration",  pron: "/kənˌfɪɡjəˈreɪʃən/",     meaning: "システムやツールの設定",                          freq: 15 },
+  { word: "Connection",     pron: "/kəˈnekʃən/",             meaning: "サーバーやデータベースへの接続",                  freq: 15 },
+  { word: "Container",      pron: "/kənˈteɪnər/",            meaning: "アプリの実行環境をパッケージ化したもの",           freq: 8  },
+  { word: "Cookie",         pron: "/ˈkʊki/",                 meaning: "ブラウザに保存される小さなデータ",                freq: 5  },
+  { word: "Database",       pron: "/ˈdeɪtəbeɪs/",            meaning: "データを整理して保管する仕組み",                  freq: 25 },
+  { word: "Debug",          pron: "/diːˈbʌɡ/",               meaning: "バグを見つけて修正する作業",                      freq: 5  },
+  { word: "Delete",         pron: "/dɪˈliːt/",               meaning: "データやファイルを削除する",                      freq: 15 },
+  { word: "Deploy",         pron: "/dɪˈplɔɪ/",               meaning: "アプリを本番環境に展開・公開する",                freq: 15 },
+  { word: "Dependency",     pron: "/dɪˈpendənsi/",           meaning: "動作に必要な外部ライブラリや設定",                freq: 8  },
+  { word: "Development",    pron: "/dɪˈveləpmənt/",          meaning: "ソフトウェアの開発作業",                          freq: 20 },
+  { word: "DNS",            pron: "/ˌdiː en ˈes/",           meaning: "ドメイン名をIPアドレスに変換する仕組み",           freq: 15 },
+  { word: "Docker",         pron: "/ˈdɒkər/",                meaning: "コンテナ技術を使った実行環境ツール",              freq: 15 },
+  { word: "Domain",         pron: "/doʊˈmeɪn/",              meaning: "ウェブサイトのアドレス名（例: example.com）",     freq: 20 },
+  { word: "Encryption",     pron: "/ɪnˈkrɪpʃən/",           meaning: "データを暗号化して保護すること",                  freq: 5  },
+  { word: "Endpoint",       pron: "/ˈendpɔɪnt/",             meaning: "APIのアクセス先URL",                              freq: 20 },
+  { word: "Environment",    pron: "/ɪnˈvaɪrənmənt/",         meaning: "開発・ステージング・本番などの実行環境",           freq: 8  },
+  { word: "Error",          pron: "/ˈerər/",                 meaning: "処理が失敗したときに返される情報",                freq: 20 },
+  { word: "Export",         pron: "/ˈekspɔːrt/",             meaning: "データやファイルを外部に出力する",                freq: 5  },
+  { word: "Extension",      pron: "/ɪkˈstenʃən/",            meaning: "機能を追加する拡張・ファイルの拡張子",            freq: 5  },
+  { word: "Feature",        pron: "/ˈfiːtʃər/",              meaning: "アプリケーションの機能・特徴",                    freq: 15 },
+  { word: "Fetch",          pron: "/fetʃ/",                  meaning: "サーバーからデータを取得する",                    freq: 8  },
+  { word: "Fork",           pron: "/fɔːrk/",                 meaning: "他人のリポジトリを自分のアカウントにコピーする",   freq: 5  },
+  { word: "Framework",      pron: "/ˈfreɪmwɜːrk/",           meaning: "開発の骨格を提供するツール群",                    freq: 20 },
+  { word: "Frontend",       pron: "/ˈfrʌntend/",             meaning: "ユーザーが直接見て操作する画面側",                freq: 15 },
+  { word: "Function",       pron: "/ˈfʌŋkʃən/",              meaning: "特定の処理をまとめたコードの単位",                freq: 15 },
+  { word: "Header",         pron: "/ˈhedər/",                meaning: "HTTPリクエスト・レスポンスの付加情報",            freq: 10 },
+  { word: "Host",           pron: "/hoʊst/",                 meaning: "サーバーやサービスを提供・管理する",              freq: 15 },
+  { word: "HTML",           pron: "/ˌeɪtʃ tiː em ˈel/",      meaning: "ウェブページの構造を定義するマークアップ言語",    freq: 20 },
+  { word: "HTTP",           pron: "/ˌeɪtʃ tiː tiː ˈpiː/",   meaning: "ウェブ通信の基本プロトコル",                      freq: 40 },
+  { word: "Index",          pron: "/ˈɪndeks/",               meaning: "目次・検索を高速化するための索引",                freq: 8  },
+  { word: "Install",        pron: "/ɪnˈstɔːl/",              meaning: "ソフトウェアやパッケージを導入する",              freq: 15 },
+  { word: "Integration",    pron: "/ˌɪntɪˈɡreɪʃən/",         meaning: "複数のシステムや機能を連携・統合すること",        freq: 5  },
+  { word: "Interface",      pron: "/ˈɪntərfeɪs/",            meaning: "システム同士やユーザーとのやり取りの接点",        freq: 10 },
+  { word: "Issue",          pron: "/ˈɪʃuː/",                 meaning: "バグや改善点などの課題・GitHubの課題管理機能",    freq: 10 },
+  { word: "JavaScript",     pron: "/ˈdʒɑːvəˌskrɪpt/",        meaning: "ウェブブラウザで動くプログラミング言語",          freq: 30 },
+  { word: "Library",        pron: "/ˈlaɪbreri/",             meaning: "再利用可能なコードをまとめたパッケージ",           freq: 10 },
+  { word: "Log",            pron: "/lɒɡ/",                   meaning: "システムの動作記録",                              freq: 8  },
+  { word: "Merge",          pron: "/mɜːrdʒ/",                meaning: "複数のブランチを1つに統合する",                   freq: 8  },
+  { word: "Method",         pron: "/ˈmeθəd/",                meaning: "クラスに属する関数・HTTPの操作種別（GET/POSTなど）", freq: 15 },
+  { word: "Middleware",     pron: "/ˈmɪdlweər/",             meaning: "リクエストとレスポンスの間で動く処理",            freq: 5  },
+  { word: "Migration",      pron: "/maɪˈɡreɪʃən/",           meaning: "データベースの構造を変更する操作",                freq: 5  },
+  { word: "Module",         pron: "/ˈmɒdjuːl/",              meaning: "独立した機能の単位",                              freq: 10 },
+  { word: "Network",        pron: "/ˈnetwɜːrk/",             meaning: "コンピューター同士をつなぐ通信網",                freq: 10 },
+  { word: "Node",           pron: "/noʊd/",                  meaning: "ネットワーク上の接点・Node.jsのこと",             freq: 8  },
+  { word: "Package",        pron: "/ˈpækɪdʒ/",               meaning: "ライブラリや依存関係をまとめたもの",              freq: 10 },
+  { word: "Parameter",      pron: "/pəˈræmɪtər/",            meaning: "関数やURLに渡す入力値",                           freq: 8  },
+  { word: "Password",       pron: "/ˈpæswɜːrd/",             meaning: "認証に使う秘密の文字列",                          freq: 8  },
+  { word: "Payload",        pron: "/ˈpeɪloʊd/",              meaning: "リクエスト・レスポンスのデータ本体",              freq: 5  },
+  { word: "Performance",    pron: "/pərˈfɔːrməns/",          meaning: "処理速度・システムの性能",                        freq: 10 },
+  { word: "Pipeline",       pron: "/ˈpaɪplaɪn/",             meaning: "CI/CDの一連の自動化処理フロー",                   freq: 5  },
+  { word: "Plugin",         pron: "/ˈplʌɡɪn/",               meaning: "機能を追加する拡張パーツ",                        freq: 5  },
+  { word: "Port",           pron: "/pɔːrt/",                 meaning: "ネットワーク通信の入口番号（例: 3000, 8080）",    freq: 10 },
+  { word: "Production",     pron: "/prəˈdʌkʃən/",            meaning: "実際にユーザーが使う本番環境",                    freq: 8  },
+  { word: "Protocol",       pron: "/ˈproʊtəkɒl/",            meaning: "通信の規約・ルール",                              freq: 10 },
+  { word: "Proxy",          pron: "/ˈprɒksi/",               meaning: "クライアントとサーバーの間に入る中継サーバー",    freq: 5  },
+  { word: "Push",           pron: "/pʊʃ/",                   meaning: "ローカルの変更をリモートリポジトリに送る",        freq: 10 },
+  { word: "Query",          pron: "/ˈkwɪri/",                meaning: "データベースへの問い合わせ・URLのパラメータ",      freq: 15 },
+  { word: "Refactor",       pron: "/riːˈfæktər/",            meaning: "動作を変えずにコードを整理し直す",                freq: 5  },
+  { word: "Repository",     pron: "/rɪˈpɒzɪtɒri/",          meaning: "コードを管理・保存する場所",                      freq: 15 },
+  { word: "Request",        pron: "/rɪˈkwest/",              meaning: "クライアントからサーバーへの要求",                freq: 35 },
+  { word: "Response",       pron: "/rɪˈspɒns/",              meaning: "サーバーからクライアントへの返答",                freq: 30 },
+  { word: "Route",          pron: "/ruːt/",                  meaning: "URLのパスと処理の対応関係",                       freq: 12 },
+  { word: "Schema",         pron: "/ˈskiːmə/",               meaning: "データ構造の定義・設計図",                        freq: 10 },
+  { word: "Script",         pron: "/skrɪpt/",                meaning: "実行可能なコード・自動化スクリプト",              freq: 10 },
+  { word: "Server",         pron: "/ˈsɜːrvər/",              meaning: "サービスを提供するコンピューター・プログラム",    freq: 35 },
+  { word: "Service",        pron: "/ˈsɜːrvɪs/",              meaning: "特定の機能を提供する仕組み・アプリ",              freq: 20 },
+  { word: "Session",        pron: "/ˈseʃən/",                meaning: "ユーザーの一連のアクセス情報を保持する仕組み",    freq: 10 },
+  { word: "SSL",            pron: "/ˌes es ˈel/",            meaning: "通信を暗号化するセキュリティプロトコル",          freq: 3  },
+  { word: "Staging",        pron: "/ˈsteɪdʒɪŋ/",             meaning: "本番公開前のテスト用環境",                        freq: 5  },
+  { word: "Template",       pron: "/ˈtemplɪt/",              meaning: "繰り返し使えるHTMLなどの雛形",                    freq: 8  },
+  { word: "Token",          pron: "/ˈtoʊkən/",               meaning: "認証・認可に使う文字列",                          freq: 12 },
+  { word: "Transaction",    pron: "/trænˈzækʃən/",           meaning: "一連のデータベース操作をまとめたもの",            freq: 10 },
+  { word: "URL",            pron: "/ˌjuː ɑːr ˈel/",          meaning: "ウェブ上のリソースの住所",                        freq: 10 },
+  { word: "Validation",     pron: "/ˌvæləˈdeɪʃən/",          meaning: "入力値が正しいかチェックすること",                freq: 8  },
+  { word: "Version",        pron: "/ˈvɜːrʒən/",              meaning: "ソフトウェアの版・バージョン番号",                freq: 12 },
+  { word: "Webhook",        pron: "/ˈwebhʊk/",               meaning: "イベント発生時に自動で外部URLを呼び出す仕組み",   freq: 5  },
+  { word: "Workflow",       pron: "/ˈwɜːrkfloʊ/",            meaning: "作業の自動化フロー・CI/CDの手順",                 freq: 8  },
+  { word: "YAML",           pron: "/ˈjæməl/",                meaning: "設定ファイルによく使われるデータ記述言語",        freq: 5  },
 ];
 
 let currentSort = 'alpha';
@@ -161,7 +162,9 @@ function sort(type) {
 
 function render() {
   const q = currentQuery.toLowerCase();
-  let list = words.filter(w => w.word.toLowerCase().includes(q));
+  let list = words.filter(w =>
+    w.word.toLowerCase().includes(q) || w.meaning.includes(q)
+  );
 
   if (currentSort === 'alpha') {
     list.sort((a, b) => a.word.localeCompare(b.word));
@@ -173,6 +176,8 @@ function render() {
   document.getElementById('grid').innerHTML = list.map(w => `
     <div class="card">
       <div class="word">${w.word}</div>
+      <div class="pron">${w.pron}</div>
+      <div class="meaning">${w.meaning}</div>
       <div class="freq"><span>頻度 ${w.freq}</span></div>
     </div>
   `).join('');
