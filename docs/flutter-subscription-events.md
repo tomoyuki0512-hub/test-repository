@@ -95,9 +95,9 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
 | 7 | `SUBSCRIPTION_RESTARTED` | 解約済み（期間内）のサブスクをユーザーが「再開」操作したとき |
 | 8 | `SUBSCRIPTION_PRICE_CHANGE_CONFIRMED` | 価格改定にユーザーが同意したとき |
 | 9 | `SUBSCRIPTION_DEFERRED` | 開発者が API でサブスクの更新日を延長したとき |
-| 10 | `SUBSCRIPTION_PAUSED` | ユーザーがサブスクを一時停止したとき |
+| 10 | `SUBSCRIPTION_PAUSED` | ユーザーがサブスクを一時停止したとき（Google Play Console で機能を有効化した場合のみ発生。デフォルトOFF） |
 | 11 | `SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED` | 一時停止のスケジュールが変更されたとき |
-| 12 | `SUBSCRIPTION_REVOKED` | 開発者が API で強制的にサブスクを取り消したとき（返金処理など） |
+| 12 | `SUBSCRIPTION_REVOKED` | 開発者が API でサブスクを取り消したとき、またはGoogle Playが返金承認時にアクセス権を剥奪したとき |
 | 13 | `SUBSCRIPTION_EXPIRED` | サブスクリプションが完全に失効したとき |
 | 20 | `SUBSCRIPTION_PENDING_PURCHASE_CANCELED` | 保留中の購入（銀行振込等）がキャンセルされたとき |
 
@@ -128,12 +128,38 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
   ├─（期間内に再開）→ SUBSCRIPTION_RESTARTED
   └─（期間終了）→ SUBSCRIPTION_EXPIRED
 
-一時停止 → SUBSCRIPTION_PAUSED
-  └─（再開日）→ SUBSCRIPTION_RENEWED
+一時停止（ユーザー操作・要事前有効化）→ SUBSCRIPTION_PAUSED
+  └─（再開日が来たとき）→ SUBSCRIPTION_RENEWED
 
-強制取り消し → SUBSCRIPTION_REVOKED
-  └─ SUBSCRIPTION_EXPIRED
+取り消し → SUBSCRIPTION_REVOKED
+  ├─（開発者が API で実行）
+  └─（Google が返金承認時にアクセス権も剥奪）
+        └─ SUBSCRIPTION_EXPIRED
 ```
+
+### 2-3. 一時停止（SUBSCRIPTION_PAUSED）の詳細
+
+| 項目 | 内容 |
+|---|---|
+| 操作主体 | ユーザー（Google Play のサブスク管理画面から操作） |
+| 前提条件 | Google Play Console でサブスク商品ごとに「一時停止を許可する」を**有効化**する必要あり（デフォルト: OFF） |
+| 停止期間 | ユーザーが 1・2・3 ヶ月から選択 |
+| 課金 | 一時停止中は課金されない。再開日から通常課金が再開 |
+| アクセス権 | 一時停止中はアクセスを停止する（`SUBSCRIPTION_PAUSED` 受信後にブロック） |
+| 再開 | 設定した再開日が来ると自動的に `SUBSCRIPTION_RENEWED` が発生してアクセス復元 |
+| ユーザーによる早期再開 | Google Play から手動で再開可能。その場合も `SUBSCRIPTION_RENEWED` が通知される |
+| スケジュール変更 | 再開日を変更した場合は `SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED` が発生 |
+
+### 2-4. 強制取り消し（SUBSCRIPTION_REVOKED）の詳細
+
+`SUBSCRIPTION_REVOKED` が発生するケースは2種類あります。
+
+| ケース | 操作主体 | 内容 |
+|---|---|---|
+| 開発者による取り消し | 開発者 | Google Play Developer API の `purchases.subscriptions.revoke` を呼び出す。即時にサブスクが失効しアクセス権が剥奪される |
+| Google による返金＋失効 | Google（ユーザーが返金申請） | ユーザーがGoogle Playサポートに返金申請し、Googleが承認した際にアクセス権も同時に剥奪するケース。返金のみ（アクセス継続）の場合はこのイベントは発生しない |
+
+**`SUBSCRIPTION_REVOKED` 受信後の対応：** 即座にアクセスを停止し、`SUBSCRIPTION_EXPIRED` が続いて通知される（または内部的に失効扱いになる）。
 
 ---
 
