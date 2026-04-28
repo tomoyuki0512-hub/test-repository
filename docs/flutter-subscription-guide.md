@@ -245,33 +245,63 @@ dependencies:
 
 ## 4. iOS / Android 各種相違点
 
+### 4-1. 主要な差異一覧
+
 | 項目 | iOS (App Store) | Android (Google Play) |
 |---|---|---|
-| 決済SDK | StoreKit / StoreKit2 | Google Play Billing Library |
-| Flutterラッパー | `in_app_purchase` iOS実装 | `in_app_purchase` Android実装 |
-| サンドボックステスト | Apple ID のSandboxテスターを作成 | テストトラック（クローズドα等）＋ライセンステスター登録 |
-| 手数料 | 15〜30% | 15〜30%（初年度15%） |
-| 外部決済 | デジタルコンテンツは原則禁止 | Alternative Billing の選択肢あり |
+| ネイティブ決済SDK | **StoreKit2**（StoreKit1はWWDC24でdeprecated） | **Google Play Billing Library 7+**（7.0未満は2025年8月以降に公開不可） |
+| Flutterラッパー | `in_app_purchase`（iOS実装） | `in_app_purchase`（Android実装） |
+| サブスクリプション管理画面 | App Store Connect | Google Play Console |
+| 手数料 | 15〜30%（Small Business Program適用時15%） | 10〜20%（2026年3月改定）|
+| 外部決済 | デジタルコンテンツは原則禁止（EU除く） | Alternative Billing あり（地域によって選択可） |
+| レシート形式 | JWS（JSON Web Signature）形式のトランザクション | purchaseToken（文字列） |
 | レシート検証API | App Store Server API | Google Play Developer API |
-| 推奨SDK | StoreKit2（iOS15+） | Billing Library 6+ |
-| 解約導線 | アプリ内にサブスクリプション管理ページへの導線必須 | Google Play のサブスク管理ページへの導線必須 |
+| プロダクト登録タイミング | アプリ審査と同時に申請 | アプリとは独立して登録・審査可能 |
+| 解約導線 | サブスク管理ページ（`itms-apps://...`）への導線必須 | Google Play サブスク管理ページへの導線必須 |
 | プロモーション機能 | Introductory Offer / Promotional Offer | Introductory Price / Promo Codes |
 | ファミリー共有 | Family Sharing（オプトイン） | Family Library（オプトイン） |
-| オフライン時の挙動 | StoreKit が自動ハンドリング | Billing Library が自動ハンドリング |
-| プロダクト管理画面 | App Store Connect | Google Play Console |
-| 審査タイミング | プロダクト登録はアプリ審査と同時 | プロダクト登録はアプリとは独立して可能 |
+| オフライン時 | StoreKit が自動ハンドリング | Billing Library が自動ハンドリング |
+| 最低OS要件（2026年） | iOS 13+（purchases_flutter）/ iOS 15+（StoreKit2直接利用） | Android SDK 21+（Android 5.0） |
 
-### 注意点：テスト方法の違い
+### 4-2. SDKバージョンに関する重要事項
 
-**iOS（Sandbox）**
-- App Store Connect で Sandbox テスターアカウントを作成
-- 実機で Sandbox アカウントにサインインしてテスト
-- 更新間隔が短縮される（例：1ヶ月 → 5分）
+#### iOS：StoreKit1 の deprecated
 
-**Android（テスト）**
-- Google Play Console でライセンステスターのメールアドレスを登録
-- 内部テストトラックに配布してテスト
-- テスト用の自動更新間隔短縮あり（1ヶ月 → 5分）
+- WWDC 2024 にて Apple が StoreKit1 API を正式に deprecated
+- 新機能追加は StoreKit2 のみ。今後はStoreKit2への移行が必須
+- `in_app_purchase` パッケージは内部でStoreKit2対応を進めている
+- StoreKit2 は **iOS 15 以上が必要**（iOS 13/14 サポートが必要な場合は要注意）
+
+#### Android：Google Play Billing Library 7 の義務化
+
+- **2025年8月31日以降**、Google Play Console は Billing Library 7.0 未満を使用したアプリの更新を拒否
+- `in_app_purchase` の最新バージョンは Billing Library 7 に対応済み
+- 既存アプリは早急に最新パッケージへの更新が必要
+- Billing Library 7 でのサブスクリプション構造：`SubscriptionOfferDetails`（ベースプラン + オファー）
+
+### 4-3. テスト方法の違い
+
+#### iOS（Sandbox テスト）
+
+| 手順 | 内容 |
+|---|---|
+| 1 | App Store Connect → ユーザーとアクセス → Sandbox テスターを作成 |
+| 2 | 実機の「設定 → App Store → Sandbox アカウント」でサインイン |
+| 3 | アプリからIAPをテスト |
+| 更新間隔 | 1ヶ月 → 5分、1年 → 1時間（自動短縮） |
+
+**注意点：** シミュレーターではIAPのテストが制限あり（実機推奨）。Xcode の StoreKit Testing を使えばオフラインでのモックテストも可能。
+
+#### Android（テストトラック）
+
+| 手順 | 内容 |
+|---|---|
+| 1 | Google Play Console → 設定 → ライセンステスター にメールアドレスを登録 |
+| 2 | 内部テストトラックにアプリをアップロード |
+| 3 | テスターのアカウントで実機テスト |
+| 更新間隔 | 1ヶ月 → 5分、1年 → 30分（自動短縮） |
+
+**注意点：** テストはGoogle Playに一度アップロードが必要（ローカルビルドのみでは不可）。エミュレーターでもPlay Storeがインストールされていれば一部テスト可能。
 
 ---
 
