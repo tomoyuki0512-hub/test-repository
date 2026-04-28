@@ -34,3 +34,7 @@ title: ガイド一覧
 ## システム設計・運用
 
 - [低トラフィックサイト向けシステム構成ガイド](ando-piano-system-design.md)
+
+## 学習ツール
+
+- [英単語帳](english-words.html)

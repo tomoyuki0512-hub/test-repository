@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英単語帳</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; color: #333; }
+    header {
+      background: #24292e; color: #fff; padding: 20px 24px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    header h1 { font-size: 1.2rem; flex: 1; }
+    .controls { display: flex; gap: 8px; }
+    .controls button {
+      padding: 6px 14px; border: none; border-radius: 4px;
+      cursor: pointer; font-size: 0.85rem; background: #444; color: #ccc;
+    }
+    .controls button.active { background: #0366d6; color: #fff; }
+    input[type="search"] {
+      padding: 6px 12px; border-radius: 4px; border: none;
+      font-size: 0.9rem; width: 200px;
+    }
+    main { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+    .count { color: #666; font-size: 0.85rem; margin-bottom: 12px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .card {
+      background: #fff; border-radius: 6px; padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: default;
+    }
+    .word { font-size: 1rem; font-weight: bold; color: #24292e; }
+    .freq { font-size: 0.72rem; color: #999; margin-top: 4px; }
+    .freq span { background: #e8f0fe; color: #0366d6; padding: 1px 6px; border-radius: 10px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>英単語帳</h1>
+  <input type="search" id="search" placeholder="単語を検索...">
+  <div class="controls">
+    <button id="btn-alpha" class="active" onclick="sort('alpha')">アルファベット順</button>
+    <button id="btn-freq" onclick="sort('freq')">頻出順</button>
+  </div>
+</header>
+<main>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+</main>
+<script>
+const words = [
+  { word: "API",            freq: 90 },
+  { word: "Authentication", freq: 12 },
+  { word: "Authorization",  freq: 8  },
+  { word: "Backend",        freq: 15 },
+  { word: "Branch",         freq: 12 },
+  { word: "Build",          freq: 15 },
+  { word: "Cache",          freq: 8  },
+  { word: "CDN",            freq: 5  },
+  { word: "CLI",            freq: 10 },
+  { word: "Client",         freq: 20 },
+  { word: "Clone",          freq: 5  },
+  { word: "Cloud",          freq: 10 },
+  { word: "Cluster",        freq: 5  },
+  { word: "Commit",         freq: 15 },
+  { word: "Component",      freq: 15 },
+  { word: "Configuration",  freq: 15 },
+  { word: "Connection",     freq: 15 },
+  { word: "Container",      freq: 8  },
+  { word: "Cookie",         freq: 5  },
+  { word: "Database",       freq: 25 },
+  { word: "Debug",          freq: 5  },
+  { word: "Delete",         freq: 15 },
+  { word: "Deploy",         freq: 15 },
+  { word: "Dependency",     freq: 8  },
+  { word: "Development",    freq: 20 },
+  { word: "DNS",            freq: 15 },
+  { word: "Docker",         freq: 15 },
+  { word: "Domain",         freq: 20 },
+  { word: "Encryption",     freq: 5  },
+  { word: "Endpoint",       freq: 20 },
+  { word: "Environment",    freq: 8  },
+  { word: "Error",          freq: 20 },
+  { word: "Export",         freq: 5  },
+  { word: "Extension",      freq: 5  },
+  { word: "Feature",        freq: 15 },
+  { word: "Fetch",          freq: 8  },
+  { word: "Fork",           freq: 5  },
+  { word: "Framework",      freq: 20 },
+  { word: "Frontend",       freq: 15 },
+  { word: "Function",       freq: 15 },
+  { word: "Header",         freq: 10 },
+  { word: "Host",           freq: 15 },
+  { word: "HTML",           freq: 20 },
+  { word: "HTTP",           freq: 40 },
+  { word: "Index",          freq: 8  },
+  { word: "Install",        freq: 15 },
+  { word: "Integration",    freq: 5  },
+  { word: "Interface",      freq: 10 },
+  { word: "Issue",          freq: 10 },
+  { word: "JavaScript",     freq: 30 },
+  { word: "Library",        freq: 10 },
+  { word: "Log",            freq: 8  },
+  { word: "Merge",          freq: 8  },
+  { word: "Method",         freq: 15 },
+  { word: "Middleware",     freq: 5  },
+  { word: "Migration",      freq: 5  },
+  { word: "Module",         freq: 10 },
+  { word: "Network",        freq: 10 },
+  { word: "Node",           freq: 8  },
+  { word: "Package",        freq: 10 },
+  { word: "Parameter",      freq: 8  },
+  { word: "Password",       freq: 8  },
+  { word: "Payload",        freq: 5  },
+  { word: "Performance",    freq: 10 },
+  { word: "Pipeline",       freq: 5  },
+  { word: "Plugin",         freq: 5  },
+  { word: "Port",           freq: 10 },
+  { word: "Production",     freq: 8  },
+  { word: "Protocol",       freq: 10 },
+  { word: "Proxy",          freq: 5  },
+  { word: "Push",           freq: 10 },
+  { word: "Query",          freq: 15 },
+  { word: "Refactor",       freq: 5  },
+  { word: "Repository",     freq: 15 },
+  { word: "Request",        freq: 35 },
+  { word: "Response",       freq: 30 },
+  { word: "Route",          freq: 12 },
+  { word: "Schema",         freq: 10 },
+  { word: "Script",         freq: 10 },
+  { word: "Server",         freq: 35 },
+  { word: "Service",        freq: 20 },
+  { word: "Session",        freq: 10 },
+  { word: "SSL",            freq: 3  },
+  { word: "Staging",        freq: 5  },
+  { word: "Template",       freq: 8  },
+  { word: "Token",          freq: 12 },
+  { word: "Transaction",    freq: 10 },
+  { word: "URL",            freq: 10 },
+  { word: "Validation",     freq: 8  },
+  { word: "Version",        freq: 12 },
+  { word: "Webhook",        freq: 5  },
+  { word: "Workflow",       freq: 8  },
+  { word: "YAML",           freq: 5  },
+];
+
+let currentSort = 'alpha';
+let currentQuery = '';
+
+function sort(type) {
+  currentSort = type;
+  document.getElementById('btn-alpha').classList.toggle('active', type === 'alpha');
+  document.getElementById('btn-freq').classList.toggle('active', type === 'freq');
+  render();
+}
+
+function render() {
+  const q = currentQuery.toLowerCase();
+  let list = words.filter(w => w.word.toLowerCase().includes(q));
+
+  if (currentSort === 'alpha') {
+    list.sort((a, b) => a.word.localeCompare(b.word));
+  } else {
+    list.sort((a, b) => b.freq - a.freq || a.word.localeCompare(b.word));
+  }
+
+  document.getElementById('count').textContent = `${list.length} 単語`;
+  document.getElementById('grid').innerHTML = list.map(w => `
+    <div class="card">
+      <div class="word">${w.word}</div>
+      <div class="freq"><span>頻度 ${w.freq}</span></div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  currentQuery = e.target.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
