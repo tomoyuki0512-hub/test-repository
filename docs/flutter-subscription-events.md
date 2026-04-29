@@ -75,6 +75,28 @@ App Store はサブスクリプションの状態変化を **JWS（JSON Web Sign
   └─（取り消し）→ REFUND_REVERSED
 ```
 
+### 1-3. フロー外イベントの発生タイミング（iOS）
+
+メインの課金フローとは独立して発生するイベントです。
+
+| イベント | 発生タイミング |
+|---|---|
+| `EXPIRED / PRICE_INCREASE` | 価格改定にユーザーが同意せず、期間終了で失効したとき |
+| `EXPIRED / PRODUCT_NOT_FOR_SALE` | 開発者がプロダクトを販売停止にし、更新できず失効したとき |
+| `EXPIRED / CUSTOMER_CANCELLED` | ユーザーがAppleサポートへ連絡し、即時キャンセル・失効が認められたとき |
+| `DID_CHANGE_RENEWAL_PREF / UPGRADE` | 同一グループ内で上位プランへ変更したとき（即時反映） |
+| `DID_CHANGE_RENEWAL_PREF / DOWNGRADE` | 同一グループ内で下位プランへ変更したとき（次回更新時に反映） |
+| `DID_CHANGE_RENEWAL_PREF`（subtypeなし） | 同一グループ内で同ランクのプランへ横移動したとき |
+| `OFFER_REDEEMED` | フリートライアル・割引オファーを適用したとき（初回購入・再サブスク・アップ/ダウングレード時） |
+| `REFUND_DECLINED` | 開発者が`CONSUMPTION_REQUEST`で「消費済み」と報告し、Appleが返金を却下したとき |
+| `CONSUMPTION_REQUEST` | Appleが返金審査のため消費状況の報告を開発者へ求めたとき（消費型IAPのみ） |
+| `PRICE_INCREASE / PENDING` | 開発者が価格改定を設定し、ユーザーの同意待ち状態になったとき |
+| `PRICE_INCREASE / ACCEPTED` | ユーザーが価格改定に同意したとき（または自動同意期限が来たとき） |
+| `RENEWAL_EXTENSION / SUMMARY` | 開発者がAPIで一括更新日延長を実行し完了したとき |
+| `RENEWAL_EXTENSION / FAILURE` | 更新日延長の処理でエラーが発生したとき |
+| `REVOKE` | ファミリー共有メンバーのアクセスが取り消されたとき（購入者が解約・共有停止等） |
+| `TEST` | App Store Connectから手動でテスト通知を送信したとき |
+
 ---
 
 ## 2. Android — Google Play Real-time Developer Notifications
@@ -160,6 +182,17 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
 | Google による返金＋失効 | Google（ユーザーが返金申請） | ユーザーがGoogle Playサポートに返金申請し、Googleが承認した際にアクセス権も同時に剥奪するケース。返金のみ（アクセス継続）の場合はこのイベントは発生しない |
 
 **`SUBSCRIPTION_REVOKED` 受信後の対応：** 即座にアクセスを停止し、`SUBSCRIPTION_EXPIRED` が続いて通知される（または内部的に失効扱いになる）。
+
+### 2-5. フロー外イベントの発生タイミング（Android）
+
+メインの課金フローとは独立して発生するイベントです。
+
+| イベント | 発生タイミング |
+|---|---|
+| `SUBSCRIPTION_PRICE_CHANGE_CONFIRMED` (8) | 開発者が価格改定を設定し、ユーザーが同意したとき（または自動同意期限が来たとき）。通常の更新フローとは独立して発生 |
+| `SUBSCRIPTION_DEFERRED` (9) | 開発者がGoogle Play Developer APIで更新日を延長したとき。次回課金日が先送りされるがサブスクの状態は変わらない |
+| `SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED` (11) | 一時停止中にユーザーが再開日を変更したとき |
+| `SUBSCRIPTION_PENDING_PURCHASE_CANCELED` (20) | コンビニ払い・銀行振込など「保留中」の支払いがユーザーまたはシステムによりキャンセルされたとき |
 
 ---
 
