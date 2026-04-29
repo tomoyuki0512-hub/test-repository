@@ -20,28 +20,28 @@
 graph LR
 
     subgraph CLIENT["クライアント"]
-        Flutter["Flutter App\niOS / Android"]
+        Flutter["Flutter App (iOS/Android)"]
     end
 
     subgraph APPLE_EXT["Apple"]
-        Apple["App Store\nServer API"]
+        Apple["App Store Server API"]
     end
 
     subgraph GCP["Google Cloud Platform"]
-        GooglePlay["Google Play\nDeveloper API"]
-        PubSubTopic["Pub/Sub\nトピック"]
-        PubSubSub["Pub/Sub\nサブスクリプション\n（Push型）"]
+        GooglePlay["Google Play Developer API"]
+        PubSubTopic["Pub/Sub トピック"]
+        PubSubSub["Pub/Sub サブスクリプション (Push型)"]
     end
 
     subgraph AWS["AWS"]
         subgraph VPC["VPC"]
             subgraph PUBLIC["Public Subnet"]
-                ALB["ALB\nロードバランサー"]
-                JavaAPI["Java API\nサーバー"]
+                ALB["ALB ロードバランサー"]
+                JavaAPI["Java API サーバー"]
             end
             subgraph PRIVATE["Private Subnet"]
-                RDS[("PostgreSQL\nRDS")]
-                Redis[("Redis\nElastiCache")]
+                RDS[("PostgreSQL (RDS)")]
+                Redis[("Redis (ElastiCache)")]
             end
         end
     end
@@ -51,15 +51,15 @@ graph LR
     ALB -->|"HTTP"| JavaAPI
 
     %% API → 外部サービス（検証）
-    JavaAPI -->|"レシート検証\nJWT認証"| Apple
-    JavaAPI -->|"購入検証\nOAuth2"| GooglePlay
+    JavaAPI -->|"レシート検証 JWT認証"| Apple
+    JavaAPI -->|"購入検証 OAuth2"| GooglePlay
 
     %% API → DB / キャッシュ
     JavaAPI --- RDS
     JavaAPI --- Redis
 
     %% Apple Webhook（直接HTTPS）
-    Apple -.->|"Webhook\nJWS署名"| ALB
+    Apple -.->|"Webhook JWS署名"| ALB
 
     %% Google Play → Pub/Sub → API
     GooglePlay -.->|"通知発行"| PubSubTopic
