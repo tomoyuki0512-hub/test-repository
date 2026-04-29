@@ -166,3 +166,63 @@ with Diagram(
 | 破線 `- - -` | ストアからの非同期通知（Webhook / Pub/Sub Push） |
 | オレンジ破線 | Apple Webhook（JWS署名付きHTTPS） |
 | 青破線 | Android通知（Google Play → Pub/Sub → API）|
+
+---
+
+## 4. Mermaid → PNG / SVG への変換方法
+
+### 方法①: Mermaid CLI（ローカル変換）
+
+```bash
+# インストール
+npm install -g @mermaid-js/mermaid-cli
+
+# 変換
+mmdc -i diagram.md -o output.png
+mmdc -i diagram.md -o output.svg
+```
+
+### 方法②: mermaid.live（ブラウザ・インストール不要）
+
+`https://mermaid.live` にコードを貼り付けてPNG/SVGをダウンロードできる。最も手軽。
+
+### 方法③: GitHub / GitLab（自動レンダリング）
+
+Markdownファイル内に `\`\`\`mermaid ... \`\`\`` と書くだけで、リポジトリのビューで自動レンダリングされる。このファイルもGitHub上で表示すればそのまま図として見られる。
+
+### 方法④: VS Code 拡張
+
+`Markdown Preview Mermaid Support` 拡張をインストールするとプレビューパネルで確認できる。
+
+---
+
+## 5. Python Diagrams の実行方法
+
+`pip install diagrams` だけでは動かない。内部でGraphvizを使うため別途インストールが必要。
+
+```bash
+# 1. Graphviz をインストール（OS別）
+brew install graphviz        # Mac
+apt-get install graphviz     # Ubuntu / Debian
+choco install graphviz       # Windows（Chocolatey）
+
+# 2. Python ライブラリをインストール
+pip install diagrams
+
+# 3. スクリプトを実行
+python diagram.py
+# → カレントディレクトリに flutter-subscription-architecture.png が生成される
+```
+
+---
+
+## 6. 用途別おすすめ
+
+| | Mermaid | Python Diagrams |
+|---|---|---|
+| 手軽さ | ◎（mermaid.liveなら即時） | △（Graphvizのインストールが必要） |
+| GitHubでの表示 | ◎ 自動レンダリング | ✗ 別途画像をコミットする必要あり |
+| アイコンの見栄え | △ テキストベース | ◎ AWS/GCP公式アイコンで視覚的 |
+| カスタマイズ性 | △ | ◎ |
+
+ドキュメント用途なら **Mermaid + GitHub表示** が最も手軽。発表資料など見栄えが必要な場面では **Python Diagrams** が向いている。
