@@ -144,4 +144,14 @@ title: サブスクリプション資料 総合インデックス（はじめに
 
 ---
 
+---
+
+## 出典・参考リンク（公式情報）
+
+本資料群の事実関係はすべて Apple / Google / Flutter の一次情報に基づいています。完全な出典リストは各ドキュメント末尾の「出典・参考リンク（公式情報）」を参照してください。主要な入口は以下のとおりです。
+
+- Apple: [Auto-renewable Subscriptions](https://developer.apple.com/app-store/subscriptions/) ／ [App Store Server API](https://developer.apple.com/documentation/appstoreserverapi) ／ [Upcoming Requirements](https://developer.apple.com/news/upcoming-requirements/)
+- Google: [Google Play Billing 概要](https://developer.android.com/google/play/billing) ／ [RTDN リファレンス](https://developer.android.com/google/play/billing/rtdn-reference) ／ [手数料の解説](https://support.google.com/googleplay/android-developer/answer/16954621)
+- Flutter: [in_app_purchase（pub.dev）](https://pub.dev/packages/in_app_purchase) ／ [In-app purchases overview](https://docs.flutter.dev/resources/in-app-purchases-overview)
+
 > **更新日:** 2026-05-20 ／ 手数料・SDK要件・法規制は変動が激しいため、各章末の日付と一次情報（Apple Developer / Android Developers）を必ず確認してください。

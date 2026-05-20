@@ -357,5 +357,24 @@ Google Play Console（通知設定）
 
 ## 参照ドキュメント
 
-- `docs/flutter-subscription-guide.md` — IAP要件定義資料
-- `docs/flutter-subscription-events.md` — iOS/Androidイベント一覧
+- [flutter-subscription-guide.md](flutter-subscription-guide.md) — IAP要件定義資料
+- [flutter-subscription-events.md](flutter-subscription-events.md) — iOS/Androidイベント一覧
+- [flutter-subscription-overview.md](flutter-subscription-overview.md) — 総合インデックス・用語集
+
+---
+
+## 出典・参考リンク（公式情報）
+
+API仕様・認証・通知方式は以下の一次情報に基づきます（最終確認: 2026-05-20）。
+
+### Apple（developer.apple.com）
+
+- [App Store Server API](https://developer.apple.com/documentation/appstoreserverapi) ／ [Get All Subscription Statuses](https://developer.apple.com/documentation/appstoreserverapi/get-all-subscription-statuses)
+- [App Store Server Notifications V2](https://developer.apple.com/documentation/appstoreservernotifications)
+- [verifyReceipt（非推奨）](https://developer.apple.com/documentation/appstorereceipts/verify-receipt)
+
+### Google / Android
+
+- [Google Play Developer API（android-publisher）](https://developers.google.com/android-publisher) ／ [purchases.subscriptionsv2.get](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2/get)
+- [Real-time developer notifications リファレンス](https://developer.android.com/google/play/billing/rtdn-reference) ／ [RTDN/Pub/Sub セットアップ（Getting ready）](https://developer.android.com/google/play/billing/getting-ready)
+- [Google Play Billing Library 非推奨FAQ（v8要件）](https://developer.android.com/google/play/billing/deprecation-faq)

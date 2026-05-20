@@ -228,3 +228,10 @@ python diagram.py
 | カスタマイズ性 | △ | ◎ |
 
 ドキュメント用途なら **Mermaid + GitHub表示** が最も手軽。発表資料など見栄えが必要な場面では **Python Diagrams** が向いている。
+
+---
+
+## 出典・参考リンク
+
+- 構成・通知方式（Webhook / Pub/Sub）の根拠となる公式情報は [システム構成設計](flutter-subscription-system-design.md) 末尾の「出典・参考リンク（公式情報）」を参照。
+- 作図ツール: Mermaid（`@mermaid-js/mermaid-cli`、`mermaid.live`）／ Python `diagrams` ライブラリ ／ Graphviz は各公式サイトを参照（本文中のコマンド・URLを参照）。
