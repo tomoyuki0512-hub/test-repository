@@ -1,7 +1,5 @@
 # Flutterアプリ サブスクリプション システム構成設計
 
-> **対象読者:** バックエンド開発 ／ 全体像・用語は [総合インデックス](flutter-subscription-overview.md)、実装要件は [要件定義資料](flutter-subscription-guide.md) を参照。
-
 ## 前提
 
 | 項目 | 内容 |
@@ -12,7 +10,7 @@
 | IAPパッケージ | `in_app_purchase`（Flutter公式） |
 | インフラ | 既存環境に準拠 |
 
-レシート検証・サブスクリプション状態管理はすべて自前のJava API + PostgreSQLで実装する（外部の課金SaaSは使用しない）。
+RevenueCatは使わないため、レシート検証・サブスクリプション状態管理はすべて自前実装する。
 
 ---
 
@@ -198,7 +196,7 @@ AND current_period_end > NOW()
 AppleがこのエンドポイントにHTTPSで直接POSTする。APIエンドポイントを用意するだけでよい。
 
 - Body: `{ "signedPayload": "<JWS文字列>" }`
-- 処理は非同期化し、**HTTP 200を即時返却**する（Appleは受信失敗時に最大5回リトライする）
+- 処理は非同期化し、**HTTP 200を即時返却**する（Appleは受信失敗時に最大6回リトライする）
 - 処理フロー: JWS署名検証 → ペイロードデコード → `subscription_events`にログ → `subscriptions`を更新
 
 #### POST `/webhook/google/pubsub`（Android）
@@ -346,7 +344,7 @@ Google Play Console（通知設定）
 | 項目 | 内容 |
 |---|---|
 | `completePurchase()` 必須 | Androidは購入確認を3日以内に完了しないと自動キャンセル。`/verify`のレスポンスを受け取った後、Flutter側で必ず呼ぶ |
-| Webhookの冪等性 | 同一イベントが複数回届く（Appleは最大5回リトライ）。`notificationUUID`と`is_duplicate`フラグで重複処理を防ぐ |
+| Webhookの冪等性 | 同一イベントが複数回届く（Appleは最大6回リトライ）。`notificationUUID`と`is_duplicate`フラグで重複処理を防ぐ |
 | DBを正とする | アプリ起動時の権利確認はDBから行う。ストアAPIへの問い合わせはWebhook未着のフォールバックと「購入を復元する」操作時のみ |
 | Grace Period有効化 | iOSはApp Store Connectで手動ON（デフォルトOFF）。フリートライアルを使う場合は「無料オファーからの移行も含む」オプションもONにする |
 | `originalTransactionId`の保持 | iOS全ライフサイクルの追跡キー。初回購入時に必ずDB保存 |
@@ -357,24 +355,5 @@ Google Play Console（通知設定）
 
 ## 参照ドキュメント
 
-- [flutter-subscription-guide.md](flutter-subscription-guide.md) — IAP要件定義資料
-- [flutter-subscription-events.md](flutter-subscription-events.md) — iOS/Androidイベント一覧
-- [flutter-subscription-overview.md](flutter-subscription-overview.md) — 総合インデックス・用語集
-
----
-
-## 出典・参考リンク（公式情報）
-
-API仕様・認証・通知方式は以下の一次情報に基づきます（最終確認: 2026-05-20）。
-
-### Apple（developer.apple.com）
-
-- [App Store Server API](https://developer.apple.com/documentation/appstoreserverapi) ／ [Get All Subscription Statuses](https://developer.apple.com/documentation/appstoreserverapi/get-all-subscription-statuses)
-- [App Store Server Notifications V2](https://developer.apple.com/documentation/appstoreservernotifications)
-- [verifyReceipt（非推奨）](https://developer.apple.com/documentation/appstorereceipts/verify-receipt)
-
-### Google / Android
-
-- [Google Play Developer API（android-publisher）](https://developers.google.com/android-publisher) ／ [purchases.subscriptionsv2.get](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2/get)
-- [Real-time developer notifications リファレンス](https://developer.android.com/google/play/billing/rtdn-reference) ／ [RTDN/Pub/Sub セットアップ（Getting ready）](https://developer.android.com/google/play/billing/getting-ready)
-- [Google Play Billing Library 非推奨FAQ（v8要件）](https://developer.android.com/google/play/billing/deprecation-faq)
+- `docs/flutter-subscription-guide.md` — IAP要件定義資料
+- `docs/flutter-subscription-events.md` — iOS/Androidイベント一覧

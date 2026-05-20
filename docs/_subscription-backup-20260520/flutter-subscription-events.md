@@ -1,7 +1,5 @@
 # サブスクリプション ステータス・イベント一覧
 
-> **対象読者:** 開発部隊・QA ／ 用語は [総合インデックス](flutter-subscription-overview.md) の用語集を参照。
-
 iOS（App Store Server Notifications）と Android（Google Play Pub/Sub）で発生するイベントの全一覧と、それぞれが発生するタイミングをまとめます。
 
 ---
@@ -112,29 +110,18 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
 |---|---|---|
 | 1 | `SUBSCRIPTION_RECOVERED` | Account Hold 中に支払いが回収され、サブスクが回復したとき |
 | 2 | `SUBSCRIPTION_RENEWED` | 自動更新が成功したとき（毎更新日）、またはダウングレードが適用されたとき |
-| 3 | `SUBSCRIPTION_CANCELED` | サブスクが解約されたとき（ユーザー操作・課金失敗いずれの場合も。期間内はまだアクティブ） |
+| 3 | `SUBSCRIPTION_CANCELED` | ユーザーがサブスクを解約操作したとき（期間内はまだアクティブ） |
 | 4 | `SUBSCRIPTION_PURCHASED` | 新規サブスクリプションが購入されたとき |
 | 5 | `SUBSCRIPTION_ON_HOLD` | Grace Period が終了しても回収できず、Account Hold に入ったとき |
 | 6 | `SUBSCRIPTION_IN_GRACE_PERIOD` | 更新日に課金が失敗し、Grace Period に入ったとき |
 | 7 | `SUBSCRIPTION_RESTARTED` | 解約済み（期間内）のサブスクをユーザーが「再開」操作したとき |
-| 8 | `SUBSCRIPTION_PRICE_CHANGE_CONFIRMED` | 価格改定にユーザーが同意したとき ⚠️ **非推奨**（価格改定は 19・22 で扱う） |
+| 8 | `SUBSCRIPTION_PRICE_CHANGE_CONFIRMED` | 価格改定にユーザーが同意したとき |
 | 9 | `SUBSCRIPTION_DEFERRED` | 開発者が API でサブスクの更新日を延長したとき |
 | 10 | `SUBSCRIPTION_PAUSED` | ユーザーがサブスクを一時停止したとき（Google Play Console で機能を有効化した場合のみ発生。デフォルトOFF） |
 | 11 | `SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED` | 一時停止のスケジュールが変更されたとき |
-| 12 | `SUBSCRIPTION_REVOKED` | 有効期限前にサブスクが取り消されたとき（開発者の `revoke`、またはGoogle Playが返金承認時にアクセス権を剥奪） |
+| 12 | `SUBSCRIPTION_REVOKED` | 開発者が API でサブスクを取り消したとき、またはGoogle Playが返金承認時にアクセス権を剥奪したとき |
 | 13 | `SUBSCRIPTION_EXPIRED` | サブスクリプションが完全に失効したとき |
-| 17 | `SUBSCRIPTION_ITEMS_CHANGED` | サブスクのバンドル内アイテムが変更されたとき |
-| 18 | `SUBSCRIPTION_CANCELLATION_SCHEDULED` | 分割払い（インストールメント）サブスクの解約が予約されたとき |
-| 19 | `SUBSCRIPTION_PRICE_CHANGE_UPDATED` | サブスクの価格改定の詳細が更新されたとき |
 | 20 | `SUBSCRIPTION_PENDING_PURCHASE_CANCELED` | 保留中の購入（銀行振込等）がキャンセルされたとき |
-| 22 | `SUBSCRIPTION_PRICE_STEP_UP_CONSENT_UPDATED` | 価格ステップアップの同意期間が開始、またはユーザーが同意したとき |
-
-> **`SubscriptionNotification` 以外の通知カテゴリ:** RTDN にはサブスク通知のほかに次がある（公式: [RTDN リファレンス](https://developer.android.com/google/play/billing/rtdn-reference)）。
-> - **`VoidedPurchaseNotification`** — 返金・チャージバック等で購入が無効化されたとき（返金の確実な検知に有用。`refundType`/`productType` を含む）
-> - **`OneTimeProductNotification`** — 一回購入型商品の購入（1）・保留購入のキャンセル（2）
-> - **`TestNotification`** — Play Console から送信するテスト通知
->
-> ⚠️ 数値は連番ではなく欠番（14〜16・21 など）がある。新しい型が追加されうるため、未知の型は無視して処理を続ける実装にする。
 
 ### 2-2. ステータス遷移フロー（Android）
 
@@ -202,11 +189,9 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
 
 | イベント | 発生タイミング |
 |---|---|
-| `SUBSCRIPTION_PRICE_CHANGE_UPDATED` (19) / `SUBSCRIPTION_PRICE_STEP_UP_CONSENT_UPDATED` (22) | 価格改定の詳細更新・価格ステップアップの同意状況。通常の更新フローとは独立して発生（旧 `SUBSCRIPTION_PRICE_CHANGE_CONFIRMED` (8) は非推奨） |
+| `SUBSCRIPTION_PRICE_CHANGE_CONFIRMED` (8) | 開発者が価格改定を設定し、ユーザーが同意したとき（または自動同意期限が来たとき）。通常の更新フローとは独立して発生 |
 | `SUBSCRIPTION_DEFERRED` (9) | 開発者がGoogle Play Developer APIで更新日を延長したとき。次回課金日が先送りされるがサブスクの状態は変わらない |
 | `SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED` (11) | 一時停止中にユーザーが再開日を変更したとき |
-| `SUBSCRIPTION_ITEMS_CHANGED` (17) | サブスクのバンドル内アイテムが変更されたとき |
-| `SUBSCRIPTION_CANCELLATION_SCHEDULED` (18) | 分割払い（インストールメント）サブスクの解約が予約されたとき |
 | `SUBSCRIPTION_PENDING_PURCHASE_CANCELED` (20) | コンビニ払い・銀行振込など「保留中」の支払いがユーザーまたはシステムによりキャンセルされたとき |
 
 ---
@@ -226,33 +211,26 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
 | 再サブスク購入 | `SUBSCRIBED / RESUBSCRIBE` | `SUBSCRIPTION_PURCHASED` |
 | アップグレード | `DID_CHANGE_RENEWAL_PREF / UPGRADE` | `SUBSCRIPTION_RENEWED`（即時適用後） |
 | ダウングレード | `DID_CHANGE_RENEWAL_PREF / DOWNGRADE` | `SUBSCRIPTION_RENEWED`（次回更新時） |
-| 返金 | `REFUND` | `VoidedPurchaseNotification`（返金・無効化）／ アクセス剥奪を伴う場合は `SUBSCRIPTION_REVOKED` |
+| 返金 | `REFUND` | `SUBSCRIPTION_REVOKED` |
 | 一時停止 | なし（iOS非対応） | `SUBSCRIPTION_PAUSED` |
-| 価格改定の同意 | `PRICE_INCREASE / ACCEPTED` | `SUBSCRIPTION_PRICE_CHANGE_UPDATED` (19) / `SUBSCRIPTION_PRICE_STEP_UP_CONSENT_UPDATED` (22)（旧 `..._CONFIRMED` (8) は非推奨） |
+| 価格改定の同意 | `PRICE_INCREASE / ACCEPTED` | `SUBSCRIPTION_PRICE_CHANGE_CONFIRMED` |
 | ファミリー共有の取り消し | `REVOKE` | なし（Android非対応） |
 
 ---
 
-## 4. バックエンドでの取り扱い方針
+## 4. RevenueCat を使う場合の対応
 
-本プロジェクトでは、これらのストア通知を自前バックエンドで直接受信し、`subscriptions` テーブルの状態へ反映します。各イベントとDBステータスの対応は [システム構成設計](flutter-subscription-system-design.md) の「第6章 WebhookイベントとDBステータスの対応」を参照してください。
+RevenueCat を使う場合、ストア固有のイベントは RevenueCat が抽象化し、統一された Webhook イベントとして配信されます。
 
----
-
-## 出典・参考リンク（公式情報）
-
-本ページのイベント定義は以下の一次情報（Apple / Google 公式）に基づきます（最終確認: 2026-05-20）。
-
-### iOS — App Store Server Notifications V2（Apple Developer）
-
-- [App Store Server Notifications](https://developer.apple.com/documentation/appstoreservernotifications)
-- [notificationType（通知タイプ一覧）](https://developer.apple.com/documentation/appstoreservernotifications/notificationType)
-- [subtype（サブタイプ一覧）](https://developer.apple.com/documentation/appstoreservernotifications/subtype)
-- [App Store Server API](https://developer.apple.com/documentation/appstoreserverapi) / [Get All Subscription Statuses](https://developer.apple.com/documentation/appstoreserverapi/get-all-subscription-statuses)
-
-### Android — Real-time Developer Notifications（Android Developers）
-
-- [Real-time developer notifications reference guide](https://developer.android.com/google/play/billing/rtdn-reference)
-- [Purchase lifecycle and RTDNs](https://developer.android.com/google/play/billing/lifecycle)
-- [Subscription lifecycle](https://developer.android.com/google/play/billing/lifecycle/subscriptions)
-- [Google Play Developer API — purchases.subscriptionsv2.get](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2/get)
+| RevenueCat Webhook イベント | 対応するストアイベント |
+|---|---|
+| `INITIAL_PURCHASE` | iOS: `SUBSCRIBED/INITIAL_BUY` / Android: `SUBSCRIPTION_PURCHASED` |
+| `RENEWAL` | iOS: `DID_RENEW` / Android: `SUBSCRIPTION_RENEWED` |
+| `CANCELLATION` | iOS: `DID_CHANGE_RENEWAL_STATUS/AUTO_RENEW_DISABLED` / Android: `SUBSCRIPTION_CANCELED` |
+| `UNCANCELLATION` | iOS: `AUTO_RENEW_ENABLED` / Android: `SUBSCRIPTION_RESTARTED` |
+| `BILLING_ISSUE` | iOS: `DID_FAIL_TO_RENEW` / Android: `SUBSCRIPTION_IN_GRACE_PERIOD` |
+| `SUBSCRIBER_ALIAS` | 内部のユーザーID統合（ストアイベントなし） |
+| `EXPIRATION` | iOS: `EXPIRED` / Android: `SUBSCRIPTION_EXPIRED` |
+| `PRODUCT_CHANGE` | iOS: `DID_CHANGE_RENEWAL_PREF` / Android: プラン変更通知 |
+| `TRANSFER` | ユーザー間の権利移転（ストアイベントなし） |
+| `REFUND` | iOS: `REFUND` / Android: `SUBSCRIPTION_REVOKED` |

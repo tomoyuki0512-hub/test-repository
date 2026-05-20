@@ -37,6 +37,8 @@ title: ガイド一覧
 
 ## Flutterアプリ サブスクリプション（IAP）
 
+- [総合インデックス（はじめに・用語集）](flutter-subscription-overview.md) ← まずはここから
+- [事業視点ガイド（料金戦略・KPI）](flutter-subscription-business.md)
 - [サブスクリプション要件定義資料](flutter-subscription-guide.md)
 - [iOS / Android イベント・ステータス一覧](flutter-subscription-events.md)
 - [システム構成設計](flutter-subscription-system-design.md)
