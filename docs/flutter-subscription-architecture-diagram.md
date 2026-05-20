@@ -1,5 +1,7 @@
 # Flutterアプリ サブスクリプション システム構成図
 
+> **対象読者:** 開発・インフラ ／ DB・API設計は [システム構成設計](flutter-subscription-system-design.md) を参照。
+
 ## 構成概要
 
 | 項目 | 選定 |

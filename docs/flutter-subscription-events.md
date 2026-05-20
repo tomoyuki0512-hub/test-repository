@@ -1,5 +1,7 @@
 # サブスクリプション ステータス・イベント一覧
 
+> **対象読者:** 開発部隊・QA ／ 用語は [総合インデックス](flutter-subscription-overview.md) の用語集を参照。
+
 iOS（App Store Server Notifications）と Android（Google Play Pub/Sub）で発生するイベントの全一覧と、それぞれが発生するタイミングをまとめます。
 
 ---
@@ -218,19 +220,6 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
 
 ---
 
-## 4. RevenueCat を使う場合の対応
+## 4. バックエンドでの取り扱い方針
 
-RevenueCat を使う場合、ストア固有のイベントは RevenueCat が抽象化し、統一された Webhook イベントとして配信されます。
-
-| RevenueCat Webhook イベント | 対応するストアイベント |
-|---|---|
-| `INITIAL_PURCHASE` | iOS: `SUBSCRIBED/INITIAL_BUY` / Android: `SUBSCRIPTION_PURCHASED` |
-| `RENEWAL` | iOS: `DID_RENEW` / Android: `SUBSCRIPTION_RENEWED` |
-| `CANCELLATION` | iOS: `DID_CHANGE_RENEWAL_STATUS/AUTO_RENEW_DISABLED` / Android: `SUBSCRIPTION_CANCELED` |
-| `UNCANCELLATION` | iOS: `AUTO_RENEW_ENABLED` / Android: `SUBSCRIPTION_RESTARTED` |
-| `BILLING_ISSUE` | iOS: `DID_FAIL_TO_RENEW` / Android: `SUBSCRIPTION_IN_GRACE_PERIOD` |
-| `SUBSCRIBER_ALIAS` | 内部のユーザーID統合（ストアイベントなし） |
-| `EXPIRATION` | iOS: `EXPIRED` / Android: `SUBSCRIPTION_EXPIRED` |
-| `PRODUCT_CHANGE` | iOS: `DID_CHANGE_RENEWAL_PREF` / Android: プラン変更通知 |
-| `TRANSFER` | ユーザー間の権利移転（ストアイベントなし） |
-| `REFUND` | iOS: `REFUND` / Android: `SUBSCRIPTION_REVOKED` |
+本プロジェクトでは、これらのストア通知を自前バックエンドで直接受信し、`subscriptions` テーブルの状態へ反映します。各イベントとDBステータスの対応は [システム構成設計](flutter-subscription-system-design.md) の「第6章 WebhookイベントとDBステータスの対応」を参照してください。
