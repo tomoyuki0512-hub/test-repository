@@ -73,6 +73,24 @@
   .tag.active { background: #dcfce7; color: #166534; }
   .tag.canceled { background: #fef3c7; color: #92400e; }
   .tag.expired { background: #fee2e2; color: #991b1b; }
+  .tag.grace { background: #ffedd5; color: #9a3412; }
+  .tag.hold { background: #fee2e2; color: #7f1d1d; }
+  .banner.ok { background: #dcfce7; border-color: #bbf7d0; color: #166534; }
+  .blockscreen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 18px;
+    gap: 6px;
+  }
+  .blockscreen .warnico { font-size: 40px; }
+  .blockscreen h3 { margin: 6px 0 2px; font-size: 16px; }
+  .blockscreen p { font-size: 12.5px; color: var(--sub); margin: 0; }
+  .blockscreen .btn { margin-top: 16px; }
+  .blockscreen .note { font-size: 11px; color: var(--sub); margin-top: 14px; }
 
   /* phone frame */
   .phone {
@@ -236,7 +254,7 @@
 
 <header class="page">
   <h1>解約・再加入 UXモック</h1>
-  <p>Flutter 月額サブスクリプション ／ 解約後・失効後・再開の画面例（状態別）</p>
+  <p>Flutter 月額サブスクリプション ／ 解約・失効・再開・課金失敗（猶予/停止/回復）の画面例（状態別）</p>
   <p>※ 文言は <code>flutter-subscription-ux.md</code> に準拠。金額(¥980/月)・日付(更新日5/1・解約5/10・再開5/15・期限6/1)はサンプル。実装では検証済みの実データを表示すること。</p>
 </header>
 
@@ -245,6 +263,8 @@
   <span><span class="tag active">ACTIVE</span> 有効</span>
   <span><span class="tag canceled">CANCELED</span> 解約済み・期間内（アクセス継続）</span>
   <span><span class="tag expired">EXPIRED</span> 失効後（アクセス停止）</span>
+  <span><span class="tag grace">GRACE_PERIOD</span> 課金失敗・猶予中（アクセス維持）</span>
+  <span><span class="tag hold">BILLING_RETRY / ACCOUNT_HOLD</span> 猶予後・停止</span>
 </div>
 
 <div class="grid">
@@ -390,6 +410,69 @@
       <div class="tabbar"><div>ホーム</div><div>さがす</div><div class="on">アカウント</div></div>
     </div></div>
     <div class="caption"><b>⑥ 再開完了トースト</b><span class="tag active">ACTIVE</span><br>確定後に次回請求日・金額を提示。常設カードも更新（Webhook確定後）。</div>
+  </div>
+
+  <!-- 7. 課金失敗・猶予中バナー -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">ホーム</div>
+      <div class="body">
+        <div class="banner">
+          <div class="txt">
+            <b>お支払いに問題があります</b>
+            6月8日までにお支払い方法を更新してください。それまでは引き続きご利用いただけます。
+          </div>
+        </div>
+        <button class="btn" style="margin-top:10px;">支払い方法を更新</button>
+        <div class="card" style="margin-top:12px;">
+          <h3>今日のおすすめ</h3>
+          <div class="row"><span class="k">コンテンツ A</span><span class="v">›</span></div>
+          <div class="row"><span class="k">コンテンツ B</span><span class="v">›</span></div>
+        </div>
+      </div>
+      <div class="tabbar"><div class="on">ホーム</div><div>さがす</div><div>アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>⑦ 課金失敗・猶予中バナー</b><span class="tag grace">GRACE_PERIOD</span><br>アクセスは止めない。期限＋更新導線を穏やかに。残り日数を提示。</div>
+  </div>
+
+  <!-- 8. アクセス停止・全面ブロック -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="blockscreen">
+        <div class="warnico">⚠️</div>
+        <h3>ご利用が一時停止されています</h3>
+        <p>お支払い方法を更新すると、すぐに再開できます。</p>
+        <button class="btn">支払い方法を更新</button>
+        <button class="btn ghost">プランを解約する</button>
+        <div class="note">お支払いの確認を続けています</div>
+      </div>
+    </div></div>
+    <div class="caption"><b>⑧ アクセス停止・全面ブロック</b><span class="tag hold">BILLING_RETRY / ACCOUNT_HOLD</span><br>起動時に全面表示。更新が主CTA。解約・更新の操作は残す。</div>
+  </div>
+
+  <!-- 9. 回復トースト -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">ホーム</div>
+      <div class="body">
+        <div class="banner ok">
+          <div class="txt">
+            <b>お支払いが完了しました</b>
+            ご利用を再開しました。
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px;">
+          <h3>今日のおすすめ</h3>
+          <div class="row"><span class="k">コンテンツ A</span><span class="v">›</span></div>
+          <div class="row"><span class="k">コンテンツ B</span><span class="v">›</span></div>
+        </div>
+      </div>
+      <div class="tabbar"><div class="on">ホーム</div><div>さがす</div><div>アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>⑨ 回復（支払い成功）トースト</b><span class="tag active">ACTIVE</span><br>即座にアクセス復元＋「再開しました」を提示。</div>
   </div>
 
 </div>
