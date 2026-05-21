@@ -42,6 +42,7 @@ title: ガイド一覧
 - [サブスクリプション要件定義資料](flutter-subscription-guide.md)
 - [iOS / Android イベント・ステータス一覧](flutter-subscription-events.md)
 - [解約・再加入 UX設計ガイド](flutter-subscription-ux.md)
+- [解約・再加入 UXモック（HTML）](flutter-subscription-ux-mockup.html)
 - [システム構成設計](flutter-subscription-system-design.md)
 - [システム構成図（Mermaid / Python Diagrams）](flutter-subscription-architecture-diagram.md)
 

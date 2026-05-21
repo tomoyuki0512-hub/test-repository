@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>解約・再加入 UXモック | Flutterサブスクリプション</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --ink: #1d1f24;
+    --sub: #6b7280;
+    --line: #e5e7eb;
+    --brand: #4f46e5;
+    --brand-ink: #ffffff;
+    --warn-bg: #fff7ed;
+    --warn-line: #fed7aa;
+    --warn-ink: #9a3412;
+    --ok: #16a34a;
+    --lock: #9ca3af;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  header.page {
+    padding: 32px 20px 8px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  header.page h1 { font-size: 22px; margin: 0 0 6px; }
+  header.page p { color: var(--sub); margin: 4px 0; font-size: 14px; }
+  .legend {
+    max-width: 1100px;
+    margin: 8px auto 0;
+    padding: 12px 20px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    font-size: 13px;
+    color: var(--sub);
+  }
+  .legend b { color: var(--ink); }
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8px 20px 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 36px 24px;
+  }
+  .mock { display: flex; flex-direction: column; align-items: center; }
+  .mock .caption {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--sub);
+    max-width: 300px;
+  }
+  .mock .caption b { color: var(--ink); display: block; font-size: 14px; margin-bottom: 2px; }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-bottom: 6px;
+  }
+  .tag.active { background: #dcfce7; color: #166534; }
+  .tag.canceled { background: #fef3c7; color: #92400e; }
+  .tag.expired { background: #fee2e2; color: #991b1b; }
+
+  /* phone frame */
+  .phone {
+    width: 300px;
+    height: 600px;
+    background: #000;
+    border-radius: 40px;
+    padding: 10px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    position: relative;
+  }
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    border-radius: 30px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .statusbar {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--card);
+  }
+  .navbar {
+    padding: 10px 16px;
+    font-size: 16px;
+    font-weight: 700;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+  .body {
+    flex: 1;
+    overflow: hidden;
+    padding: 14px;
+    position: relative;
+  }
+  .tabbar {
+    height: 50px;
+    display: flex;
+    border-top: 1px solid var(--line);
+    background: var(--card);
+  }
+  .tabbar div {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--sub);
+  }
+  .tabbar div.on { color: var(--brand); font-weight: 700; }
+
+  .banner {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-line);
+    color: var(--warn-ink);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .banner .txt { flex: 1; }
+  .banner b { display: block; margin-bottom: 2px; }
+  .mini-btn {
+    background: var(--brand);
+    color: var(--brand-ink);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .card h3 { margin: 0 0 8px; font-size: 14px; }
+  .row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; }
+  .row .k { color: var(--sub); }
+  .row .v { font-weight: 600; }
+  .v.green { color: var(--ok); }
+  .btn {
+    display: block;
+    width: 100%;
+    background: var(--brand);
+    color: var(--brand-ink);
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 6px;
+  }
+  .btn.ghost {
+    background: transparent;
+    color: var(--sub);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 8px;
+  }
+  .feat { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .feat:last-child { border-bottom: none; }
+  .feat .ic { width: 18px; text-align: center; }
+  .feat.locked { color: var(--lock); }
+  .pill { font-size: 10px; background: #eef2ff; color: var(--brand); padding: 1px 7px; border-radius: 999px; margin-left: auto; font-weight: 700; }
+
+  .hero { text-align: center; padding: 8px 6px 4px; }
+  .hero .big { font-size: 18px; font-weight: 800; }
+  .hero .small { font-size: 12px; color: var(--sub); margin-top: 4px; }
+
+  /* bottom sheet */
+  .dim { position: absolute; inset: 0; background: rgba(0,0,0,.4); }
+  .sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: var(--card);
+    border-radius: 18px 18px 0 0;
+    padding: 16px 16px 18px;
+    box-shadow: 0 -8px 24px rgba(0,0,0,.15);
+  }
+  .sheet .handle { width: 36px; height: 4px; background: var(--line); border-radius: 2px; margin: 0 auto 12px; }
+  .sheet h3 { margin: 0 0 8px; font-size: 15px; }
+  .sheet p { font-size: 12.5px; color: var(--ink); margin: 0 0 12px; }
+  .sheet .hl { color: var(--brand); font-weight: 700; }
+  .sheet .note { font-size: 11px; color: var(--sub); margin-top: 8px; }
+
+  .toast {
+    position: absolute;
+    left: 14px; right: 14px; bottom: 64px;
+    background: #1f2937;
+    color: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  }
+  .toast .ic { color: #4ade80; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<header class="page">
+  <h1>解約・再加入 UXモック</h1>
+  <p>Flutter 月額サブスクリプション ／ 解約後・失効後・再開の画面例（状態別）</p>
+  <p>※ 文言は <code>flutter-subscription-ux.md</code> に準拠。金額(¥980/月)・日付(更新日5/1・解約5/10・再開5/15・期限6/1)はサンプル。実装では検証済みの実データを表示すること。</p>
+</header>
+
+<div class="legend">
+  <span><b>状態タグ:</b></span>
+  <span><span class="tag active">ACTIVE</span> 有効</span>
+  <span><span class="tag canceled">CANCELED</span> 解約済み・期間内（アクセス継続）</span>
+  <span><span class="tag expired">EXPIRED</span> 失効後（アクセス停止）</span>
+</div>
+
+<div class="grid">
+
+  <!-- 1. ホーム：期間内バナー -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">ホーム</div>
+      <div class="body">
+        <div class="banner">
+          <div class="txt">
+            <b>解約手続きが完了しました</b>
+            6月1日まで引き続きすべての機能をご利用いただけます。
+          </div>
+          <button class="mini-btn">再開</button>
+        </div>
+        <div class="card" style="margin-top:12px;">
+          <h3>今日のおすすめ</h3>
+          <div class="row"><span class="k">コンテンツ A</span><span class="v">›</span></div>
+          <div class="row"><span class="k">コンテンツ B</span><span class="v">›</span></div>
+          <div class="row"><span class="k">コンテンツ C</span><span class="v">›</span></div>
+        </div>
+      </div>
+      <div class="tabbar"><div class="on">ホーム</div><div>さがす</div><div>アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>① ホーム（期間内バナー）</b><span class="tag canceled">CANCELED</span><br>控えめなバナーで「期限」と「再開」を提示。期間内は機能を止めない。</div>
+  </div>
+
+  <!-- 2. アカウント：状態カードA -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">アカウント</div>
+      <div class="body">
+        <div class="card">
+          <h3>サブスクリプション</h3>
+          <div class="row"><span class="k">状態</span><span class="v" style="color:#92400e;">解約済み（期間内）</span></div>
+          <div class="row"><span class="k">利用できる期限</span><span class="v">2026年6月1日</span></div>
+          <div class="row"><span class="k">次回の請求</span><span class="v green">なし</span></div>
+          <button class="btn">自動更新を再開する</button>
+          <button class="btn ghost">プランの詳細を見る</button>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--sub);">6月1日以降は、保存・ダウンロード・広告非表示などのプレミアム機能が使えなくなります。</div>
+        </div>
+      </div>
+      <div class="tabbar"><div>ホーム</div><div>さがす</div><div class="on">アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>② アカウント状態カード</b><span class="tag canceled">CANCELED</span><br>「期限・次回請求なし・再開」を一覧で。失うものをやわらかく明示。</div>
+  </div>
+
+  <!-- 3. 失効後 再加入画面 -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">プレミアム</div>
+      <div class="body">
+        <div class="hero">
+          <div class="big">プランは終了しました</div>
+          <div class="small">データは保存されています。再開すればすぐ続きから使えます。</div>
+        </div>
+        <div class="card" style="margin-top:8px;">
+          <div class="feat"><span class="ic">✔</span>基本機能<span class="pill">無料</span></div>
+          <div class="feat locked"><span class="ic">🔒</span>保存・ダウンロード<span class="pill">プレミアム</span></div>
+          <div class="feat locked"><span class="ic">🔒</span>広告非表示<span class="pill">プレミアム</span></div>
+          <div class="feat locked"><span class="ic">🔒</span>高度な分析<span class="pill">プレミアム</span></div>
+        </div>
+        <button class="btn">プランを再開する（¥980/月）</button>
+      </div>
+      <div class="tabbar"><div>ホーム</div><div>さがす</div><div class="on">アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>③ 失効後の再加入画面</b><span class="tag expired">EXPIRED</span><br>無料/有料の境界を明示し、再加入CTAを目立たせる。データ保持で安心感。</div>
+  </div>
+
+  <!-- 4. 再開確認シート（期間内） -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">アカウント</div>
+      <div class="body">
+        <div class="card" style="opacity:.5;">
+          <h3>サブスクリプション</h3>
+          <div class="row"><span class="k">状態</span><span class="v">解約済み（期間内）</span></div>
+          <div class="row"><span class="k">利用できる期限</span><span class="v">2026年6月1日</span></div>
+        </div>
+        <div class="dim"></div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <h3>自動更新を再開しますか？</h3>
+          <p>再開しても<span class="hl">今すぐの請求はありません</span>。次回更新日 <span class="hl">2026年6月1日</span> に <span class="hl">¥980/月</span> が請求され、以降は毎月自動更新されます。</p>
+          <button class="btn">再開する</button>
+          <button class="btn ghost">キャンセル</button>
+          <div class="note">いつでも解約できます。解約は次回更新日の前まで有効です。</div>
+        </div>
+      </div>
+      <div class="tabbar"><div>ホーム</div><div>さがす</div><div class="on">アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>④ 再開確認シート（期間内）</b><span class="tag canceled">CANCELED</span><br>「今は課金なし／次回6/1」を最初に。予定として表記（iOS反映ラグ対策）。</div>
+  </div>
+
+  <!-- 5. 再開確認シート（失効後） -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">プレミアム</div>
+      <div class="body">
+        <div class="hero" style="opacity:.5;">
+          <div class="big">プランは終了しました</div>
+        </div>
+        <div class="dim"></div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <h3>プランを再開しますか？</h3>
+          <p><span class="hl">本日 ¥980</span> を請求してプランを開始します。次回の請求は <span class="hl">2026年7月1日</span>（毎月自動更新）です。</p>
+          <button class="btn">¥980で再開する</button>
+          <button class="btn ghost">キャンセル</button>
+          <div class="note">失効後の再開は新規購入として扱われ、当日から新しい請求サイクルになります。</div>
+        </div>
+      </div>
+      <div class="tabbar"><div>ホーム</div><div>さがす</div><div class="on">アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>⑤ 再開確認シート（失効後）</b><span class="tag expired">EXPIRED</span><br>即時課金＋新サイクルを明示。期間内の表記を流用しないこと。</div>
+  </div>
+
+  <!-- 6. 完了トースト -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">アカウント</div>
+      <div class="body">
+        <div class="card">
+          <h3>サブスクリプション</h3>
+          <div class="row"><span class="k">状態</span><span class="v" style="color:var(--ok);">有効（自動更新ON）</span></div>
+          <div class="row"><span class="k">次回の請求</span><span class="v">2026年6月1日</span></div>
+          <div class="row"><span class="k">金額</span><span class="v">¥980 / 月</span></div>
+        </div>
+        <div class="toast">
+          <span class="ic">✔</span>
+          <span>自動更新を再開しました。次回請求は <b>6月1日（¥980/月）</b> です。</span>
+        </div>
+      </div>
+      <div class="tabbar"><div>ホーム</div><div>さがす</div><div class="on">アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>⑥ 再開完了トースト</b><span class="tag active">ACTIVE</span><br>確定後に次回請求日・金額を提示。常設カードも更新（Webhook確定後）。</div>
+  </div>
+
+</div>
+
+</body>
+</html>
