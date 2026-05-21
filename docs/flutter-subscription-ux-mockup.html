@@ -75,6 +75,7 @@
   .tag.expired { background: #fee2e2; color: #991b1b; }
   .tag.grace { background: #ffedd5; color: #9a3412; }
   .tag.hold { background: #fee2e2; color: #7f1d1d; }
+  .tag.revoked { background: #e5e7eb; color: #374151; }
   .banner.ok { background: #dcfce7; border-color: #bbf7d0; color: #166534; }
   .blockscreen {
     flex: 1;
@@ -254,7 +255,7 @@
 
 <header class="page">
   <h1>解約・再加入 UXモック</h1>
-  <p>Flutter 月額サブスクリプション ／ 解約・失効・再開・課金失敗（猶予/停止/回復）の画面例（状態別）</p>
+  <p>Flutter 月額サブスクリプション ／ 解約・失効・再開・課金失敗（猶予/停止/回復）・返金取消の画面例（状態別）</p>
   <p>※ 文言は <code>flutter-subscription-ux.md</code> に準拠。金額(¥980/月)・日付(更新日5/1・解約5/10・再開5/15・期限6/1)はサンプル。実装では検証済みの実データを表示すること。</p>
 </header>
 
@@ -265,6 +266,7 @@
   <span><span class="tag expired">EXPIRED</span> 失効後（アクセス停止）</span>
   <span><span class="tag grace">GRACE_PERIOD</span> 課金失敗・猶予中（アクセス維持）</span>
   <span><span class="tag hold">BILLING_RETRY / ACCOUNT_HOLD</span> 猶予後・停止</span>
+  <span><span class="tag revoked">REVOKED</span> 返金・取り消しによる利用終了</span>
 </div>
 
 <div class="grid">
@@ -473,6 +475,29 @@
       <div class="tabbar"><div class="on">ホーム</div><div>さがす</div><div>アカウント</div></div>
     </div></div>
     <div class="caption"><b>⑨ 回復（支払い成功）トースト</b><span class="tag active">ACTIVE</span><br>即座にアクセス復元＋「再開しました」を提示。</div>
+  </div>
+
+  <!-- 10. 返金・取り消しによる利用終了 -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+      <div class="navbar">プレミアム</div>
+      <div class="body">
+        <div class="hero">
+          <div class="big">ご利用を終了しました</div>
+          <div class="small">返金処理が完了したため、プレミアム機能のご利用を終了しました。</div>
+        </div>
+        <div class="card" style="margin-top:8px;">
+          <div class="feat"><span class="ic">✔</span>基本機能<span class="pill">無料</span></div>
+          <div class="feat locked"><span class="ic">🔒</span>保存・ダウンロード<span class="pill">プレミアム</span></div>
+          <div class="feat locked"><span class="ic">🔒</span>広告非表示<span class="pill">プレミアム</span></div>
+        </div>
+        <button class="btn">プランを再開する（¥980/月）</button>
+        <button class="btn ghost">お困りの場合はサポートへ</button>
+      </div>
+      <div class="tabbar"><div>ホーム</div><div>さがす</div><div class="on">アカウント</div></div>
+    </div></div>
+    <div class="caption"><b>⑩ 返金・取り消しによる利用終了</b><span class="tag revoked">REVOKED</span><br>穏やかに利用終了を伝える。非難しない／サポート導線を置く。</div>
   </div>
 
 </div>

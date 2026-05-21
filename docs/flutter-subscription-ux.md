@@ -204,7 +204,91 @@ title: 解約・再加入 UX設計ガイド
 
 ---
 
-## 11. 画面モック（ワイヤーフレーム）
+## 11. 返金・取り消し時の対応
+
+返金は「**取り消し（revoke）を伴うか**」で対応もステータスも変わる。返金処理自体はストアが行い、開発者はWebhookで検知して権利を更新する。技術詳細は [要件定義資料 第11章](flutter-subscription-guide.md)・[システム構成設計 第6章](flutter-subscription-system-design.md) を参照。
+
+### 11-1. 2パターンと状態
+
+| パターン | 意味 | アクセス | DBステータス |
+|---|---|---|---|
+| **返金＋取り消し（revoke）** | アクセス権を即時剥奪して返金 | **即停止** | **`REVOKED`** |
+| 返金のみ（revokeなし） | 返金するが期間終了までは使える | 期間終了まで継続 | 現状維持 → 期間終了で `EXPIRED` |
+
+### 11-2. 検知するイベント
+
+| OS | イベント | 内容 |
+|---|---|---|
+| iOS | `REFUND` | Appleが返金を承認（`revocationDate` を含む）→ アクセス剥奪 |
+| iOS | `REFUND_REVERSED` | 返金がチャージバック等で取消 → **権利を復帰** |
+| iOS | `REFUND_DECLINED` | 返金が却下（権利はそのまま） |
+| Android | `SUBSCRIPTION_REVOKED` (12) | 取り消し＝アクセス剥奪（API revoke / 返金＋失効） |
+| Android | `VoidedPurchaseNotification` | 返金・チャージバックの確実な検知（`refundType` / `productType` を含む） |
+
+> Android の「返金のみ（revokeなし）」では `SUBSCRIPTION_REVOKED` は届かない。返金検知は **`VoidedPurchaseNotification`** を併用するのが確実。
+
+### 11-3. やること（開発側）
+
+1. **Webhookの真正性検証**（iOS: JWS署名 / Android: Pub/Sub Bearer Token）
+2. **対象ユーザーの特定**（`originalTransactionId` / `purchaseToken`）
+3. **`subscriptions.status = REVOKED` に更新し、アクセスを即停止**
+4. **冪等処理**（同一通知が複数回届く。`notificationUUID` 等で重複スキップ）
+5. **監査ログ保存**（`subscription_events.raw_payload` に原本を保持。会計照合・問い合わせ用）
+6. **復帰対応**（iOS `REFUND_REVERSED` を受けたら、有効期限内なら `ACTIVE` に戻す）
+7. **不正・チャージバック対策**（返金パターンを記録。悪質な繰り返しは再加入制限を検討。ただし正当な返金者を巻き込まない）
+8. 事業側で**売上の戻し計上**とチャージバック率のモニタリング
+
+### 11-4. ステータス遷移
+
+```
+ACTIVE / CANCELED / GRACE_PERIOD …
+        │ 返金＋取り消し（iOS: REFUND / Android: SUBSCRIPTION_REVOKED）
+        ▼
+     REVOKED（アクセス✕・即停止）
+        │ iOS REFUND_REVERSED（返金取消）
+        ▼
+     ACTIVE（有効期限内なら権利復帰）
+```
+
+### 11-5. 処理シーケンス図
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Store as App Store / Google Play
+    participant API as 自前バックエンド(Webhook)
+    participant DB as DB(subscriptions / events)
+    participant App as Flutterアプリ
+
+    Store->>API: 返金通知(iOS REFUND / Android SUBSCRIPTION_REVOKED・VoidedPurchase)
+    API->>API: 署名・真正性を検証
+    API->>DB: subscription_events に原本を記録(冪等チェック)
+    alt 返金＋取り消し(revoke)
+        API->>DB: subscriptions.status = REVOKED
+        App->>API: 起動・画面遷移時に状態取得
+        API-->>App: アクセス停止を返す
+        App->>App: 機能をブロック・返金案内を表示
+    else 返金のみ(revokeなし)
+        API->>DB: 期間終了まで現状維持(期間終了で EXPIRED)
+    end
+    opt iOS REFUND_REVERSED(返金取消)
+        Store->>API: REFUND_REVERSED
+        API->>DB: 有効期限内なら status = ACTIVE に復帰
+    end
+```
+
+### 11-6. ユーザー向け画面の方針
+
+- 失効後（`EXPIRED`）の再加入画面に近いが、**返金が文脈**になる。基本は穏やかに「利用終了」を伝える。
+- 文言は2案（運用方針で選択）:
+  - 標準（正当な返金者向け）: 「返金処理が完了し、プレミアム機能のご利用を終了しました。」
+  - 中立（チャージバック等を区別しない）: 「プレミアム機能のご利用が終了しました。」
+- ⚠️ **強い非難・不正断定の文言は避ける**（誤検知・正当な返金者への配慮）。サポート導線を必ず置く。
+- 再加入を妨げない（`REVOKED` でも再購入は受け付ける）。ただし不正が疑われるケースの扱いは運用ルールで定義。
+
+---
+
+## 12. 画面モック（ワイヤーフレーム）
 
 実画面に近いHTMLモックは **[flutter-subscription-ux-mockup.html](flutter-subscription-ux-mockup.html)**（ブラウザ／GitHub Pagesでプレビュー可）。以下はテキスト版ワイヤーフレーム。金額(¥980/月)・日付(更新日5/1・解約5/10・再開5/15・期限6/1)はサンプルで、実装では検証済みの実データを表示する。
 
@@ -387,6 +471,27 @@ title: 解約・再加入 UX設計ガイド
 │ [ホーム]  さがす   アカウント  │
 └─────────────────────────────┘
 → 即座にアクセス復元＋「再開しました」を提示。
+```
+
+### ⑩ 返金・取り消しによる利用終了  `REVOKED`
+
+```
+┌─────────────────────────────┐
+│  プレミアム                   │
+├─────────────────────────────┤
+│      ご利用を終了しました      │
+│  返金処理が完了したため、      │
+│  プレミアム機能のご利用を      │
+│  終了しました。               │
+│ ┌─────────────────────────┐ │
+│ │ ✔ 基本機能         [無料] │ │
+│ │ 🔒 保存・DL    [プレミアム] │ │
+│ │ 🔒 広告非表示  [プレミアム] │ │
+│ └─────────────────────────┘ │
+│ [   プランを再開する ¥980/月  ]│
+│      お困りの場合はサポートへ   │
+└─────────────────────────────┘
+→ 穏やかに利用終了を伝える。非難しない／サポート導線を置く。
 ```
 
 ---
