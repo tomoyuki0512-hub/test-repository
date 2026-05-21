@@ -139,6 +139,7 @@ title: サブスクリプション資料 総合インデックス（はじめに
 | [事業視点ガイド](flutter-subscription-business.md) | 事業部・企画 | 料金戦略・KPI・手数料の収益影響・トライアル設計・ロードマップ |
 | [要件定義資料](flutter-subscription-guide.md) | 開発・PM | IAPの全要件（パッケージ・支払い・審査・検証・ライフサイクル・解約・返金） |
 | [イベント・ステータス一覧](flutter-subscription-events.md) | 開発・QA | iOS/Androidの全通知イベントと発生タイミング・遷移フロー |
+| [解約・再加入 UX設計ガイド](flutter-subscription-ux.md) | 企画・デザイン・開発 | 解約後／失効後の画面設計・再開導線・課金タイミングの表記 |
 | [システム構成設計](flutter-subscription-system-design.md) | バックエンド開発 | DB設計・API設計・Webhook処理・セキュリティ |
 | [システム構成図](flutter-subscription-architecture-diagram.md) | 開発・インフラ | 構成図（Mermaid / Python Diagrams）と作図手順 |
 
