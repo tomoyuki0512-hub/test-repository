@@ -34,6 +34,7 @@ title: ガイド一覧
 ## ネットワーク・通信のしくみ
 
 - [光ファイバー ゼロからわかる完全ガイド](optical-fiber-guide.md)
+- [光ファイバー ケーブル・コードと接続部材ガイド](optical-fiber-cable-types.md)
 
 ## システム設計・運用
 
