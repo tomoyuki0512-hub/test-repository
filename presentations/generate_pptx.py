@@ -4,6 +4,8 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
+from pptx.oxml.ns import qn
 
 JP_FONT = "Meiryo"
 NAVY = RGBColor(0x1F, 0x3A, 0x5F)
@@ -123,6 +125,99 @@ def add_table(slide, headers, rows, top=1.45, left=0.6, width=12.1, height=4.8,
     return tbl
 
 
+def _label(slide, text, left, top, width, height, size, color,
+           align=PP_ALIGN.LEFT, bold=True):
+    tb = slide.shapes.add_textbox(Inches(left), Inches(top), Inches(width), Inches(height))
+    tf = tb.text_frame
+    tf.word_wrap = True
+    tf.margin_top = 0
+    tf.margin_bottom = 0
+    p = tf.paragraphs[0]
+    p.alignment = align
+    r = p.add_run()
+    r.text = text
+    set_font(r, size, bold, color)
+    return tb
+
+
+def _no_shadow(shape):
+    shape.shadow.inherit = False
+
+
+def _arrow_tail(connector):
+    ln = connector.line._get_or_add_ln()
+    ln.append(ln.makeelement(qn('a:tailEnd'),
+                             {'type': 'triangle', 'w': 'med', 'len': 'med'}))
+
+
+def draw_tir_diagram(slide, left, top, width, height):
+    """全反射の模式図：横から見たファイバー内を光がジグザグに反射して進む。"""
+    clad = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,
+                                  Inches(left), Inches(top), Inches(width), Inches(height))
+    clad.fill.solid(); clad.fill.fore_color.rgb = RGBColor(0xCF, 0xE0, 0xF2)
+    clad.line.color.rgb = NAVY; clad.line.width = Pt(1.25); _no_shadow(clad)
+
+    core_h = height * 0.46
+    core_top = top + (height - core_h) / 2
+    core = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+                                  Inches(left), Inches(core_top), Inches(width), Inches(core_h))
+    core.fill.solid(); core.fill.fore_color.rgb = RGBColor(0xFF, 0xF3, 0xC4)
+    core.line.color.rgb = RGBColor(0xD8, 0xB8, 0x40); core.line.width = Pt(0.75)
+    _no_shadow(core)
+
+    y_hi, y_lo = core_top, core_top + core_h
+    y_mid = core_top + core_h / 2
+    n = 4
+    xs = [left + width * i / n for i in range(n + 1)]
+    pts = [(left, y_mid)]
+    for i in range(1, n):
+        pts.append((xs[i], y_hi if i % 2 == 1 else y_lo))
+    pts.append((left + width, y_mid))
+    for i in range(len(pts) - 1):
+        x1, y1 = pts[i]; x2, y2 = pts[i + 1]
+        c = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT,
+                                       Inches(x1), Inches(y1), Inches(x2), Inches(y2))
+        c.line.color.rgb = RGBColor(0xD1, 0x2E, 0x2E); c.line.width = Pt(2.5)
+        if i == len(pts) - 2:
+            _arrow_tail(c)
+    for i in range(1, n):
+        mx = xs[i]; my = y_hi if i % 2 == 1 else y_lo
+        d = 0.09
+        dot = slide.shapes.add_shape(MSO_SHAPE.OVAL,
+                                     Inches(mx - d / 2), Inches(my - d / 2), Inches(d), Inches(d))
+        dot.fill.solid(); dot.fill.fore_color.rgb = RGBColor(0xD1, 0x2E, 0x2E)
+        dot.line.fill.background(); _no_shadow(dot)
+    _label(slide, "クラッド（跳ね返す壁）", left + 0.12, top + 0.03, width - 0.24, 0.3,
+           11, NAVY, PP_ALIGN.LEFT)
+    _label(slide, "コア（光の通り道）", left + 0.12, y_lo + 0.02, width - 0.24, 0.3,
+           11, RGBColor(0xB8, 0x90, 0x10), PP_ALIGN.CENTER)
+
+
+def draw_cross_section(slide, cx, cy, outer_d):
+    """断面図：被覆・クラッド・コアの同心円（cx, cy, outer_d はインチ）。"""
+    layers = [
+        (outer_d, RGBColor(0xDD, 0xE3, 0xEA), NAVY),
+        (outer_d * 0.72, RGBColor(0xBF, 0xD6, 0xEE), BLUE),
+        (outer_d * 0.34, RGBColor(0xFF, 0xEC, 0x99), RGBColor(0xD8, 0xB8, 0x40)),
+    ]
+    for d, fill, line in layers:
+        o = slide.shapes.add_shape(MSO_SHAPE.OVAL,
+                                   Inches(cx - d / 2), Inches(cy - d / 2), Inches(d), Inches(d))
+        o.fill.solid(); o.fill.fore_color.rgb = fill
+        o.line.color.rgb = line; o.line.width = Pt(1.25); _no_shadow(o)
+
+
+def _legend(slide, left, top, items, sw=0.24, gap=0.46, size=12):
+    for i, (color, text) in enumerate(items):
+        y = top + i * gap
+        sq = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+                                    Inches(left), Inches(y), Inches(sw), Inches(sw))
+        sq.fill.solid(); sq.fill.fore_color.rgb = color
+        sq.line.color.rgb = NAVY; sq.line.width = Pt(0.5); _no_shadow(sq)
+        _label(slide, text, left + sw + 0.12, y - 0.02, 4.2, 0.3, size, GRAY,
+               PP_ALIGN.LEFT, bold=False)
+
+
 # ---------- 1. Title ----------
 title_slide(
     "光ファイバー 完全ガイド",
@@ -177,23 +272,32 @@ add_bullets(s, [
     ("光は密度の違う物質の境目で曲がる/跳ね返る", 0),
     ("ある角度より浅いと100%跳ね返る ＝ 全反射", 0),
     ("たとえ：プールの底から水面を見ると底が鏡のように映る", 1),
-    ("ファイバーは「光が通る中心」を「跳ね返す外側」で包む", 0),
-    ("光はジグザグに反射しながら進み、曲げても漏れにくい", 0),
-], top=1.6, size=20)
+    ("中心(コア)を外側(クラッド)で包む構造", 0),
+    ("ジグザグに反射しながら進み曲げても漏れにくい", 0),
+], top=1.55, left=0.6, width=6.1, size=18)
+draw_tir_diagram(s, left=7.0, top=2.3, width=5.7, height=2.3)
+_label(s, "▲ 光が全反射しながら進むようす", 7.0, 4.9, 5.7, 0.4, 13, NAVY, PP_ALIGN.CENTER)
 
 # 構造
 s = content_slide("3層構造（輪切りにすると）")
 add_table(s,
     ["部分", "役割", "たとえ"],
     [
-        ["コア（芯）", "光が通る道（屈折率 高）", "ストロー内の水の通り道"],
-        ["クラッド", "光を逃がさず跳ね返す（屈折率 低）", "通り道を囲む鏡の壁"],
-        ["被覆/ジャケット", "傷・水・曲げから守る", "ケーブルの服・よろい"],
+        ["コア（芯）", "光が通る道（屈折率 高）", "水の通り道"],
+        ["クラッド", "跳ね返す（屈折率 低）", "鏡の壁"],
+        ["被覆", "傷・水・曲げから守る", "服・よろい"],
     ],
-    col_widths=[3.0, 5.1, 4.0], fsize=16, height=3.0)
+    top=1.55, left=0.5, width=7.2, col_widths=[1.7, 3.3, 2.2], fsize=14, height=3.0)
 add_bullets(s, [
     ("ポイント：コア＞クラッドの屈折率差が全反射を生む", 0),
-], top=5.1, size=18)
+], top=4.95, left=0.5, width=7.2, size=16)
+_label(s, "断面図（輪切り）", 8.0, 1.5, 4.6, 0.4, 15, NAVY, PP_ALIGN.CENTER)
+draw_cross_section(s, cx=10.3, cy=3.35, outer_d=2.6)
+_legend(s, 8.55, 5.0, [
+    (RGBColor(0xFF, 0xEC, 0x99), "コア（光が通る芯）"),
+    (RGBColor(0xBF, 0xD6, 0xEE), "クラッド（跳ね返す層）"),
+    (RGBColor(0xDD, 0xE3, 0xEA), "被覆（保護の服）"),
+])
 
 # 種類
 s = content_slide("種類：シングルモード vs マルチモード")
