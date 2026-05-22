@@ -31,6 +31,10 @@ title: ガイド一覧
 - [Claude Codeアプリ開発 応用編（Docker・CI/CD・スタック選定）](claude-code-dev-guide-advanced.md)
 - [Claude Codeで結果をすぐにプレビューする方法](preview-guide.md)
 
+## ネットワーク・通信のしくみ
+
+- [光ファイバー ゼロからわかる完全ガイド](optical-fiber-guide.md)
+
 ## システム設計・運用
 
 - [低トラフィックサイト向けシステム構成ガイド](ando-piano-system-design.md)
