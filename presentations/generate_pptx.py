@@ -219,106 +219,6 @@ def _legend(slide, left, top, items, sw=0.24, gap=0.46, size=12):
                PP_ALIGN.LEFT, bold=False)
 
 
-def draw_connector_icon(slide, cx, top, name, shape, feature):
-    """コネクタの簡易アイコン（カード＋形＋名称＋特徴）。"""
-    cw, ch = 2.55, 2.0
-    left = cx - cw / 2
-    card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,
-                                  Inches(left), Inches(top), Inches(cw), Inches(ch))
-    card.fill.solid(); card.fill.fore_color.rgb = LIGHT
-    card.line.color.rgb = BLUE; card.line.width = Pt(1.0); _no_shadow(card)
-    _label(slide, name, left, top + 0.08, cw, 0.4, 18, NAVY, PP_ALIGN.CENTER)
-    sx = cx; sy = top + 0.98
-    if shape == "square":
-        sz = 0.7
-        b = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
-                                   Inches(sx - sz / 2), Inches(sy - sz / 2), Inches(sz), Inches(sz))
-    elif shape == "small_square":
-        sz = 0.48
-        b = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
-                                   Inches(sx - sz / 2), Inches(sy - sz / 2), Inches(sz), Inches(sz))
-    elif shape == "circle":
-        sz = 0.7
-        b = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                   Inches(sx - sz / 2), Inches(sy - sz / 2), Inches(sz), Inches(sz))
-    else:  # hexagon
-        sz = 0.8
-        b = slide.shapes.add_shape(MSO_SHAPE.HEXAGON,
-                                   Inches(sx - sz / 2), Inches(sy - sz * 0.45), Inches(sz), Inches(sz * 0.9))
-    b.fill.solid(); b.fill.fore_color.rgb = NAVY; b.line.color.rgb = NAVY; _no_shadow(b)
-    fd = 0.16
-    fr = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                Inches(sx - fd / 2), Inches(sy - fd / 2), Inches(fd), Inches(fd))
-    fr.fill.solid(); fr.fill.fore_color.rgb = WHITE; fr.line.fill.background(); _no_shadow(fr)
-    _label(slide, feature, left + 0.1, top + ch - 0.42, cw - 0.2, 0.35, 12, GRAY,
-           PP_ALIGN.CENTER, bold=False)
-
-
-def draw_cord_section(slide, cx, cy, d):
-    """コードの断面：外被→アラミド繊維→1心。"""
-    jacket = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                    Inches(cx - d / 2), Inches(cy - d / 2), Inches(d), Inches(d))
-    jacket.fill.solid(); jacket.fill.fore_color.rgb = RGBColor(0x35, 0x6A, 0xA8)
-    jacket.line.color.rgb = NAVY; jacket.line.width = Pt(1.0); _no_shadow(jacket)
-    d2 = d * 0.72
-    aram = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                  Inches(cx - d2 / 2), Inches(cy - d2 / 2), Inches(d2), Inches(d2))
-    aram.fill.solid(); aram.fill.fore_color.rgb = RGBColor(0xF2, 0xE2, 0xA8)
-    aram.line.fill.background(); _no_shadow(aram)
-    d3 = d * 0.28
-    fib = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                 Inches(cx - d3 / 2), Inches(cy - d3 / 2), Inches(d3), Inches(d3))
-    fib.fill.solid(); fib.fill.fore_color.rgb = RGBColor(0xFF, 0xD2, 0x3C)
-    fib.line.color.rgb = RGBColor(0xD8, 0xB8, 0x40); _no_shadow(fib)
-
-
-def draw_cable_section(slide, cx, cy, d):
-    """ケーブルの断面：厚い外被→テンションメンバ→複数心。"""
-    jacket = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                    Inches(cx - d / 2), Inches(cy - d / 2), Inches(d), Inches(d))
-    jacket.fill.solid(); jacket.fill.fore_color.rgb = RGBColor(0x22, 0x33, 0x44)
-    jacket.line.color.rgb = NAVY; jacket.line.width = Pt(1.0); _no_shadow(jacket)
-    d_in = d * 0.80
-    inner = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                   Inches(cx - d_in / 2), Inches(cy - d_in / 2), Inches(d_in), Inches(d_in))
-    inner.fill.solid(); inner.fill.fore_color.rgb = RGBColor(0xCF, 0xE0, 0xF2)
-    inner.line.fill.background(); _no_shadow(inner)
-    dt = d * 0.22
-    tm = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                Inches(cx - dt / 2), Inches(cy - dt / 2), Inches(dt), Inches(dt))
-    tm.fill.solid(); tm.fill.fore_color.rgb = RGBColor(0x88, 0x8F, 0x99)
-    tm.line.fill.background(); _no_shadow(tm)
-    r = d * 0.27
-    fd = d * 0.14
-    for k in range(6):
-        ang = math.radians(60 * k - 90)
-        fx = cx + r * math.cos(ang)
-        fy = cy + r * math.sin(ang)
-        f = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                   Inches(fx - fd / 2), Inches(fy - fd / 2), Inches(fd), Inches(fd))
-        f.fill.solid(); f.fill.fore_color.rgb = RGBColor(0xFF, 0xD2, 0x3C)
-        f.line.color.rgb = RGBColor(0xD8, 0xB8, 0x40); f.line.width = Pt(0.5); _no_shadow(f)
-
-
-def draw_box(slide, cx, cy, w, h, text, fill=NAVY, tcolor=WHITE, size=12):
-    b = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,
-                               Inches(cx - w / 2), Inches(cy - h / 2), Inches(w), Inches(h))
-    b.fill.solid(); b.fill.fore_color.rgb = fill
-    b.line.color.rgb = NAVY; b.line.width = Pt(1.0); _no_shadow(b)
-    tf = b.text_frame; tf.word_wrap = True; tf.vertical_anchor = MSO_ANCHOR.MIDDLE
-    p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
-    r = p.add_run(); r.text = text; set_font(r, size, True, tcolor)
-    return b
-
-
-def draw_hline(slide, x1, x2, y, weight, color):
-    c = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT,
-                                   Inches(x1), Inches(y), Inches(x2), Inches(y))
-    c.line.color.rgb = color; c.line.width = Pt(weight)
-    _arrow_tail(c)
-    return c
-
-
 # ---------- 1. Title ----------
 title_slide(
     "光ファイバー 完全ガイド",
@@ -337,8 +237,8 @@ add_bullets(s, [
     ("第2部　ケーブル・コードと接続部材", 0),
     ("テープスロット型 vs 層より型ケーブル", 1),
     ("単心／メガネ／FOコードの違い", 1),
-    ("ケーブルとコードの違い（図解あり）", 1),
-    ("成端箱とクロージャ／コネクタと規格（図解あり）", 1),
+    ("ケーブルとコードの違い", 1),
+    ("成端箱とクロージャ／コネクタと規格", 1),
     ("付録：用語集", 0),
 ], top=1.35, size=18)
 
@@ -489,30 +389,6 @@ add_table(s,
     ],
     col_widths=[2.4, 4.85, 4.85], fsize=15)
 
-# ケーブルとコード 図解
-s = content_slide("ケーブルとコード（イメージ図）")
-_label(s, "コード（細い・屋内・機器寄り）", 0.6, 1.3, 5.8, 0.4, 17, NAVY, PP_ALIGN.CENTER)
-draw_cord_section(s, cx=3.4, cy=3.0, d=2.0)
-_legend(s, 1.3, 4.55, [
-    (RGBColor(0xFF, 0xD2, 0x3C), "光ファイバ心線（1心）"),
-    (RGBColor(0xF2, 0xE2, 0xA8), "アラミド繊維（抗張力）"),
-    (RGBColor(0x35, 0x6A, 0xA8), "外被（柔らかい）"),
-], size=12)
-_label(s, "ケーブル（太い・屋外・多心）", 6.9, 1.3, 5.9, 0.4, 17, NAVY, PP_ALIGN.CENTER)
-draw_cable_section(s, cx=9.8, cy=3.05, d=2.6)
-_legend(s, 7.5, 4.55, [
-    (RGBColor(0xFF, 0xD2, 0x3C), "光ファイバ心線（多心）"),
-    (RGBColor(0x88, 0x8F, 0x99), "テンションメンバ（鋼線/FRP）"),
-    (RGBColor(0x22, 0x33, 0x44), "厚い外被（防水・耐候）"),
-], size=12)
-draw_box(s, 1.9, 6.7, 1.9, 0.62, "機器")
-draw_hline(s, 2.85, 4.3, 6.7, 1.5, BLUE)
-_label(s, "コード(細)", 2.85, 6.3, 1.45, 0.3, 11, BLUE, PP_ALIGN.CENTER, bold=False)
-draw_box(s, 5.3, 6.7, 2.0, 0.62, "成端箱")
-draw_hline(s, 6.3, 9.1, 6.7, 4.5, NAVY)
-_label(s, "ケーブル(太)", 6.3, 6.3, 2.8, 0.3, 11, NAVY, PP_ALIGN.CENTER, bold=False)
-draw_box(s, 10.4, 6.7, 2.6, 0.62, "屋外・電柱・地中")
-
 # 成端箱とクロージャ
 s = content_slide("成端箱とクロージャの違い")
 add_table(s,
@@ -536,12 +412,7 @@ add_table(s,
         ["ST", "丸型・ひねって固定（バヨネット）", "古めの設備・LAN"],
         ["FC", "丸型・ねじで締めて固定", "計測器・産業用"],
     ],
-    top=1.4, left=0.6, width=12.1, col_widths=[1.8, 6.1, 4.2], fsize=15, height=2.5)
-iy = 4.6
-draw_connector_icon(s, 2.3, iy, "SC", "square", "角型・押す")
-draw_connector_icon(s, 5.3, iy, "LC", "small_square", "小型・ツメ")
-draw_connector_icon(s, 8.3, iy, "ST", "circle", "丸型・ひねる")
-draw_connector_icon(s, 11.3, iy, "FC", "hexagon", "丸型・ねじ")
+    top=1.9, left=0.9, width=11.5, col_widths=[1.9, 5.7, 3.9], fsize=17, height=3.8)
 
 # まとめ
 s = content_slide("まとめ")
