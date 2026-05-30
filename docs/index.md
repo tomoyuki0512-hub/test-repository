@@ -31,6 +31,16 @@ title: ガイド一覧
 - [Claude Codeアプリ開発 応用編（Docker・CI/CD・スタック選定）](claude-code-dev-guide-advanced.md)
 - [Claude Codeで結果をすぐにプレビューする方法](preview-guide.md)
 
+## Claude / AIモデル
+
+- [Claude Opus 4.8 新機能まとめ](opus-4-8/README.md) ← 新機能と使い方の例
+  - [概要・ベンチマーク・価格](opus-4-8/01-overview.md)
+  - [Effort（労力）制御](opus-4-8/02-effort-control.md)
+  - [Fast mode（高速モード）](opus-4-8/03-fast-mode.md)
+  - [会話途中のシステムメッセージ](opus-4-8/04-mid-conversation-system-messages.md)
+  - [プロンプトキャッシュ・その他](opus-4-8/05-prompt-caching-and-misc.md)
+  - [Dynamic Workflows（Claude Code）](opus-4-8/06-dynamic-workflows.md)
+
 ## ネットワーク・通信のしくみ
 
 - [光ファイバー ゼロからわかる完全ガイド](optical-fiber-guide.md)
@@ -52,6 +62,10 @@ title: ガイド一覧
 - [解約・再加入 UXモック（HTML）](flutter-subscription-ux-mockup.html)
 - [システム構成設計](flutter-subscription-system-design.md)
 - [システム構成図（Mermaid / Python Diagrams）](flutter-subscription-architecture-diagram.md)
+
+## デザイン・画像
+
+- [画像フォーマットの特徴とWeb・アプリでの使用用途](../image-formats-guide.md)
 
 ## 学習ツール
 
