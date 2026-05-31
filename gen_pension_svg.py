@@ -187,6 +187,47 @@ def assetchart(P60, cash65, cash75, D):
     s.append('</svg>')
     return "\n".join(s),bal,cumW,econ
 
+# ---- 汎用 複数線チャート(資産/累計) ----
+def acc(P, start, age, r):
+    """年金Pをstart歳から年利rで運用(取崩なし・末入金)。age時点の残高"""
+    n=age-start
+    return P*(((1+r)**n-1)/r) if n>0 else 0.0
+
+def multiline(title, series, vMax, ytick=20_000_000, subtitle=None):
+    """series: [(label,color,dash(bool),func(age)->value)]"""
+    W,Hh=760,440
+    xL,xR,yB,yT=82,665,392,(70 if subtitle else 52)
+    aMin,aMax=60,95
+    def px(a): return round(xL+(a-aMin)/(aMax-aMin)*(xR-xL),1)
+    def py(v): return round(yB-(min(v,vMax)/vMax)*(yB-yT),1)
+    s=[f'<svg viewBox="0 0 {W} {Hh}" width="100%" style="max-width:760px;font-family:sans-serif">']
+    s.append(f'<rect x="0" y="0" width="{W}" height="{Hh}" fill="#ffffff"/>')
+    s.append(f'<text x="20" y="26" font-size="15" font-weight="bold" fill="#333">{title}</text>')
+    if subtitle:
+        s.append(f'<text x="20" y="44" font-size="11.5" fill="#777">{subtitle}</text>')
+    for v in range(0,vMax+1,ytick):
+        y=py(v)
+        s.append(f'<line x1="{xL}" y1="{y}" x2="{xR}" y2="{y}" stroke="{C_GRID}" stroke-width="1"/>')
+        s.append(f'<text x="{xL-6}" y="{y+4}" font-size="10" fill="{C_AX}" text-anchor="end">{v//10000:,}万</text>')
+    for a in range(60,96,5):
+        x=px(a)
+        s.append(f'<text x="{x}" y="{yB+16}" font-size="11" fill="{C_AX}" text-anchor="middle">{a}歳</text>')
+    s.append(f'<line x1="{xL}" y1="{yB}" x2="{xR}" y2="{yB}" stroke="{C_AX}" stroke-width="1.5"/>')
+    ylab=[]
+    for lab,col,dash,fn in series:
+        da=' stroke-dasharray="5 3"' if dash else ''
+        pts=" ".join(f"{px(a)},{py(fn(a))}" for a in range(60,96))
+        s.append(f'<polyline points="{pts}" fill="none" stroke="{col}" stroke-width="2.4"{da}/>')
+        ylab.append((py(fn(95)),lab,col))
+    # 終端ラベル(重なり回避で軽くずらす)
+    ylab.sort()
+    last=-100
+    for y,lab,col in ylab:
+        yy=max(y, last+12); last=yy
+        s.append(f'<text x="{xR+4}" y="{yy+3}" font-size="10" font-weight="bold" fill="{col}">{lab}</text>')
+    s.append('</svg>')
+    return "\n".join(s)
+
 # ===== 各パターン定義 =====
 A=(60,amt(H,60),60,amt(K,60))
 B=(65,H,65,K)
@@ -390,12 +431,86 @@ md.append("> ⚠️ **公平のための注意**：これは「60歳パターン
 md.append("")
 md.append("---")
 md.append("")
+# ===== ⑦ 公平比較：全パターンを同率5%運用 =====
+C70tot=C70[1]+C70[3]
+ser7=[
+ ("①繰上60", C_KOSEI, False, lambda a: acc(P60,60,a,0.05)),
+ ("②65歳",   "#6b8e23", False, lambda a: acc(cash65,65,a,0.05)),
+ ("③繰下70", "#b5894a", False, lambda a: acc(C70tot,70,a,0.05)),
+ ("③繰下75", "#8a5a2b", False, lambda a: acc(cash75,75,a,0.05)),
+ ("⑤推奨",   "#d6663b", False, lambda a: acc(1578528,65,a,0.05)+acc(1181014,70,a,0.05)),
+]
+md.append("## ⚖️ ⑦ 公平比較：全パターンを同じ年利5%で運用したら？")
+md.append("")
+md.append("⑥は「60歳だけ運用」でしたが、ここでは**どのパターンも受け取った年金を全額・年利5%で運用**（取り崩しなし）した"
+          "**純資産**で比較します。早くもらうほど運用期間が長く、複利が効きます。")
+md.append("")
+md.append(multiline("全パターンを年利5%で運用した純資産", ser7, 180_000_000,
+                    subtitle="各パターンの年金を全額・年利5%で積立運用(取り崩しなし)した場合の残高"))
+md.append("")
+md.append("| 年齢 | ①繰上60 | ②65歳 | ③繰下70 | ③繰下75 | ⑤推奨 |")
+md.append("| --- | --- | --- | --- | --- | --- |")
+for age in [80,85,90,95]:
+    row=[acc(P60,60,age,0.05),acc(cash65,65,age,0.05),acc(C70tot,70,age,0.05),
+         acc(cash75,75,age,0.05),acc(1578528,65,age,0.05)+acc(1181014,70,age,0.05)]
+    md.append(f"| {age}歳 | "+" | ".join(f"{v/10000:,.0f}万" for v in row)+" |")
+md.append("")
+md.append("> 👀 **結論：全員が同率で運用すると、むしろ①繰上げ60歳が長く優位**（90歳時点でも最大級）。"
+          "**運用前提では「早くもらう」ほど有利**になりやすく、繰下げの“増額”メリットは運用益に追いつかれます。"
+          "ただし繰下げの本質的価値は**「死ぬまで増えた年金が保証される」長生き・インフレ保険**であり、"
+          "運用は**元本割れリスク**を負う点が決定的に違います。")
+md.append("")
+md.append("---")
+md.append("")
+# ===== ⑧ 感応度：年利3/4/5%でどこまで戦えるか =====
+# 繰上げ60を3/4/5%運用(純資産) vs 繰下げ75・65の現金(無運用)
+ser8=[
+ ("繰上60@5%", "#c0392b", False, lambda a: acc(P60,60,a,0.05)),
+ ("繰上60@4%", "#e67e22", False, lambda a: acc(P60,60,a,0.04)),
+ ("繰上60@3%", "#f0b27a", False, lambda a: acc(P60,60,a,0.03)),
+ ("③繰下75(現金)", "#8a5a2b", True, lambda a: cash75*max(0,a-75)),
+ ("②65歳(現金)",   "#6b8e23", True, lambda a: cash65*max(0,a-65)),
+]
+# 繰上60純資産(90歳)=繰下75現金(90歳)となる利回りを数値探索
+target=cash75*15
+lo,hi=0.0,0.10
+for _ in range(60):
+    mid=(lo+hi)/2
+    if acc(P60,60,90,mid)<target: lo=mid
+    else: hi=mid
+thr=(lo+hi)/2
+md.append("## 📈 ⑧ 感応度分析：年利が何%なら運用が勝てる？")
+md.append("")
+md.append("「繰上げ60歳を運用」した**純資産**を、年利**3%/4%/5%**で比べ、繰下げ・本来受給を"
+          "**運用せず現金で受け取った**場合（点線）と対比します。")
+md.append("")
+md.append(multiline("繰上げ60の運用(3/4/5%) vs 繰下げ・本来の現金受給", ser8, 180_000_000,
+                    subtitle="実線=繰上げ60を各利回りで運用した純資産 / 点線=無運用の累計受給(現金)"))
+md.append("")
+md.append("| 年齢 | 繰上60@3% | 繰上60@4% | 繰上60@5% | ③繰下75(現金) | ②65歳(現金) |")
+md.append("| --- | --- | --- | --- | --- | --- |")
+for age in [80,85,90,95]:
+    row=[acc(P60,60,age,0.03),acc(P60,60,age,0.04),acc(P60,60,age,0.05),
+         cash75*max(0,age-75),cash65*max(0,age-65)]
+    md.append(f"| {age}歳 | "+" | ".join(f"{v/10000:,.0f}万" for v in row)+" |")
+md.append("")
+md.append(f"> 👀 **しきい値**：繰上げ60を運用した純資産が、90歳時点で③繰下げ75歳の現金累計に並ぶ利回りは**わずか約{thr*100:.1f}%**。"
+          "つまり**年1〜2%でも運用できれば、現金で受け取る繰下げの“受給総額”は上回ります**（複利と早期受給の効果）。")
+md.append("")
+md.append("> ⚠️ ただし上記は**現金（無運用）の繰下げ**との比較です。繰下げの真価は受給額そのものではなく、"
+          "**生涯保証・長生き保険・遺族年金の土台**にあります。「期待リターンの運用」か「確実性の繰下げ」かは、"
+          "**運用リスクを取れるか／長生きにどう備えるか**で選ぶのが本筋です。")
+md.append("")
+md.append("---")
+md.append("")
 md.append("## まとめ")
 md.append("")
 md.append("1. **厚生年金と基礎年金は別々に**繰上げ・繰下げできる（④⑤の併用が可能）。")
 md.append("2. **繰下げ＝一生増額**だが、待機中は無年金＆**加給年金が止まる**、そして**遺族年金は増えない**。")
 md.append("3. **基礎年金の繰下げは遺族厚生と全額併給**でき、残された配偶者にも効く（⑤推奨の核心）。")
 md.append("4. 財力に余裕がなければ②（65歳）で十分。遺族年金額は繰下げの有無で変わりません。")
+md.append("5. **運用前提（⑥⑦⑧）では「早くもらって投資」が受給総額で有利**になりやすい。"
+          "ただし繰下げは**元本割れのない生涯保証・長生き保険**——“期待値の運用”か“確実性の繰下げ”かはリスク許容度で選ぶ。")
 md.append("")
 md.append("> 本ガイドはモデル前提を置いた概算です。実額は加入記録・年齢差・加給年金・在職老齢年金等で変わります。正確な試算は年金事務所・ねんきんネットでご確認ください。")
 md.append("")
