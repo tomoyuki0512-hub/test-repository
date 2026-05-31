@@ -63,6 +63,12 @@ title: ガイド一覧
 - [システム構成設計](flutter-subscription-system-design.md)
 - [システム構成図（Mermaid / Python Diagrams）](flutter-subscription-architecture-diagram.md)
 
+## 年金・社会保障
+
+- [遺族年金・遺族厚生年金 完全ガイド](survivors-pension-guide.md) ← 受給条件と男性・女性・子のパターン別金額例
+- [障害年金 完全ガイド](disability-pension-guide.md) ← 受給条件・等級・パターン別金額例
+- [国からもらえる保障 まとめ](government-support-guide.md) ← 医療・仕事・子育て・障害・生活の社会保障早見
+
 ## デザイン・画像
 
 - [画像フォーマットの特徴とWeb・アプリでの使用用途](../image-formats-guide.md)
