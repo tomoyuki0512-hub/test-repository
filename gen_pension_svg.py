@@ -133,6 +133,60 @@ def linechart(series, marks):
     s.append('</svg>')
     return "\n".join(s)
 
+# ---- 繰上げ60＋運用 シナリオの資産推移チャート ----
+def invest_series(P60, D, r=0.05):
+    """ages 60..95 の 運用残高 / 取崩累計 / 経済価値 を返す"""
+    bal={60:0.0}; cumW={60:0.0}
+    b=0.0; cw=0.0
+    for age in range(60,95):
+        if age<65:                 # 60->65: 全額運用・取崩なし
+            b=b*(1+r)+P60
+        else:                      # 65以降: 年金を運用継続＋少し取崩
+            b=b*(1+r)+P60-D; cw+=D
+        bal[age+1]=b; cumW[age+1]=cw
+    econ={a:bal[a]+cumW[a] for a in range(60,96)}
+    return bal,cumW,econ
+
+def assetchart(P60, cash65, cash75, D):
+    bal,cumW,econ=invest_series(P60,D)
+    W,Hh=760,460
+    xL,xR,yB,yT=78,705,400,55
+    aMin,aMax=60,95; vMax=150_000_000
+    def px(a): return round(xL+(a-aMin)/(aMax-aMin)*(xR-xL),1)
+    def py(v): return round(yB-(min(v,vMax)/vMax)*(yB-yT),1)
+    s=[f'<svg viewBox="0 0 {W} {Hh}" width="100%" style="max-width:760px;font-family:sans-serif">']
+    s.append(f'<rect x="0" y="0" width="{W}" height="{Hh}" fill="#ffffff"/>')
+    s.append(f'<text x="20" y="26" font-size="15" font-weight="bold" fill="#333">繰上げ60＋年利5%運用：資産の推移</text>')
+    # 5年間 全額運用フェーズ 帯
+    s.append(f'<rect x="{px(60)}" y="{yT}" width="{px(65)-px(60)}" height="{yB-yT}" fill="#eef4fb"/>')
+    s.append(f'<text x="{(px(60)+px(65))/2}" y="{yT+14}" font-size="9.5" fill="#5a7fb0" text-anchor="middle">5年間 全額運用</text>')
+    s.append(f'<text x="{(px(60)+px(65))/2}" y="{yT+26}" font-size="9.5" fill="#5a7fb0" text-anchor="middle">(取崩なし)</text>')
+    # Y軸グリッド(2000万刻み)
+    for v in range(0,150000001,20000000):
+        y=py(v)
+        s.append(f'<line x1="{xL}" y1="{y}" x2="{xR}" y2="{y}" stroke="{C_GRID}" stroke-width="1"/>')
+        s.append(f'<text x="{xL-6}" y="{y+4}" font-size="10" fill="{C_AX}" text-anchor="end">{v//10000:,}万</text>')
+    for a in range(60,96,5):
+        x=px(a)
+        s.append(f'<text x="{x}" y="{yB+16}" font-size="11" fill="{C_AX}" text-anchor="middle">{a}歳</text>')
+    s.append(f'<line x1="{xL}" y1="{yB}" x2="{xR}" y2="{yB}" stroke="{C_AX}" stroke-width="1.5"/>')
+    # 運用残高(面)
+    pts=[f"{px(60)},{py(0)}"]+[f"{px(a)},{py(bal[a])}" for a in range(60,96)]+[f"{px(95)},{py(0)}"]
+    s.append(f'<polygon points="{" ".join(pts)}" fill="{C_KOSEI}" opacity="0.25"/>')
+    s.append(f'<polyline points="{" ".join(f"{px(a)},{py(bal[a])}" for a in range(60,96))}" fill="none" stroke="{C_KOSEI}" stroke-width="2.4"/>')
+    # 経済価値(残高+取崩累計)
+    s.append(f'<polyline points="{" ".join(f"{px(a)},{py(econ[a])}" for a in range(60,96))}" fill="none" stroke="#d6663b" stroke-width="2.6"/>')
+    # 比較:②65現金 ③繰下75現金(無運用)
+    s.append(f'<polyline points="{" ".join(f"{px(a)},{py(cash65*max(0,a-65))}" for a in range(60,96))}" fill="none" stroke="#6b8e23" stroke-width="2" stroke-dasharray="5 3"/>')
+    s.append(f'<polyline points="{" ".join(f"{px(a)},{py(cash75*max(0,a-75))}" for a in range(60,96))}" fill="none" stroke="#8a5a2b" stroke-width="2" stroke-dasharray="5 3"/>')
+    # ラベル
+    s.append(f'<text x="{px(95)+2}" y="{py(econ[95])+3}" font-size="10" font-weight="bold" fill="#d6663b">経済価値</text>')
+    s.append(f'<text x="{px(95)+2}" y="{py(bal[95])+12}" font-size="10" font-weight="bold" fill="{C_KOSEI}">運用残高</text>')
+    s.append(f'<text x="{px(95)+2}" y="{py(cash75*20)+3}" font-size="9.5" fill="#8a5a2b">③繰下75(現金)</text>')
+    s.append(f'<text x="{px(95)+2}" y="{py(cash65*30)+3}" font-size="9.5" fill="#6b8e23">②65歳(現金)</text>')
+    s.append('</svg>')
+    return "\n".join(s),bal,cumW,econ
+
 # ===== 各パターン定義 =====
 A=(60,amt(H,60),60,amt(K,60))
 B=(65,H,65,K)
@@ -296,6 +350,43 @@ for lab,p in labels:
     md.append(f"| {lab} | {cum(p,80)/10000:.0f}万円 | {cum(p,85)/10000:.0f}万円 | {cum(p,90)/10000:.0f}万円 |")
 md.append("")
 md.append("> 80歳前後が損益分岐の目安。**早く亡くなりそうなら繰上げ／②、長生き前提なら繰下げ**が有利です。")
+md.append("")
+md.append("---")
+md.append("")
+# ===== ⑥ 繰上げ60＋運用 セクション =====
+P60=A[1]+A[3]            # 繰上げ60の年金合計
+cash65=B[1]+B[3]        # 65歳本来の年金合計
+cash75=C75[1]+C75[3]    # 繰下げ75の年金合計
+Dwd=1_200_000           # 65歳以降の取り崩し(月10万)
+ac_svg,bal,cumW,econ=assetchart(P60,cash65,cash75,Dwd)
+md.append("## 💹 ⑥ 繰上げ60歳＋年利5%運用（早くもらって投資する作戦）")
+md.append("")
+md.append("「**早くもらって運用すれば繰下げに勝てるか？**」を検証します。"
+          f"繰上げ60歳の年金（**{P60:,}円/年**）を年利5%で運用するモデルです。")
+md.append("")
+md.append("**前提（モデル）**")
+md.append("")
+md.append(f"- **60〜64歳**：年金を全額、年利5%で運用（取り崩しゼロ）→ 65歳時点で元手 **約{bal[65]/10000:.0f}万円**")
+md.append(f"- **65歳以降**：年金を運用に回し続けつつ、生活の足しに**毎年{Dwd:,}円（月10万円）取り崩し**、残りは5%運用を継続")
+md.append("- 比較対象（点線）：②65歳・③繰下げ75歳を**運用せず現金で受け取った**場合の累計")
+md.append("")
+md.append(ac_svg)
+md.append("")
+md.append("### 年齢別の資産（繰上げ60＋運用）")
+md.append("")
+md.append("| 年齢 | 運用残高 | 取崩累計 | 経済価値(残高+取崩) | 参考:②65現金累計 | 参考:③繰下75現金累計 |")
+md.append("| --- | --- | --- | --- | --- | --- |")
+for age in [65,70,75,80,85,90,95]:
+    md.append(f"| {age}歳 | {bal[age]/10000:,.0f}万円 | {cumW[age]/10000:,.0f}万円 | "
+              f"**{econ[age]/10000:,.0f}万円** | {cash65*max(0,age-65)/10000:,.0f}万円 | {cash75*max(0,age-75)/10000:,.0f}万円 |")
+md.append("")
+md.append("> 👀 **ポイント**：5%で運用できるなら、**繰上げ60＋運用の経済価値は早い段階から現金受給を上回り続けます**。"
+          "繰上げの「一生▲24%減額」という弱点を、5年間の運用益と複利が補って余りある計算です。")
+md.append("")
+md.append("> ⚠️ **公平のための注意**：これは「60歳パターンだけ運用」という指定どおりの試算です。"
+          "**②65歳や③繰下げも同様に5%運用すれば結果は変わります**（例：②65歳の年金も5%運用すると90歳で約1.1億円）。"
+          "また**年利5%は元本保証ではなく価格変動・元本割れリスク**があり、繰下げ（+0.7%/月＝公的保証の増額）とは性質が異なります。"
+          "「確実性の繰下げ」か「期待値の運用」かは、リスク許容度次第です。")
 md.append("")
 md.append("---")
 md.append("")
