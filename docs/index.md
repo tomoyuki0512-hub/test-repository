@@ -68,6 +68,7 @@ title: ガイド一覧
 - [遺族年金・遺族厚生年金 完全ガイド](survivors-pension-guide.md) ← 受給条件と男性・女性・子のパターン別金額例
 - [障害年金 完全ガイド](disability-pension-guide.md) ← 受給条件・等級・パターン別金額例
 - [国からもらえる保障 まとめ](government-support-guide.md) ← 医療・仕事・子育て・障害・生活の社会保障早見
+- [年金 繰上げ・繰下げ 図解ガイド（SVG）](pension-deferral-svg-guide.md) ← 年齢による損益分岐点をSVGで可視化
 
 ## デザイン・画像
 
