@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" width="100%" style="max-width:960px;font-family:'Helvetica Neue',Arial,'Hiragino Sans','Noto Sans JP',sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#37474f"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#e53935"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2e7d32"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="700" fill="#ffffff"/>
+  <text x="480" y="34" font-size="20" font-weight="bold" fill="#263238" text-anchor="middle">iOS（App Store）サブスクリプションの状態遷移図</text>
+  <text x="480" y="56" font-size="12" fill="#607d8b" text-anchor="middle">App Store Server API のステータス＋ App Store Server Notifications V2 の通知タイプ（括弧内）</text>
+
+  <!-- ===== Edges (drawn first so nodes sit on top) ===== -->
+
+  <!-- Start -> Active -->
+  <path d="M480,108 L480,150" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="490" y="134" font-size="11" fill="#37474f">購入 (SUBSCRIBED / INITIAL_BUY)</text>
+
+  <!-- Active self-loop: renew -->
+  <path d="M445,158 C430,120 530,120 515,158" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="480" y="118" font-size="11" fill="#2e7d32" text-anchor="middle">更新成功 (DID_RENEW)</text>
+
+  <!-- Active <-> AutoRenewOff -->
+  <path d="M575,180 L675,180" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="625" y="143" font-size="10.5" fill="#37474f" text-anchor="middle">自動更新オフ</text>
+  <text x="625" y="156" font-size="9" fill="#90a4ae" text-anchor="middle">(AUTO_RENEW_DISABLED)</text>
+  <path d="M675,206 L575,206" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="625" y="247" font-size="10.5" fill="#37474f" text-anchor="middle">自動更新オン</text>
+  <text x="625" y="260" font-size="9" fill="#90a4ae" text-anchor="middle">(AUTO_RENEW_ENABLED)</text>
+
+  <!-- Active <-> Grace -->
+  <path d="M385,180 L265,180" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="320" y="130" font-size="10.5" fill="#37474f" text-anchor="middle">更新失敗・猶予あり</text>
+  <text x="320" y="143" font-size="9" fill="#90a4ae" text-anchor="middle">(DID_FAIL_TO_RENEW /</text>
+  <text x="320" y="155" font-size="9" fill="#90a4ae" text-anchor="middle">GRACE_PERIOD)</text>
+  <path d="M265,206 L385,206" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="320" y="250" font-size="10.5" fill="#2e7d32" text-anchor="middle">支払い回復 (DID_RENEW)</text>
+
+  <!-- Grace -> BillingRetry -->
+  <path d="M170,232 L170,350" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="182" y="288" font-size="10.5" fill="#37474f">猶予期間終了</text>
+  <text x="182" y="302" font-size="9.5" fill="#90a4ae">(GRACE_PERIOD_EXPIRED)</text>
+
+  <!-- Active -> BillingRetry direct (no grace) -->
+  <path d="M410,232 C330,300 290,300 240,352" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="330" y="300" font-size="10.5" fill="#37474f">更新失敗・猶予なし</text>
+  <text x="330" y="314" font-size="9.5" fill="#90a4ae">(DID_FAIL_TO_RENEW)</text>
+
+  <!-- BillingRetry -> Active recover -->
+  <path d="M265,378 C400,360 430,300 455,232" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="400" y="346" font-size="10.5" fill="#2e7d32" text-anchor="middle">支払い回復 (DID_RENEW)</text>
+
+  <!-- BillingRetry -> Expired -->
+  <path d="M170,432 C200,510 270,536 375,528" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="250" y="500" font-size="10.5" fill="#37474f">最大60日で失効</text>
+  <text x="250" y="514" font-size="9.5" fill="#90a4ae">(EXPIRED / BILLING_RETRY)</text>
+
+  <!-- AutoRenewOff -> Expired (voluntary) -->
+  <path d="M720,232 C660,330 600,430 560,502" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="648" y="372" font-size="10.5" fill="#37474f">期限到来</text>
+  <text x="648" y="386" font-size="9.5" fill="#90a4ae">(EXPIRED / VOLUNTARY)</text>
+
+  <!-- Expired -> Active resubscribe -->
+  <path d="M495,500 C545,420 545,300 505,232" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="558" y="372" font-size="10.5" fill="#2e7d32" text-anchor="middle">再加入</text>
+  <text x="558" y="386" font-size="9.5" fill="#7cb342" text-anchor="middle">(SUBSCRIBED /</text>
+  <text x="558" y="398" font-size="9.5" fill="#7cb342" text-anchor="middle">RESUBSCRIBE)</text>
+
+  <!-- Active -> Revoked (refund) -->
+  <path d="M560,205 C720,250 800,370 780,500" fill="none" stroke="#e53935" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowRed)"/>
+  <text x="812" y="330" font-size="10.5" fill="#e53935" text-anchor="middle">返金・取消</text>
+  <text x="812" y="344" font-size="9.5" fill="#ef9a9a" text-anchor="middle">(REVOKE)</text>
+  <text x="812" y="360" font-size="9" fill="#ef9a9a" text-anchor="middle">※任意の状態から</text>
+
+  <!-- ===== Nodes ===== -->
+
+  <!-- Start -->
+  <rect x="375" y="66" width="210" height="42" rx="21" fill="#ede7f6" stroke="#5e35b1" stroke-width="1.8"/>
+  <text x="480" y="92" font-size="13.5" font-weight="bold" fill="#4527a0" text-anchor="middle">新規購入 / 初回課金</text>
+
+  <!-- Active -->
+  <rect x="375" y="150" width="200" height="72" rx="12" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="475" y="182" font-size="15" font-weight="bold" fill="#1b5e20" text-anchor="middle">有効（Active）</text>
+  <text x="475" y="202" font-size="11" fill="#388e3c" text-anchor="middle">status 1・自動更新ON</text>
+  <text x="475" y="216" font-size="10" fill="#66bb6a" text-anchor="middle">利用可</text>
+
+  <!-- AutoRenewOff -->
+  <rect x="675" y="150" width="200" height="72" rx="12" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="775" y="180" font-size="14" font-weight="bold" fill="#0d47a1" text-anchor="middle">自動更新オフ</text>
+  <text x="775" y="199" font-size="10.5" fill="#1976d2" text-anchor="middle">status 1・期限まで有効</text>
+  <text x="775" y="213" font-size="10" fill="#64b5f6" text-anchor="middle">解約予約（利用可）</text>
+
+  <!-- Grace -->
+  <rect x="70" y="150" width="195" height="72" rx="12" fill="#fff8e1" stroke="#f9a825" stroke-width="2"/>
+  <text x="167" y="180" font-size="14" font-weight="bold" fill="#e65100" text-anchor="middle">請求猶予期間</text>
+  <text x="167" y="199" font-size="10.5" fill="#f57f17" text-anchor="middle">status 4・In Grace Period</text>
+  <text x="167" y="213" font-size="10" fill="#fbc02d" text-anchor="middle">利用可（支払い再試行中）</text>
+
+  <!-- BillingRetry -->
+  <rect x="70" y="350" width="195" height="72" rx="12" fill="#fff3e0" stroke="#fb8c00" stroke-width="2"/>
+  <text x="167" y="380" font-size="14" font-weight="bold" fill="#bf360c" text-anchor="middle">請求リトライ中</text>
+  <text x="167" y="399" font-size="10.5" fill="#e64a19" text-anchor="middle">status 3・In Billing Retry</text>
+  <text x="167" y="413" font-size="10" fill="#ff8a65" text-anchor="middle">利用不可（最大60日再試行）</text>
+
+  <!-- Expired -->
+  <rect x="375" y="500" width="200" height="72" rx="12" fill="#eceff1" stroke="#78909c" stroke-width="2"/>
+  <text x="475" y="532" font-size="15" font-weight="bold" fill="#37474f" text-anchor="middle">失効（Expired）</text>
+  <text x="475" y="552" font-size="11" fill="#546e7a" text-anchor="middle">status 2</text>
+  <text x="475" y="566" font-size="10" fill="#90a4ae" text-anchor="middle">利用不可</text>
+
+  <!-- Revoked -->
+  <rect x="675" y="500" width="200" height="72" rx="12" fill="#fdecea" stroke="#e53935" stroke-width="2"/>
+  <text x="775" y="532" font-size="14" font-weight="bold" fill="#b71c1c" text-anchor="middle">取り消し（Revoked）</text>
+  <text x="775" y="552" font-size="11" fill="#c62828" text-anchor="middle">status 5</text>
+  <text x="775" y="566" font-size="10" fill="#ef5350" text-anchor="middle">返金/ファミリー共有解除等</text>
+
+  <!-- Legend -->
+  <rect x="40" y="612" width="880" height="64" rx="8" fill="#fafafa" stroke="#cfd8dc" stroke-width="1"/>
+  <text x="56" y="632" font-size="11" font-weight="bold" fill="#455a64">凡例</text>
+  <line x1="56" y1="650" x2="96" y2="650" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="104" y="654" font-size="10.5" fill="#455a64">回復・更新（利用継続/再開）</text>
+  <line x1="300" y1="650" x2="340" y2="650" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="348" y="654" font-size="10.5" fill="#455a64">通常遷移</text>
+  <line x1="470" y1="650" x2="510" y2="650" stroke="#e53935" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowRed)"/>
+  <text x="518" y="654" font-size="10.5" fill="#455a64">返金・取消（任意の状態から）</text>
+  <text x="724" y="654" font-size="10" fill="#90a4ae">status＝App Store Server API のステータス値</text>
+</svg>
