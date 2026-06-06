@@ -60,6 +60,7 @@ title: ガイド一覧
 - [③ 収益化パターン（広告・サブスク・ハイブリッド）](store-publishing/03-monetization-ads-subscription.md) ← 広告収入・サブスク収益のモデル別シミュレーション
 - [④ Apple vs Google 比較・公開前チェックリスト](store-publishing/04-comparison-checklist.md)
 - [⑤ AWSでMacを起動してストア資材を準備する（EC2 Mac 署名ガイド）](store-publishing/05-aws-mac-signing.md) ← Macが無くても署名・ビルド・提出
+- [⑥ macOS CIランナー料金とMac購入費の比較](store-publishing/06-macos-ci-and-buying-mac.md) ← GitHub Actions等の料金・物理Mac最低費用
 
 ## Flutterアプリ サブスクリプション（IAP）
 
