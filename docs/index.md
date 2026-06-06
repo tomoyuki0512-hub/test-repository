@@ -52,6 +52,14 @@ title: ガイド一覧
 
 - [低トラフィックサイト向けシステム構成ガイド](ando-piano-system-design.md)
 
+## アプリストア公開（Apple / Google）
+
+- [総合インデックス（はじめに・全体像・用語集）](store-publishing/README.md) ← まずはここから
+- [① Apple App Store 公開フロー（ゼロから）](store-publishing/01-apple-app-store.md)
+- [② Google Play 公開フロー（ゼロから）](store-publishing/02-google-play.md)
+- [③ 収益化パターン（広告・サブスク・ハイブリッド）](store-publishing/03-monetization-ads-subscription.md) ← 広告収入・サブスク収益のモデル別シミュレーション
+- [④ Apple vs Google 比較・公開前チェックリスト](store-publishing/04-comparison-checklist.md)
+
 ## Flutterアプリ サブスクリプション（IAP）
 
 - [総合インデックス（はじめに・用語集）](flutter-subscription-overview.md) ← まずはここから
