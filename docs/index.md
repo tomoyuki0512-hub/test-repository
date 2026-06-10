@@ -82,6 +82,10 @@ title: ガイド一覧
 - [年金 繰上げ・繰下げ 図解ガイド（SVG）](pension-deferral-svg-guide.md) ← 年齢による損益分岐点をSVGで可視化
 - [年金と収入の関係（在職老齢年金・収入要件）](pension-income-test-guide.md) ← 働くと止まる？収入が多いともらえない？
 
+## 認証・セキュリティ
+
+- [SSO（シングルサインオン）完全ガイド](sso-guide.md) ← 仕組み・SAML/OAuth/OIDCの違い・導入手順を誰でもわかるように
+
 ## デザイン・画像
 
 - [画像フォーマットの特徴とWeb・アプリでの使用用途](../image-formats-guide.md)
