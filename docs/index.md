@@ -82,6 +82,10 @@ title: ガイド一覧
 - [年金 繰上げ・繰下げ 図解ガイド（SVG）](pension-deferral-svg-guide.md) ← 年齢による損益分岐点をSVGで可視化
 - [年金と収入の関係（在職老齢年金・収入要件）](pension-income-test-guide.md) ← 働くと止まる？収入が多いともらえない？
 
+## 進学・教育費
+
+- [大学進学のための奨学金・教育ローン 完全ガイド](../daigaku-shogakukin-guide.md) ← 給付/無利子/有利子・金利（固定/変動）・借りられる金額を網羅
+
 ## 認証・セキュリティ
 
 - [SSO（シングルサインオン）完全ガイド](sso-guide.md) ← 仕組み・SAML/OAuth/OIDCの違い・導入手順を誰でもわかるように
