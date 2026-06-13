@@ -73,6 +73,7 @@ title: ガイド一覧
 - [システム構成設計](flutter-subscription-system-design.md)
 - [システム構成図（Mermaid / Python Diagrams）](flutter-subscription-architecture-diagram.md)
 - [iOS サブスクリプション状態遷移図（SVG）](ios-subscription-lifecycle.md) ← AndroidのライフサイクルにないiOS版をSVGで作図
+- [サブスクリプション & RevenueCat 総合ガイド](../revenuecat-subscription-guide.md) ← メリット/デメリット・費用・開発のし易さ・開発ステップ数とサーバー/保守の削減効果
 
 ## 年金・社会保障
 
