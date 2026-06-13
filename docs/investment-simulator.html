@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>投資指標・資産シミュレーター</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; background: #f5f5f5; color: #2b2b2b; line-height: 1.6; }
+    header { background: #1b3a5b; color: #fff; padding: 22px 24px; }
+    header h1 { font-size: 1.3rem; }
+    header p { font-size: 0.85rem; color: #cdd9e5; margin-top: 6px; }
+    header a { color: #9ecbff; }
+    main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 60px; }
+    nav.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 20px 0; }
+    nav.tabs button {
+      padding: 9px 16px; border: none; border-radius: 6px 6px 0 0; cursor: pointer;
+      font-size: 0.9rem; background: #d8e0e8; color: #45566a; font-weight: 600;
+    }
+    nav.tabs button.active { background: #1b3a5b; color: #fff; }
+    section.panel { display: none; background: #fff; border-radius: 0 8px 8px 8px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    section.panel.active { display: block; }
+    h2 { font-size: 1.1rem; color: #1b3a5b; margin-bottom: 8px; }
+    h3 { font-size: 0.95rem; color: #2b4a6b; margin: 18px 0 8px; }
+    p.desc { font-size: 0.85rem; color: #667; margin-bottom: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    label { display: block; font-size: 0.8rem; color: #556; margin-bottom: 4px; font-weight: 600; }
+    input, select, textarea {
+      width: 100%; padding: 8px 10px; border: 1px solid #c7d0da; border-radius: 5px;
+      font-size: 0.9rem; font-family: inherit;
+    }
+    textarea { resize: vertical; min-height: 70px; font-family: monospace; font-size: 0.85rem; }
+    button.calc {
+      background: #1b6fb5; color: #fff; border: none; padding: 10px 22px; border-radius: 6px;
+      cursor: pointer; font-size: 0.92rem; font-weight: 600; margin-top: 4px;
+    }
+    button.calc:hover { background: #155a93; }
+    .results { margin-top: 18px; }
+    .resultcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+    .rcard { background: #eef4fa; border-radius: 8px; padding: 14px; text-align: center; }
+    .rcard .k { font-size: 0.75rem; color: #667; }
+    .rcard .v { font-size: 1.25rem; font-weight: 700; color: #1b3a5b; margin-top: 4px; }
+    .rcard .v.pos { color: #1a7f43; }
+    .rcard .v.neg { color: #c0392b; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.85rem; }
+    th, td { border: 1px solid #dde3ea; padding: 7px 9px; text-align: right; }
+    th { background: #f0f4f8; color: #45566a; }
+    th:first-child, td:first-child { text-align: left; }
+    .chartbox { margin-top: 22px; position: relative; height: 340px; }
+    .note { font-size: 0.78rem; color: #889; margin-top: 16px; border-top: 1px dashed #ccc; padding-top: 12px; }
+    .hint { font-size: 0.75rem; color: #8a93a0; margin-top: 4px; }
+    .matrix-input { font-family: monospace; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>📊 投資指標・資産シミュレーター</h1>
+  <p>リターン・標準偏差・シャープレシオの計算と、複利・積立投資の成長グラフを描画します。解説は <a href="investment-indicators-simulation.md">投資指標と資産シミュレーション まとめ</a> を参照。</p>
+</header>
+
+<main>
+  <nav class="tabs">
+    <button data-tab="indicators" class="active">① 指標の計算</button>
+    <button data-tab="portfolio">② ポートフォリオ</button>
+    <button data-tab="lump">③ 一括投資（複利）</button>
+    <button data-tab="monthly">④ 積立投資</button>
+  </nav>
+
+  <!-- ① 指標の計算 -->
+  <section class="panel active" id="indicators">
+    <h2>① リターン系列から指標を計算</h2>
+    <p class="desc">リターンの系列（％）を入力すると、平均リターン・標準偏差（リスク）・シャープレシオを計算します。月次データなら「年率換算」で √12 倍します。</p>
+    <div class="grid">
+      <div>
+        <label>リターン系列（カンマ/改行/空白区切り, ％）</label>
+        <textarea id="ind-series">1.2, -0.8, 2.1, 0.5, -1.5, 3.0, 1.1, -0.3, 0.9, 2.4, -2.0, 1.7</textarea>
+        <div class="hint">例は月次リターン12点</div>
+      </div>
+    </div>
+    <div class="grid">
+      <div>
+        <label>無リスク金利（年率 %）</label>
+        <input type="number" id="ind-rf" value="0.75" step="0.05">
+      </div>
+      <div>
+        <label>データ頻度</label>
+        <select id="ind-freq">
+          <option value="12">月次（年率換算 ×√12）</option>
+          <option value="252">日次（年率換算 ×√252）</option>
+          <option value="1">年次（換算なし）</option>
+        </select>
+      </div>
+      <div>
+        <label>標準偏差の分母</label>
+        <select id="ind-ddof">
+          <option value="1">標本（n−1）</option>
+          <option value="0">母集団（n）</option>
+        </select>
+      </div>
+    </div>
+    <button class="calc" onclick="calcIndicators()">計算する</button>
+
+    <div class="results" id="ind-results" style="display:none;">
+      <div class="resultcards">
+        <div class="rcard"><div class="k">データ数</div><div class="v" id="ind-n">–</div></div>
+        <div class="rcard"><div class="k">平均リターン（年率）</div><div class="v" id="ind-mean">–</div></div>
+        <div class="rcard"><div class="k">標準偏差（年率・リスク）</div><div class="v" id="ind-std">–</div></div>
+        <div class="rcard"><div class="k">シャープレシオ</div><div class="v" id="ind-sharpe">–</div></div>
+      </div>
+      <div class="chartbox"><canvas id="ind-chart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ② ポートフォリオ -->
+  <section class="panel" id="portfolio">
+    <h2>② ポートフォリオの指標（分散効果）</h2>
+    <p class="desc">複数資産の期待リターン・標準偏差・構成比と相関行列から、ポートフォリオの期待リターン・標準偏差・シャープレシオを計算します。「単純加重平均」との差で分散効果が見えます。</p>
+    <div class="grid">
+      <div>
+        <label>資産（1行1資産：名前, 期待リターン%, 標準偏差%, 構成比%）</label>
+        <textarea id="pf-assets">A 国内株式, 8, 18, 30
+B 先進国債券, 3, 6, 40
+C 先進国株式, 10, 20, 30</textarea>
+      </div>
+      <div>
+        <label>相関行列（資産順, 対角=1）</label>
+        <textarea id="pf-corr" class="matrix-input">1, 0.1, 0.7
+0.1, 1, 0.0
+0.7, 0.0, 1</textarea>
+        <div class="hint">資産がN個ならN×Nの正方行列</div>
+      </div>
+    </div>
+    <div class="grid">
+      <div>
+        <label>無リスク金利（年率 %）</label>
+        <input type="number" id="pf-rf" value="1" step="0.1">
+      </div>
+    </div>
+    <button class="calc" onclick="calcPortfolio()">計算する</button>
+
+    <div class="results" id="pf-results" style="display:none;">
+      <table id="pf-table"></table>
+      <div class="chartbox"><canvas id="pf-chart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ③ 一括投資 -->
+  <section class="panel" id="lump">
+    <h2>③ 一括投資のシミュレーション（複利）</h2>
+    <p class="desc">元本を一度に投資し、毎年一定の利率で複利運用したときの成長。<code>将来価値 = 元本 × (1 + 年率)^年数</code></p>
+    <div class="grid">
+      <div><label>元本（円）</label><input type="number" id="lp-principal" value="10000"></div>
+      <div><label>運用年数</label><input type="number" id="lp-years" value="30"></div>
+      <div><label>年率①（%）</label><input type="number" id="lp-r1" value="3" step="0.1"></div>
+      <div><label>年率②（%）</label><input type="number" id="lp-r2" value="5" step="0.1"></div>
+      <div><label>年率③（%）</label><input type="number" id="lp-r3" value="7" step="0.1"></div>
+      <div><label>年率④（%）</label><input type="number" id="lp-r4" value="10" step="0.1"></div>
+    </div>
+    <button class="calc" onclick="calcLump()">計算する</button>
+
+    <div class="results" id="lp-results" style="display:none;">
+      <div class="chartbox"><canvas id="lp-chart"></canvas></div>
+      <table id="lp-table"></table>
+    </div>
+  </section>
+
+  <!-- ④ 積立投資 -->
+  <section class="panel" id="monthly">
+    <h2>④ 積立投資のシミュレーション（手数料・信託報酬込み）</h2>
+    <p class="desc">毎月一定額を積み立て、月複利で運用。購入時手数料と信託報酬を反映します。<br>
+    <code>実投資額 = 月額×(1−購入時手数料率)</code> ／ <code>実質リターン = 市場リターン − 信託報酬率</code></p>
+    <div class="grid">
+      <div><label>毎月の積立額（円）</label><input type="number" id="mn-monthly" value="30000"></div>
+      <div><label>運用年数</label><input type="number" id="mn-years" value="30"></div>
+      <div><label>市場リターン（年率 %）</label><input type="number" id="mn-return" value="5" step="0.1"></div>
+      <div><label>購入時手数料（%）</label><input type="number" id="mn-load" value="0" step="0.1"></div>
+      <div><label>信託報酬（年率 %）</label><input type="number" id="mn-fee" value="0.2" step="0.05"></div>
+    </div>
+    <button class="calc" onclick="calcMonthly()">計算する</button>
+
+    <div class="results" id="mn-results" style="display:none;">
+      <div class="resultcards">
+        <div class="rcard"><div class="k">実質リターン（年率）</div><div class="v" id="mn-eff">–</div></div>
+        <div class="rcard"><div class="k">元本（拠出総額）</div><div class="v" id="mn-cost">–</div></div>
+        <div class="rcard"><div class="k">評価額</div><div class="v" id="mn-fv">–</div></div>
+        <div class="rcard"><div class="k">運用益</div><div class="v pos" id="mn-gain">–</div></div>
+      </div>
+      <div class="chartbox"><canvas id="mn-chart"></canvas></div>
+      <table id="mn-table"></table>
+    </div>
+  </section>
+
+  <p class="note">
+    ⚠️ 本ツールはリターンが一定と仮定した単純試算です。実際の相場は変動し、税金（譲渡益・分配金に約20.315%／NISA等は非課税）は未考慮です。指標の意味とオーダー感の把握用としてご利用ください。
+  </p>
+</main>
+
+<script>
+// ---- タブ切替 ----
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('section.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---- ユーティリティ ----
+const charts = {};
+function drawChart(id, config) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), config);
+}
+const yen = n => Math.round(n).toLocaleString('ja-JP') + '円';
+const pct = n => n.toFixed(2) + '%';
+function parseNumbers(text) {
+  return text.split(/[\s,]+/).map(s => s.trim()).filter(s => s !== '').map(Number).filter(n => !isNaN(n));
+}
+
+// ---- ① 指標の計算 ----
+function calcIndicators() {
+  const series = parseNumbers(document.getElementById('ind-series').value); // %
+  if (series.length < 2) { alert('リターン系列を2点以上入力してください'); return; }
+  const rf = parseFloat(document.getElementById('ind-rf').value);     // 年率%
+  const ann = parseFloat(document.getElementById('ind-freq').value);  // 12 / 252 / 1
+  const ddof = parseInt(document.getElementById('ind-ddof').value);   // 1 or 0
+
+  const n = series.length;
+  const mean = series.reduce((a, b) => a + b, 0) / n;                  // 期間あたり平均%
+  const variance = series.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - ddof);
+  const stdPeriod = Math.sqrt(variance);                              // 期間あたりσ%
+
+  // 年率換算
+  const meanAnn = mean * ann;
+  const stdAnn = stdPeriod * Math.sqrt(ann);
+  const sharpe = stdAnn === 0 ? NaN : (meanAnn - rf) / stdAnn;
+
+  document.getElementById('ind-n').textContent = n + ' 点';
+  document.getElementById('ind-mean').textContent = pct(meanAnn);
+  document.getElementById('ind-std').textContent = pct(stdAnn);
+  const sh = document.getElementById('ind-sharpe');
+  sh.textContent = isNaN(sharpe) ? '–' : sharpe.toFixed(3);
+  sh.className = 'v ' + (sharpe >= 0 ? 'pos' : 'neg');
+  document.getElementById('ind-results').style.display = 'block';
+
+  drawChart('ind-chart', {
+    type: 'bar',
+    data: {
+      labels: series.map((_, i) => (i + 1)),
+      datasets: [
+        { label: 'リターン(%)', data: series, backgroundColor: series.map(v => v >= 0 ? '#1b6fb5' : '#c0392b') },
+        { label: '平均(%)', type: 'line', data: series.map(() => mean), borderColor: '#e67e22', borderDash: [6,4], pointRadius: 0, borderWidth: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { title: { display: true, text: 'リターン系列と平均' } },
+      scales: { y: { title: { display: true, text: 'リターン (%)' } }, x: { title: { display: true, text: '期間' } } }
+    }
+  });
+}
+
+// ---- ② ポートフォリオ ----
+function calcPortfolio() {
+  const rows = document.getElementById('pf-assets').value.trim().split('\n').filter(r => r.trim());
+  const assets = rows.map(r => {
+    const parts = r.split(',').map(s => s.trim());
+    return { name: parts[0], ret: parseFloat(parts[1]), std: parseFloat(parts[2]), w: parseFloat(parts[3]) / 100 };
+  });
+  const N = assets.length;
+  if (N < 1) { alert('資産を入力してください'); return; }
+
+  const corrRows = document.getElementById('pf-corr').value.trim().split('\n').filter(r => r.trim());
+  const corr = corrRows.map(r => parseNumbers(r));
+  if (corr.length !== N || corr.some(row => row.length !== N)) {
+    alert('相関行列は資産数（' + N + '）×（' + N + '）の正方行列にしてください'); return;
+  }
+  const rf = parseFloat(document.getElementById('pf-rf').value);
+
+  // 期待リターン（加重平均）
+  const expRet = assets.reduce((a, x) => a + x.w * x.ret, 0);
+  // 標準偏差（単純加重平均 vs 正しい値）
+  const stdWeighted = assets.reduce((a, x) => a + x.w * x.std, 0);
+  let varSum = 0;
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N; j++) {
+      varSum += assets[i].w * assets[j].w * assets[i].std * assets[j].std * corr[i][j];
+    }
+  }
+  const stdPort = Math.sqrt(Math.max(varSum, 0));
+  const sharpeWeighted = stdWeighted === 0 ? NaN : (expRet - rf) / stdWeighted;
+  const sharpePort = stdPort === 0 ? NaN : (expRet - rf) / stdPort;
+
+  const wsum = assets.reduce((a, x) => a + x.w, 0) * 100;
+  const fmt = (n, d=3) => isNaN(n) ? '–' : n.toFixed(d);
+  document.getElementById('pf-table').innerHTML = `
+    <tr><th>指標</th><th>単純加重平均</th><th>正しい値（相関考慮）</th><th>差</th></tr>
+    <tr><td>期待リターン</td><td>${pct(expRet)}</td><td>${pct(expRet)}</td><td>✅ 一致</td></tr>
+    <tr><td>標準偏差（リスク）</td><td>${pct(stdWeighted)}</td><td>${pct(stdPort)}</td><td>${(stdPort-stdWeighted>=0?'+':'')}${pct(stdPort-stdWeighted)}（分散効果で低下）</td></tr>
+    <tr><td>シャープレシオ</td><td>${fmt(sharpeWeighted)}</td><td>${fmt(sharpePort)}</td><td>${fmt(sharpePort-sharpeWeighted)}（改善）</td></tr>
+    <tr><td>構成比合計</td><td colspan="3">${wsum.toFixed(1)}%${Math.abs(wsum-100)>0.1?' ⚠️ 100%になっていません':''}</td></tr>
+  `;
+  document.getElementById('pf-results').style.display = 'block';
+
+  drawChart('pf-chart', {
+    type: 'bar',
+    data: {
+      labels: ['期待リターン(%)', '標準偏差(%)', 'シャープ×10'],
+      datasets: [
+        { label: '単純加重平均', data: [expRet, stdWeighted, (isNaN(sharpeWeighted)?0:sharpeWeighted*10)], backgroundColor: '#aac4dd' },
+        { label: '正しい値（相関考慮）', data: [expRet, stdPort, (isNaN(sharpePort)?0:sharpePort*10)], backgroundColor: '#1b6fb5' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { title: { display: true, text: '加重平均 vs 相関を考慮した値（シャープは見やすさのため×10）' } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+
+// ---- ③ 一括投資 ----
+function calcLump() {
+  const P = parseFloat(document.getElementById('lp-principal').value);
+  const years = parseInt(document.getElementById('lp-years').value);
+  const rates = ['lp-r1','lp-r2','lp-r3','lp-r4'].map(id => parseFloat(document.getElementById(id).value)).filter(r => !isNaN(r));
+  const labels = Array.from({length: years + 1}, (_, y) => y);
+  const palette = ['#1b6fb5', '#27ae60', '#e67e22', '#c0392b'];
+
+  const datasets = rates.map((r, i) => ({
+    label: '年' + r + '%',
+    data: labels.map(y => P * Math.pow(1 + r/100, y)),
+    borderColor: palette[i % palette.length],
+    backgroundColor: 'transparent',
+    tension: 0.15, pointRadius: 0, borderWidth: 2
+  }));
+
+  document.getElementById('lp-results').style.display = 'block';
+  drawChart('lp-chart', {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { title: { display: true, text: '一括投資（元本' + yen(P) + '）の複利成長' } },
+      scales: { y: { title: { display: true, text: '評価額（円）' }, ticks: { callback: v => v.toLocaleString('ja-JP') } },
+                x: { title: { display: true, text: '経過年数' } } }
+    }
+  });
+
+  // テーブル（節目の年）
+  const marks = [...new Set([1,5,10,15,20,25,30, years].filter(y => y <= years))].sort((a,b)=>a-b);
+  let html = '<tr><th>経過年数</th>' + rates.map(r => '<th>年' + r + '%</th>').join('') + '</tr>';
+  marks.forEach(y => {
+    html += '<tr><td>' + y + '年</td>' + rates.map(r => '<td>' + yen(P * Math.pow(1 + r/100, y)) + '</td>').join('') + '</tr>';
+  });
+  document.getElementById('lp-table').innerHTML = html;
+}
+
+// ---- ④ 積立投資 ----
+function calcMonthly() {
+  const monthly = parseFloat(document.getElementById('mn-monthly').value);
+  const years = parseInt(document.getElementById('mn-years').value);
+  const mret = parseFloat(document.getElementById('mn-return').value);
+  const load = parseFloat(document.getElementById('mn-load').value);
+  const fee = parseFloat(document.getElementById('mn-fee').value);
+
+  const actual = monthly * (1 - load/100);    // 実投資額（毎月）
+  const effReturn = mret - fee;               // 実質リターン年率%
+  const i = effReturn / 100 / 12;             // 月利
+
+  // 各月の積立 → 年次の推移
+  const labels = [], fvData = [], costData = [];
+  for (let y = 0; y <= years; y++) {
+    const N = y * 12;
+    let fv;
+    if (i === 0) fv = actual * N;
+    else fv = actual * (Math.pow(1 + i, N) - 1) / i;
+    labels.push(y);
+    fvData.push(fv);
+    costData.push(monthly * N);
+  }
+  const finalFV = fvData[years];
+  const finalCost = costData[years];
+  const gain = finalFV - finalCost;
+
+  document.getElementById('mn-eff').textContent = pct(effReturn);
+  document.getElementById('mn-cost').textContent = yen(finalCost);
+  document.getElementById('mn-fv').textContent = yen(finalFV);
+  const g = document.getElementById('mn-gain');
+  g.textContent = yen(gain);
+  g.className = 'v ' + (gain >= 0 ? 'pos' : 'neg');
+  document.getElementById('mn-results').style.display = 'block';
+
+  drawChart('mn-chart', {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: '評価額', data: fvData, borderColor: '#1b6fb5', backgroundColor: 'rgba(27,111,181,0.12)', fill: true, tension: 0.15, pointRadius: 0, borderWidth: 2 },
+        { label: '元本（拠出総額）', data: costData, borderColor: '#888', backgroundColor: 'transparent', borderDash: [6,4], tension: 0.15, pointRadius: 0, borderWidth: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { title: { display: true, text: '積立投資（月' + yen(monthly) + '・実質' + pct(effReturn) + '）の推移' } },
+      scales: { y: { title: { display: true, text: '金額（円）' }, ticks: { callback: v => v.toLocaleString('ja-JP') } },
+                x: { title: { display: true, text: '経過年数' } } }
+    }
+  });
+
+  const marks = [...new Set([5,10,15,20,25,30, years].filter(y => y > 0 && y <= years))].sort((a,b)=>a-b);
+  let html = '<tr><th>経過年数</th><th>元本</th><th>評価額</th><th>運用益</th></tr>';
+  marks.forEach(y => {
+    const c = costData[y], f = fvData[y];
+    html += '<tr><td>' + y + '年</td><td>' + yen(c) + '</td><td>' + yen(f) + '</td><td>' + yen(f - c) + '</td></tr>';
+  });
+  document.getElementById('mn-table').innerHTML = html;
+}
+
+// 初期描画
+calcIndicators();
+</script>
+</body>
+</html>
