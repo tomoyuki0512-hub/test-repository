@@ -101,6 +101,11 @@ title: ガイド一覧
 
 - [画像フォーマットの特徴とWeb・アプリでの使用用途](../image-formats-guide.md)
 
+## 就職・キャリア
+
+- [ケース面接 完全ガイド（内容と対策）](case-interview-guide.md) ← 出題内容・解き方の型・フレームワーク・フェルミ推定・対策方法
+- [ケース面接で覚えておくべき数値まとめ](case-interview-key-numbers.md) ← 人口・GDP・市場規模・店舗数などフェルミ推定に使う基礎データ集
+
 ## 学習ツール
 
 - [英単語帳](english-words.html)
