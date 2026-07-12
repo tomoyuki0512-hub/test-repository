@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ケース面接 数値暗記フラッシュカード</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; color: #333; }
+    header {
+      background: #24292e; color: #fff; padding: 16px 24px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    header h1 { font-size: 1.15rem; flex: 1; min-width: 240px; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .controls button {
+      padding: 6px 14px; border: none; border-radius: 4px;
+      cursor: pointer; font-size: 0.85rem; background: #444; color: #ccc;
+    }
+    .controls button:hover { background: #555; }
+    nav {
+      background: #fff; padding: 10px 24px; display: flex; gap: 8px;
+      flex-wrap: wrap; border-bottom: 1px solid #e1e4e8;
+      position: sticky; top: 0; z-index: 10;
+    }
+    nav button {
+      padding: 5px 12px; border: 1px solid #d1d5da; border-radius: 14px;
+      cursor: pointer; font-size: 0.8rem; background: #fff; color: #444;
+    }
+    nav button.active { background: #0366d6; border-color: #0366d6; color: #fff; }
+    main { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
+    .count { color: #666; font-size: 0.85rem; margin-bottom: 12px; }
+    .hint { color: #888; font-size: 0.8rem; margin-bottom: 16px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: #fff; border-radius: 8px; padding: 18px; cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12); min-height: 130px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      user-select: none; transition: transform 0.08s;
+    }
+    .card:active { transform: scale(0.98); }
+    .card.flipped { background: #eef6ff; border: 1px solid #0366d6; }
+    .cat-label { font-size: 0.7rem; color: #0366d6; margin-bottom: 8px; }
+    .q { font-size: 0.98rem; font-weight: bold; color: #24292e; line-height: 1.45; flex: 1; }
+    .a { font-size: 1.05rem; font-weight: bold; color: #0a3d78; line-height: 1.45; flex: 1; }
+    .note { font-size: 0.8rem; color: #555; margin-top: 6px; line-height: 1.4; }
+    .card-footer { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .flip-hint { font-size: 0.72rem; color: #aaa; }
+    .memorized-btn {
+      padding: 3px 10px; border: 1px solid #28a745; border-radius: 12px;
+      background: #fff; color: #28a745; font-size: 0.72rem; cursor: pointer;
+    }
+    .memorized-btn:hover { background: #28a745; color: #fff; }
+    footer { text-align: center; padding: 24px; font-size: 0.8rem; color: #888; }
+    footer a { color: #0366d6; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>ケース面接 数値暗記フラッシュカード</h1>
+  <div class="controls">
+    <button onclick="shuffleCards()">シャッフル</button>
+    <button onclick="showAllAnswers()">全部めくる</button>
+    <button onclick="resetFlips()">全部もどす</button>
+    <button onclick="resetProgress()">「覚えた」をリセット</button>
+  </div>
+</header>
+<nav id="nav"></nav>
+<main>
+  <div class="count" id="count"></div>
+  <div class="hint">カードをクリック（タップ）すると答えが表示されます。覚えたカードは「✓ 覚えた」で非表示にできます（ブラウザに保存されます）。</div>
+  <div class="grid" id="grid"></div>
+</main>
+<footer>
+  出典・詳細は <a href="case-interview-key-numbers.md">数値まとめ（MD）</a> を参照。数値は概数です。
+</footer>
+<script>
+const CATS = ["人口・世帯", "経済・家計", "市場規模", "店舗数・インフラ", "デジタル・係数", "世界", "企業"];
+const cards = [
+  // 人口・世帯
+  { cat: "人口・世帯", q: "日本の総人口は？", a: "約1.2億人", note: "1.24億。すべての基本" },
+  { cat: "人口・世帯", q: "日本の世帯数は？", a: "約5,500万世帯", note: "1世帯あたり約2.2人" },
+  { cat: "人口・世帯", q: "1学年の人口は？", a: "約100万人", note: "0〜19歳は各学年ほぼ100万人と概算" },
+  { cat: "人口・世帯", q: "生産年齢人口（15〜64歳）は？", a: "約7,400万人", note: "人口の約6割" },
+  { cat: "人口・世帯", q: "65歳以上の高齢者人口は？", a: "約3,600万人", note: "高齢化率 約29%" },
+  { cat: "人口・世帯", q: "日本の就業者数は？", a: "約6,700万人", note: "働いている人の数" },
+  { cat: "人口・世帯", q: "日本人の平均寿命は？", a: "男 約81歳／女 約87歳", note: "" },
+  { cat: "人口・世帯", q: "東京都の人口は？", a: "約1,400万人", note: "23区は約1,000万人" },
+  { cat: "人口・世帯", q: "大阪府の人口は？", a: "約880万人", note: "神奈川県は約920万人" },
+  { cat: "人口・世帯", q: "日本の面積は？", a: "約38万km²", note: "可住地は約3割" },
+  { cat: "人口・世帯", q: "1日は何分？何秒？", a: "1,440分 ＝ 86,400秒", note: "24時間×60分×60秒" },
+  // 経済・家計
+  { cat: "経済・家計", q: "日本のGDP（名目）は？", a: "約600兆円（約4兆ドル）", note: "世界3〜4位" },
+  { cat: "経済・家計", q: "日本の国家予算（一般会計）は？", a: "約110兆円", note: "" },
+  { cat: "経済・家計", q: "給与所得者の平均給与は？", a: "約460万円/年", note: "" },
+  { cat: "経済・家計", q: "最低賃金（全国平均）は？", a: "約1,050円/時", note: "" },
+  { cat: "経済・家計", q: "為替レートの目安は？", a: "1ドル ≒ 150円前後", note: "概算用" },
+  { cat: "経済・家計", q: "2人以上世帯の消費支出は？", a: "約29万円/月", note: "単身世帯は約16万円/月" },
+  { cat: "経済・家計", q: "平均貯蓄額（2人以上世帯）は？", a: "約1,900万円", note: "中央値は約1,100万円" },
+  { cat: "経済・家計", q: "食費の割合（エンゲル係数）は？", a: "支出の約25%", note: "" },
+  // 市場規模
+  { cat: "市場規模", q: "外食産業の市場規模は？", a: "約25兆円", note: "" },
+  { cat: "市場規模", q: "コンビニ業界の市場規模は？", a: "約11〜12兆円", note: "" },
+  { cat: "市場規模", q: "自動車（新車販売）の市場規模は？", a: "約50兆円", note: "" },
+  { cat: "市場規模", q: "EC（BtoC物販系）の市場規模は？", a: "約15兆円", note: "" },
+  { cat: "市場規模", q: "ドラッグストアの市場規模は？", a: "約8兆円", note: "" },
+  { cat: "市場規模", q: "アパレルの市場規模は？", a: "約9兆円", note: "" },
+  { cat: "市場規模", q: "ゲームの市場規模は？", a: "約2〜3兆円", note: "" },
+  { cat: "市場規模", q: "日本の総広告費は？", a: "約7兆円", note: "うちネット広告 約3.3兆円" },
+  { cat: "市場規模", q: "化粧品の市場規模は？", a: "約2.5兆円", note: "" },
+  { cat: "市場規模", q: "ペット関連の市場規模は？", a: "約1.8兆円", note: "" },
+  // 店舗数・インフラ
+  { cat: "店舗数・インフラ", q: "コンビニの店舗数（全国）は？", a: "約56,000店", note: "セブン-イレブンは約21,000店" },
+  { cat: "店舗数・インフラ", q: "スターバックスの店舗数（日本）は？", a: "約1,900店", note: "" },
+  { cat: "店舗数・インフラ", q: "マクドナルドの店舗数（日本）は？", a: "約3,000店", note: "" },
+  { cat: "店舗数・インフラ", q: "郵便局の数は？", a: "約24,000局", note: "" },
+  { cat: "店舗数・インフラ", q: "電柱の数は？", a: "約3,600万本", note: "電力・通信合計" },
+  { cat: "店舗数・インフラ", q: "信号機の数は？", a: "約20万基", note: "" },
+  { cat: "店舗数・インフラ", q: "ガソリンスタンドの数は？", a: "約27,000箇所", note: "" },
+  { cat: "店舗数・インフラ", q: "小学校の数は？", a: "約19,000校", note: "" },
+  { cat: "店舗数・インフラ", q: "神社・寺の数は？", a: "神社 約8万社／寺 約7.7万寺", note: "" },
+  { cat: "店舗数・インフラ", q: "コンビニ1店舗の1日来客数は？", a: "約800〜1,000人", note: "客単価 約700円" },
+  { cat: "店舗数・インフラ", q: "コンビニ1店舗の1日売上は？", a: "約50〜70万円", note: "商品アイテム数 約3,000点" },
+  // デジタル・係数
+  { cat: "デジタル・係数", q: "スマホ保有率（個人）は？", a: "約8割", note: "ネット利用率は約85%" },
+  { cat: "デジタル・係数", q: "自動車の保有台数は？", a: "約8,200万台", note: "世帯保有率 約8割" },
+  { cat: "デジタル・係数", q: "キャッシュレス決済比率は？", a: "約4割", note: "" },
+  { cat: "デジタル・係数", q: "年間の労働時間は？", a: "約2,000時間", note: "約8時間/日 × 約20日/月 × 12ヶ月" },
+  { cat: "デジタル・係数", q: "年間の営業日数（概算）は？", a: "約240日", note: "土日祝除く" },
+  { cat: "デジタル・係数", q: "三大都市圏の人口集中度は？", a: "人口の約半分", note: "" },
+  { cat: "デジタル・係数", q: "パレートの法則とは？", a: "上位2割が全体の8割を生む", note: "80:20の法則" },
+  // 世界
+  { cat: "世界", q: "世界人口は？", a: "約80億人", note: "グローバル推定の基本" },
+  { cat: "世界", q: "中国の人口は？", a: "約14億人", note: "" },
+  { cat: "世界", q: "インドの人口は？", a: "約14億人", note: "中国を抜き世界1位" },
+  { cat: "世界", q: "米国の人口は？", a: "約3.4億人", note: "" },
+  { cat: "世界", q: "インドネシアの人口は？", a: "約2.8億人", note: "東南アジア最大。ASEAN全体で約6.8億人" },
+  { cat: "世界", q: "EUの人口は？", a: "約4.5億人", note: "ブラジルは約2.2億人" },
+  { cat: "世界", q: "米国のGDPは？", a: "約28兆ドル", note: "世界1位" },
+  { cat: "世界", q: "中国のGDPは？", a: "約18兆ドル", note: "世界2位。3位ドイツ約4.5兆ドル" },
+  { cat: "世界", q: "世界全体のGDPは？", a: "約110兆ドル", note: "" },
+  // 企業
+  { cat: "企業", q: "トヨタ自動車の年間売上は？", a: "約45兆円", note: "日本最大" },
+  { cat: "企業", q: "三菱商事の年間売上は？", a: "約20兆円", note: "ホンダも約20兆円" },
+  { cat: "企業", q: "NTTの年間売上は？", a: "約13兆円", note: "ソニーグループも約13兆円" },
+  { cat: "企業", q: "セブン&アイの年間売上は？", a: "約11兆円", note: "日立は約10兆円、イオンは約9.5兆円" },
+  { cat: "企業", q: "日本企業の売上のオーダー感は？", a: "トップ数十兆円／大手 数兆〜10兆円", note: "上場大企業で数千億〜1兆円" },
+];
+
+let currentCat = "all";
+let order = cards.map((_, i) => i);
+const flipped = new Set();
+const LS_KEY = "case-numbers-memorized";
+let memorized = new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]"));
+
+function save() { localStorage.setItem(LS_KEY, JSON.stringify([...memorized])); }
+function cardKey(c) { return c.cat + "|" + c.q; }
+
+function renderNav() {
+  const nav = document.getElementById("nav");
+  const btns = ['<button class="' + (currentCat === "all" ? "active" : "") + '" onclick="setCat(\'all\')">すべて</button>'];
+  for (const c of CATS) {
+    btns.push('<button class="' + (currentCat === c ? "active" : "") + '" onclick="setCat(\'' + c + '\')">' + c + "</button>");
+  }
+  nav.innerHTML = btns.join("");
+}
+
+function setCat(cat) { currentCat = cat; render(); }
+
+function visibleIndexes() {
+  return order.filter(i => {
+    const c = cards[i];
+    if (currentCat !== "all" && c.cat !== currentCat) return false;
+    return !memorized.has(cardKey(c));
+  });
+}
+
+function render() {
+  renderNav();
+  const grid = document.getElementById("grid");
+  const idxs = visibleIndexes();
+  const totalInCat = order.filter(i => currentCat === "all" || cards[i].cat === currentCat).length;
+  document.getElementById("count").textContent =
+    idxs.length + "枚を表示中（覚えた " + (totalInCat - idxs.length) + " / 全" + totalInCat + "枚）";
+  grid.innerHTML = idxs.map(i => {
+    const c = cards[i];
+    const isFlipped = flipped.has(i);
+    const body = isFlipped
+      ? '<div class="a">' + c.a + "</div>" + (c.note ? '<div class="note">' + c.note + "</div>" : "")
+      : '<div class="q">' + c.q + "</div>";
+    const footer = '<div class="card-footer"><span class="flip-hint">' +
+      (isFlipped ? "クリックで問題に戻る" : "クリックで答えを見る") + "</span>" +
+      (isFlipped ? '<button class="memorized-btn" onclick="markMemorized(event, ' + i + ')">✓ 覚えた</button>' : "") +
+      "</div>";
+    return '<div class="card' + (isFlipped ? " flipped" : "") + '" onclick="toggleFlip(' + i + ')">' +
+      '<div class="cat-label">' + c.cat + "</div>" + body + footer + "</div>";
+  }).join("");
+}
+
+function toggleFlip(i) {
+  if (flipped.has(i)) flipped.delete(i); else flipped.add(i);
+  render();
+}
+
+function markMemorized(ev, i) {
+  ev.stopPropagation();
+  memorized.add(cardKey(cards[i]));
+  save();
+  render();
+}
+
+function shuffleCards() {
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  flipped.clear();
+  render();
+}
+
+function showAllAnswers() { visibleIndexes().forEach(i => flipped.add(i)); render(); }
+function resetFlips() { flipped.clear(); render(); }
+function resetProgress() { memorized.clear(); save(); render(); }
+
+render();
+</script>
+</body>
+</html>
