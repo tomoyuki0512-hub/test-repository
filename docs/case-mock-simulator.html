@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ケース面接 模擬面接シミュレーター</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; color: #333; }
+    header {
+      background: #24292e; color: #fff; padding: 16px 24px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    header h1 { font-size: 1.1rem; flex: 1; min-width: 220px; }
+    header button {
+      padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer;
+      font-size: 0.8rem; background: #444; color: #ccc;
+    }
+    header button.active { background: #0366d6; color: #fff; }
+    .progress-wrap { background: #fff; border-bottom: 1px solid #e1e4e8; padding: 10px 24px; }
+    .phase-label { font-size: 0.8rem; color: #0366d6; font-weight: bold; margin-bottom: 6px; }
+    .bar { background: #e1e4e8; border-radius: 4px; height: 8px; overflow: hidden; }
+    .bar-fill { background: #0366d6; height: 100%; transition: width 0.3s; }
+    main { max-width: 760px; margin: 20px auto; padding: 0 16px 40px; }
+    .turn { margin-bottom: 18px; }
+    .bubble {
+      padding: 14px 18px; border-radius: 12px; line-height: 1.65; font-size: 0.95rem;
+      white-space: pre-wrap;
+    }
+    .interviewer .bubble { background: #fff; border: 1px solid #d1d5da; border-top-left-radius: 2px; }
+    .candidate .bubble { background: #dcf0ff; border: 1px solid #a5d3f5; border-top-right-radius: 2px; margin-left: 24px; }
+    .speaker { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
+    .candidate .speaker { text-align: right; margin-right: 4px; }
+    .prompt-box {
+      background: #fff8e6; border: 1px dashed #d4a72c; border-radius: 8px;
+      padding: 14px 18px; margin: 14px 0 14px 24px; font-size: 0.88rem; color: #6a5300;
+    }
+    .kaisetsu {
+      background: #f0fff4; border-left: 4px solid #28a745; border-radius: 0 8px 8px 0;
+      padding: 12px 16px; margin: 10px 0 10px 24px; font-size: 0.88rem; line-height: 1.6;
+    }
+    .controls { display: flex; gap: 10px; margin: 18px 0 0 24px; flex-wrap: wrap; }
+    .controls button {
+      padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+      border: 1px solid #d1d5da; background: #fff;
+    }
+    .controls button.primary { background: #0366d6; border-color: #0366d6; color: #fff; }
+    .done-box {
+      background: #fff; border-radius: 10px; padding: 24px; text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-top: 20px;
+    }
+    .done-box h2 { font-size: 1.05rem; margin-bottom: 10px; }
+    .done-box p { font-size: 0.88rem; color: #555; line-height: 1.6; margin-bottom: 14px; }
+    footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #888; }
+    footer a { color: #0366d6; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>模擬面接シミュレーター：ジムの会員数を2年で1.5倍に</h1>
+  <button id="mode-step" class="active" onclick="setMode('step')">練習モード</button>
+  <button id="mode-full" onclick="setMode('full')">全文表示</button>
+  <button onclick="restart()">最初から</button>
+</header>
+<div class="progress-wrap">
+  <div class="phase-label" id="phase"></div>
+  <div class="bar"><div class="bar-fill" id="bar" style="width:0%"></div></div>
+</div>
+<main id="main"></main>
+<footer>
+  解説付きの読み物版は <a href="case-interview-mock-script.md">模擬面接フル対話スクリプト（MD）</a>、
+  型の解説は <a href="case-interview-guide.md">完全ガイド</a> を参照。
+</footer>
+<script>
+// case-interview-mock-script.md と同一の対話データ
+const steps = [
+  { phase: "1. お題提示と前提確認",
+    i: "クライアントは国内でフィットネスジムを100店舗展開する企業です。会員数を2年で1.5倍にしたい。どうすればよいか、考えてください。",
+    c: "ありがとうございます。前提をいくつか確認させてください。まず『会員数』は、月会費を払う継続会員の数、という理解でよいでしょうか？" },
+  { phase: "1. お題提示と前提確認",
+    i: "はい、月会費制の会員数です。",
+    c: "ジムの形態は、総合型（スタジオ・プール併設）と24時間型のどちらに近いでしょうか？また現在の会員数の規模感があれば教えてください。" },
+  { phase: "1. お題提示と前提確認",
+    i: "駅前の中規模ジムで、マシン＋スタジオの形態です。会員数は全店合計で約10万人としましょう。",
+    c: "承知しました。では『2年で10万人→15万人』をゴールとし、新規出店は大きな投資になるため、まずは既存100店舗を前提に考え、必要なら出店も検討する、という進め方でよろしいですか？",
+    k: "①用語の定義（会員数とは何か）、②ビジネスの具体像（形態・規模）、③スコープ（既存店前提）の3点を短く確認。質問攻めにせず、スコープは自分から仮置きを提案し、ゴールも「10万→15万」と定量化した。" },
+  { phase: "2. 構造化の宣言",
+    i: "結構です。",
+    c: "少し整理する時間を30秒ほどいただけますか。" },
+  { phase: "2. 構造化の宣言",
+    i: "どうぞ。",
+    c: "（30秒後）整理できました。会員数はストックなので、次のように分解します。\n\n期末会員数 = 期初会員数 + 新規入会 − 退会\n・新規入会 = 商圏内人口 × 認知率 × 体験申込率 × 入会率\n・退会 = 会員数 × 月次退会率 × 12ヶ月\n\nつまり打ち手は『新規入会を増やす』か『退会を減らす』の2方向です。まず、現状どちらがボトルネックかを確認したいのですが、月次の退会率と新規入会数のデータはありますか？",
+    k: "会員数を「フロー（入会・退会）で動くストック」と捉えた分解が本質的。打ち手に飛ばず、先にボトルネック特定のためのデータを要求している。候補者リード型では自分から情報を取りに行く。" },
+  { phase: "3. 分析とボトルネック特定",
+    i: "月次退会率は約3%、新規入会は全店で月約3,000人です。",
+    c: "計算してみます。会員10万人で月次退会率3%なら、毎月約3,000人が退会。新規入会も月3,000人なので、現状は完全に横ばいですね。1.5倍にするには2年＝24ヶ月で5万人の純増、つまり月あたり約2,000人の純増が必要です。" },
+  { phase: "3. 分析とボトルネック特定",
+    i: "そうですね。ではどちらに手を打ちますか？",
+    c: "両方見ますが、まず退会率から検討します。理由は2つあります。第一に、退会率3%は年間に直すと約3割が入れ替わる計算で、獲得コストをかけた会員がすぐ抜けるのは効率が悪い。第二に、新規獲得には広告費がかかる一方、退会防止は既存資産への働きかけなので費用対効果が高いことが多いためです。退会理由のデータはありますか？" },
+  { phase: "3. 分析とボトルネック特定",
+    i: "退会者アンケートでは『通わなくなった・時間がない』が6割、『料金』が2割、『引っ越し』が2割です。",
+    c: "『通わなくなった』が6割というのは重要ですね。つまり価格や競合に負けているのではなく、利用習慣が定着する前に幽霊会員化→退会している可能性が高い。入会後どのくらいの期間で退会する人が多いか、分かりますか？" },
+  { phase: "3. 分析とボトルネック特定",
+    i: "入会後6ヶ月以内の退会が全体の半分を占めます。",
+    c: "では論点を絞れました。『入会後6ヶ月以内の新規会員の定着』が最大のボトルネックです。ここを改善できれば、月3,000人の退会のうち半分の1,500人がターゲットになります。",
+    k: "①数字をすぐ計算して「横ばい」という意味に変換、②「退会から見る」優先順位に理由を2つ、③データを重ねて論点を絞り込んだ。数字→解釈→次の質問、のループが理想の分析。" },
+  { phase: "4. 面接官の誘導への対応",
+    i: "なるほど。ちなみに、新規入会の方はもう伸ばせないと思いますか？",
+    c: "いえ、伸ばせる余地はあると思います。ご質問の意図として、新規側にも重要な論点があるということでしたら、そちらも検討します。先ほどの分解でいうと、商圏内での認知はすでに高いと思われるため、伸ばすなら『体験申込率』と『入会率』、つまり入口のハードルを下げる方向かと思います。例えば、都度払い・短期トライアルのような入会前の選択肢です。この方向で深掘りしましょうか？" },
+  { phase: "4. 面接官の誘導への対応",
+    i: "そうですね、実はクライアントは若年層の取り込みに課題を感じています。",
+    c: "若年層ですね。若年層は月会費の固定負担を嫌う傾向があるので、まさに都度払いやアプリ完結の入会体験が効きそうです。では打ち手を、①既存会員の定着（最優先）、②若年層向けの入口設計、の2本柱で整理します。",
+    k: "面接官の「新規は伸ばせない？」は誘導（ヒント）。自分の仮説に固執せず、無条件に従うのでもなく、意図を確認しつつ構造の中に位置づけて取り込んだ。誘導は減点ではなく、乗れるかどうかを見られている。" },
+  { phase: "5. 詰まったときのリカバリー",
+    i: "定着施策として、具体的には何をしますか？",
+    c: "……すみません、少し整理させてください。会員が定着しない原因を時系列で考えます。入会直後は『マシンの使い方が分からない』、1〜3ヶ月は『効果が出ない』、3ヶ月以降は『飽きる』。原因が時期で違うので、施策も時期別に打ちます。\n\n・入会直後：初回オリエンテーション必須化と個別プログラム作成\n・1〜3ヶ月：アプリで来店を可視化し、月2回来れば会費の一部をポイント還元\n・3ヶ月以降：スタジオプログラムやイベントで『通う理由』を追加" },
+  { phase: "5. 詰まったときのリカバリー",
+    i: "ポイント還元は面白いですが、収益を圧迫しませんか？",
+    c: "良いご指摘です。概算します。還元を月500円とすると、10万人全員が達成しても月5,000万円。一方、退会率が3%→2.5%に下がれば毎月500人の退会が減り、月会費8,000円とすると月400万円の売上維持——これが毎月積み上がるので、12ヶ月で約2,880万円/月の効果になります。半年強で還元コストを上回るため、投資として成立すると考えます。",
+    k: "詰まったら黙り込まず「整理させてください」と宣言して枠組み（時系列）を作り直す。コスト懸念への反論には、その場で概算して数字で答えた。この「即席の定量化」ができると強い。" },
+  { phase: "6. 結論",
+    i: "では、まとめてください。",
+    c: "はい。結論として、『入会後6ヶ月の定着プログラム』を最優先に、『若年層向けの入口多様化』を第二の柱として、2年で会員数15万人を目指します。\n\n理由は3つです。第一に、現状は入会と退会が月3,000人ずつで均衡しており、退会率の高さが成長を止めている構造だからです。第二に、退会の半分は入会6ヶ月以内に集中しており、時期別の定着施策で退会率3%→2%への改善が現実的だからです。これで月約1,000人の純増が生まれます。第三に、残り月1,000人の純増は、都度払い・アプリ入会など若年層向けの入口設計で新規入会を月3,000→4,000人に伸ばすことで達成可能だからです。\n\nリスクは、効果が出るまで2〜3四半期かかることです。そこで最初の半年は20店舗でパイロットを行い、効果を確認して全店展開する進め方を提案します。",
+    k: "結論→理由3つ→リスクと進め方、のPREP＋α構成。数字（3%→2%、月1,000人×2本柱＝必要純増2,000人）がゴールから逆算されて整合している点が最重要。" },
+  { phase: "7. 逆質問",
+    i: "最後に、何か質問はありますか？",
+    c: "本日のケースに関連して1つ伺いたいのですが、実際のプロジェクトでこうした会員制ビジネスの改善を扱う場合、最初の数週間はどんな分析から入ることが多いのでしょうか？",
+    k: "逆質問も評価の一部。ケースの内容に絡めた質問は関心と学習意欲を示せる。「特にありません」は避ける。" },
+];
+
+let mode = "step";
+let idx = 0;          // 現在のステップ
+let revealed = false; // 現在ステップの模範回答を開いたか
+let kaisetsuOpen = false;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById("mode-step").classList.toggle("active", m === "step");
+  document.getElementById("mode-full").classList.toggle("active", m === "full");
+  render();
+}
+function restart() { idx = 0; revealed = false; kaisetsuOpen = false; setMode("step"); }
+
+function reveal() { revealed = true; render(); }
+function toggleKaisetsu() { kaisetsuOpen = !kaisetsuOpen; render(); }
+function next() {
+  if (idx < steps.length - 1) { idx++; revealed = false; kaisetsuOpen = false; render(); }
+  else { idx = steps.length; render(); }
+}
+
+function turnHtml(s, withK) {
+  let h = '<div class="turn interviewer"><div class="speaker">面接官</div><div class="bubble">' + s.i + "</div></div>" +
+          '<div class="turn candidate"><div class="speaker">候補者（模範例）</div><div class="bubble">' + s.c + "</div></div>";
+  if (withK && s.k) h += '<div class="kaisetsu">💡 ' + s.k + "</div>";
+  return h;
+}
+
+function render() {
+  const main = document.getElementById("main");
+  if (mode === "full") {
+    document.getElementById("phase").textContent = "全文表示モード（全" + steps.length + "ターン）";
+    document.getElementById("bar").style.width = "100%";
+    main.innerHTML = steps.map(s => turnHtml(s, true)).join("");
+    return;
+  }
+  // 練習モード
+  if (idx >= steps.length) {
+    document.getElementById("phase").textContent = "終了";
+    document.getElementById("bar").style.width = "100%";
+    main.innerHTML =
+      '<div class="done-box"><h2>🎉 模擬面接 終了</h2>' +
+      "<p>お疲れさまでした。録音していた場合は、模範回答と自分の回答を比べて<br>「結論から話せたか／数字で答えたか／沈黙が長くなかったか」を振り返りましょう。</p>" +
+      '<div class="controls" style="justify-content:center;margin:0">' +
+      '<button class="primary" onclick="restart()">もう一度最初から</button></div></div>';
+    return;
+  }
+  const s = steps[idx];
+  document.getElementById("phase").textContent = "フェーズ " + s.phase + "（" + (idx + 1) + "/" + steps.length + "）";
+  document.getElementById("bar").style.width = Math.round((idx / steps.length) * 100) + "%";
+
+  let h = "";
+  // 直前のターンを1つだけ薄く表示（文脈用）
+  if (idx > 0) h += '<div style="opacity:0.45">' + turnHtml(steps[idx - 1], false) + "</div><hr style='border:none;border-top:1px solid #e1e4e8;margin:16px 0'>";
+  h += '<div class="turn interviewer"><div class="speaker">面接官</div><div class="bubble">' + s.i + "</div></div>";
+  if (!revealed) {
+    h += '<div class="prompt-box">🎤 まず<strong>自分ならどう返すか、声に出して</strong>答えてみましょう（録音推奨）。答えてから模範回答を開いてください。</div>';
+    h += '<div class="controls"><button class="primary" onclick="reveal()">模範回答を見る</button></div>';
+  } else {
+    h += '<div class="turn candidate"><div class="speaker">候補者（模範例）</div><div class="bubble">' + s.c + "</div></div>";
+    if (s.k && kaisetsuOpen) h += '<div class="kaisetsu">💡 ' + s.k + "</div>";
+    h += '<div class="controls">' +
+      (s.k ? '<button onclick="toggleKaisetsu()">' + (kaisetsuOpen ? "解説を閉じる" : "💡 解説を見る") + "</button>" : "") +
+      '<button class="primary" onclick="next()">' + (idx === steps.length - 1 ? "終了する" : "次へ") + "</button></div>";
+  }
+  main.innerHTML = h;
+  window.scrollTo({ top: 0 });
+}
+
+render();
+</script>
+</body>
+</html>
