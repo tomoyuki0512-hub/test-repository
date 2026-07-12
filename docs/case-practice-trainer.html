@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ケース面接 練習トレーナー</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; color: #333; }
+    header {
+      background: #24292e; color: #fff; padding: 16px 24px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    header h1 { font-size: 1.15rem; flex: 1; min-width: 220px; }
+    .progress-label { font-size: 0.82rem; color: #ccc; }
+    header button {
+      padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer;
+      font-size: 0.8rem; background: #444; color: #ccc;
+    }
+    nav {
+      background: #fff; padding: 10px 24px; display: flex; gap: 8px;
+      flex-wrap: wrap; border-bottom: 1px solid #e1e4e8; align-items: center;
+    }
+    nav .group-label { font-size: 0.75rem; color: #888; margin-left: 8px; }
+    nav button {
+      padding: 5px 12px; border: 1px solid #d1d5da; border-radius: 14px;
+      cursor: pointer; font-size: 0.8rem; background: #fff; color: #444;
+    }
+    nav button.active { background: #0366d6; border-color: #0366d6; color: #fff; }
+    main { max-width: 760px; margin: 24px auto; padding: 0 16px; }
+    .qcard {
+      background: #fff; border-radius: 10px; padding: 26px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    .badges { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .badge {
+      font-size: 0.72rem; padding: 2px 10px; border-radius: 10px;
+      background: #e8f0fe; color: #0366d6;
+    }
+    .badge.level { background: #fff3cd; color: #8a6d00; }
+    .badge.num { background: #f0f0f0; color: #666; }
+    .badge.done { background: #dcffe4; color: #1a7f37; }
+    .qtext { font-size: 1.25rem; font-weight: bold; line-height: 1.5; color: #24292e; margin-bottom: 20px; }
+    .timer-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .timer {
+      font-size: 2rem; font-weight: bold; font-variant-numeric: tabular-nums;
+      color: #24292e; min-width: 110px;
+    }
+    .timer.warning { color: #d73a49; }
+    .timer.up { color: #d73a49; animation: blink 1s step-start infinite; }
+    @keyframes blink { 50% { opacity: 0.3; } }
+    .timer-row button, .actions button {
+      padding: 8px 16px; border: 1px solid #d1d5da; border-radius: 6px;
+      cursor: pointer; font-size: 0.85rem; background: #fff; color: #333;
+    }
+    .timer-row button.primary { background: #2ea44f; border-color: #2ea44f; color: #fff; }
+    .timeup-msg { color: #d73a49; font-weight: bold; font-size: 0.9rem; }
+    .hint-box {
+      background: #f6f8fa; border-left: 4px solid #0366d6; padding: 12px 16px;
+      border-radius: 0 6px 6px 0; margin-bottom: 18px; font-size: 0.92rem; line-height: 1.5;
+    }
+    .grade-section { border-top: 1px solid #e1e4e8; padding-top: 16px; margin-top: 4px; }
+    .grade-section p { font-size: 0.85rem; color: #666; margin-bottom: 10px; }
+    .grade-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+    .grade-buttons button {
+      flex: 1; min-width: 140px; padding: 12px; border-radius: 8px; cursor: pointer;
+      border: 2px solid #d1d5da; background: #fff; font-size: 0.9rem;
+    }
+    .grade-buttons button:hover { border-color: #0366d6; }
+    .grade-buttons button.selected { border-color: #2ea44f; background: #dcffe4; }
+    .grade-buttons small { display: block; color: #888; margin-top: 4px; font-size: 0.72rem; }
+    .actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    .actions button.next { background: #0366d6; border-color: #0366d6; color: #fff; }
+    .empty { text-align: center; color: #888; padding: 40px 0; }
+    footer { text-align: center; padding: 24px; font-size: 0.8rem; color: #888; }
+    footer a { color: #0366d6; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>ケース面接 練習トレーナー</h1>
+  <span class="progress-label" id="progress"></span>
+  <button onclick="resetProgress()">進捗リセット</button>
+</header>
+<nav>
+  <span class="group-label">タイプ:</span>
+  <button data-type="all" class="active" onclick="setType('all')">すべて</button>
+  <button data-type="フェルミ" onclick="setType('フェルミ')">フェルミ推定</button>
+  <button data-type="ケース" onclick="setType('ケース')">ビジネスケース</button>
+  <button data-type="政策・抽象" onclick="setType('政策・抽象')">政策・抽象</button>
+  <span class="group-label">難易度:</span>
+  <button data-level="0" class="active" onclick="setLevel(0)">すべて</button>
+  <button data-level="1" onclick="setLevel(1)">★</button>
+  <button data-level="2" onclick="setLevel(2)">★★</button>
+  <button data-level="3" onclick="setLevel(3)">★★★</button>
+</nav>
+<main>
+  <div class="qcard" id="qcard"></div>
+</main>
+<footer>
+  お題の一覧・解き方は <a href="case-interview-question-bank.md">頻出お題集（MD）</a> /
+  <a href="case-interview-guide.md">完全ガイド</a> を参照。
+</footer>
+<script>
+// case-interview-question-bank.md の50問と同一データ
+const questions = [
+  { id: 1,  type: "フェルミ", sub: "市場規模", level: 1, q: "日本のコンビニ市場規模は？", hint: "店舗数 × 1店舗1日売上 × 365" },
+  { id: 2,  type: "フェルミ", sub: "市場規模", level: 1, q: "日本のカフェ市場規模は？", hint: "人口 × 利用率 × 頻度 × 単価" },
+  { id: 3,  type: "フェルミ", sub: "市場規模", level: 1, q: "日本の美容室市場規模は？", hint: "人口 × 年間利用回数 × 客単価（男女で分ける）" },
+  { id: 4,  type: "フェルミ", sub: "市場規模", level: 2, q: "日本の映画館の年間興行収入は？", hint: "人口 × 年間鑑賞回数 × チケット単価" },
+  { id: 5,  type: "フェルミ", sub: "市場規模", level: 2, q: "日本のラーメン市場規模は？", hint: "外食頻度から積む or 店舗数 × 店舗売上 の両面" },
+  { id: 6,  type: "フェルミ", sub: "市場規模", level: 2, q: "日本の宅配ピザ市場規模は？", hint: "世帯数 × 注文頻度 × 単価" },
+  { id: 7,  type: "フェルミ", sub: "市場規模", level: 2, q: "日本の結婚式市場規模は？", hint: "年間婚姻組数（1学年100万人から推定）× 実施率 × 単価" },
+  { id: 8,  type: "フェルミ", sub: "市場規模", level: 2, q: "日本のスマホゲーム市場規模は？", hint: "スマホ人口 × 課金率 × 月課金額 × 12" },
+  { id: 9,  type: "フェルミ", sub: "市場規模", level: 2, q: "日本の学習塾市場規模は？", hint: "学年人口 × 通塾率 × 月謝 × 12（小中高で分ける）" },
+  { id: 10, type: "フェルミ", sub: "市場規模", level: 3, q: "東京都内のタクシー市場規模は？", hint: "台数 × 稼働率 × 1日売上（供給側）で積む" },
+  { id: 11, type: "フェルミ", sub: "個数・ストック", level: 1, q: "日本にある電柱の数は？", hint: "可住地面積 × 単位面積あたり本数（50m間隔）" },
+  { id: 12, type: "フェルミ", sub: "個数・ストック", level: 2, q: "日本にある信号機の数は？", hint: "交差点数から推定（道路の格子間隔）or 人口比" },
+  { id: 13, type: "フェルミ", sub: "個数・ストック", level: 2, q: "日本にあるマンホールの数は？", hint: "道路延長 × 設置間隔" },
+  { id: 14, type: "フェルミ", sub: "個数・ストック", level: 2, q: "日本にある自動販売機の数は？", hint: "人口あたり台数 or 設置場所（駅・オフィス・路上）別に積む" },
+  { id: 15, type: "フェルミ", sub: "個数・ストック", level: 1, q: "日本にあるコンビニの数は？", hint: "人口 ÷ 1店舗あたり商圏人口（約2,000人）" },
+  { id: 16, type: "フェルミ", sub: "個数・ストック", level: 2, q: "東京都内の美容室の数は？", hint: "需要（人口×利用頻度）÷ 1店舗の処理能力" },
+  { id: 17, type: "フェルミ", sub: "個数・ストック", level: 3, q: "日本にあるピアノの台数は？", hint: "世帯保有率 + 学校・施設分（ストックは耐用年数に注意）" },
+  { id: 18, type: "フェルミ", sub: "個数・ストック", level: 1, q: "日本の乗用車の保有台数は？", hint: "世帯数 × 世帯保有率（都市部/地方で分ける）" },
+  { id: 19, type: "フェルミ", sub: "売上・利用量", level: 1, q: "スターバックス1店舗の1日売上は？", hint: "席数 × 回転率 × 営業時間 + テイクアウト、× 客単価" },
+  { id: 20, type: "フェルミ", sub: "売上・利用量", level: 1, q: "駅前のマクドナルド1店舗の1日売上は？", hint: "時間帯別（ピーク/オフピーク）客数 × 客単価" },
+  { id: 21, type: "フェルミ", sub: "売上・利用量", level: 2, q: "新幹線「のぞみ」1本の売上は？", hint: "座席数 × 乗車率 × 平均運賃" },
+  { id: 22, type: "フェルミ", sub: "売上・利用量", level: 2, q: "都内のコインパーキング1台分の年間売上は？", hint: "稼働率 × 時間単価 × 24h × 365" },
+  { id: 23, type: "フェルミ", sub: "売上・利用量", level: 2, q: "日本で1日に飲まれるコーヒーの杯数は？", hint: "人口 × 飲用率 × 1人あたり杯数" },
+  { id: 24, type: "フェルミ", sub: "売上・利用量", level: 2, q: "日本で1年間に消費されるお米の量は？", hint: "人口 × 1食あたり量 × 頻度 × 365" },
+  { id: 25, type: "フェルミ", sub: "売上・利用量", level: 3, q: "羽田空港の1日の利用者数は？", hint: "発着便数 × 平均座席数 × 搭乗率（供給側から）" },
+  { id: 26, type: "ケース", sub: "売上向上", level: 1, q: "駅前の書店の売上を上げるには？", hint: "客数（通行量×入店率）× 客単価。書店特有の「立ち読み→購入率」" },
+  { id: 27, type: "ケース", sub: "売上向上", level: 1, q: "回転寿司チェーンの売上を1.5倍にするには？", hint: "客数（回転率・ピーク制約）× 客単価（皿数・サイドメニュー）" },
+  { id: 28, type: "ケース", sub: "売上向上", level: 2, q: "動物園の来場者数を2倍にするには？", hint: "新規/リピート、平日/休日、ターゲット層別に分解" },
+  { id: 29, type: "ケース", sub: "売上向上", level: 2, q: "地方の温泉旅館の売上を上げるには？", hint: "稼働率 × 単価。閑散期対策とターゲット（インバウンド）拡大" },
+  { id: 30, type: "ケース", sub: "売上向上", level: 2, q: "フィットネスジムの会員数を増やすには？", hint: "新規獲得 − 退会。retention改善が先か獲得が先か" },
+  { id: 31, type: "ケース", sub: "売上向上", level: 2, q: "音楽ストリーミングサービスの有料会員を増やすには？", hint: "無料→有料の転換ファネルで分解" },
+  { id: 32, type: "ケース", sub: "売上向上", level: 2, q: "タクシー会社の売上を上げるには？", hint: "台数 × 稼働率 × 単価。配車アプリ・法人契約" },
+  { id: 33, type: "ケース", sub: "利益改善", level: 2, q: "赤字のファミレスチェーンを立て直すには？", hint: "店舗別採算 → 不採算店の特定 → 売上/コスト両面" },
+  { id: 34, type: "ケース", sub: "利益改善", level: 1, q: "町の洋菓子店の利益率を改善するには？", hint: "売上ミックス（高利益商品）と廃棄ロス・原価率" },
+  { id: 35, type: "ケース", sub: "利益改善", level: 3, q: "出版社の利益を改善するには？", hint: "紙/電子の構造変化。返品率・在庫という業界特有コスト" },
+  { id: 36, type: "ケース", sub: "利益改善", level: 2, q: "映画館の収益性を高めるには？", hint: "チケット以外（飲食・物販・広告・スクリーンの非映画利用）" },
+  { id: 37, type: "ケース", sub: "市場参入・新規事業", level: 2, q: "コンビニチェーンはフィットネス事業に参入すべきか？", hint: "市場魅力度 × 既存資産（立地・店舗網）の活かせ度" },
+  { id: 38, type: "ケース", sub: "市場参入・新規事業", level: 2, q: "日本の食品メーカーはインドに進出すべきか？", hint: "市場性 × 現地適合（食文化・価格帯）× 参入方式" },
+  { id: 39, type: "ケース", sub: "市場参入・新規事業", level: 3, q: "鉄道会社が始めるべき新規事業は？", hint: "保有資産（不動産・人流・信用）から発想を広げる" },
+  { id: 40, type: "ケース", sub: "市場参入・新規事業", level: 3, q: "銀行はどのようにデジタル化を進めるべきか？", hint: "顧客接点・業務プロセス・新サービスの3層で構造化" },
+  { id: 41, type: "ケース", sub: "M&A・価格", level: 2, q: "飲料メーカーは健康食品ベンチャーを買収すべきか？", hint: "戦略適合 × 単独価値 × シナジー × 価格上限" },
+  { id: 42, type: "ケース", sub: "M&A・価格", level: 2, q: "新しいサブスク動画サービスの月額をいくらにすべきか？", hint: "コスト積上げ/競合比較/支払意思額の3アプローチ" },
+  { id: 43, type: "ケース", sub: "M&A・価格", level: 2, q: "遊園地の入場料を値上げすべきか？", hint: "価格弾力性（客数減 vs 単価増）と顧客セグメント" },
+  { id: 44, type: "ケース", sub: "M&A・価格", level: 3, q: "高級ホテルチェーン同士の統合に賛成か？", hint: "シナジー（予約網・仕入）とカニバリ・ブランド毀損リスク" },
+  { id: 45, type: "ケース", sub: "M&A・価格", level: 3, q: "製薬会社は特許切れ主力薬の値下げにどう対応すべきか？", hint: "ジェネリック参入後の市場構造変化を織り込む" },
+  { id: 46, type: "政策・抽象", sub: "公共政策", level: 2, q: "待機児童問題をどう解決するか？", hint: "需要 − 供給のギャップ分解（ガイド7-2に骨子）" },
+  { id: 47, type: "政策・抽象", sub: "公共政策", level: 3, q: "地方の過疎化を止めるには？", hint: "人口動態（自然減/社会減）で分解し、流出要因（仕事・教育）へ" },
+  { id: 48, type: "政策・抽象", sub: "公共政策", level: 3, q: "日本の食料自給率を上げるには？", hint: "生産・消費の両面。カロリーベース/生産額ベースの定義確認から" },
+  { id: 49, type: "政策・抽象", sub: "公共政策", level: 2, q: "満員電車を解消するには？", hint: "需要の平準化（時差・リモート）× 供給増の限界" },
+  { id: 50, type: "政策・抽象", sub: "公共政策", level: 2, q: "投票率を上げるには？", hint: "投票のコスト（手間）を下げる × 便益（関心）を上げる" },
+];
+
+const LS_KEY = "case-trainer-grades";
+let grades = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+let typeFilter = "all";
+let levelFilter = 0;
+let current = null;
+let hintShown = false;
+let timerSec = 0, timerId = null, timeUp = false;
+
+function saveGrades() { localStorage.setItem(LS_KEY, JSON.stringify(grades)); }
+function minutesFor(q) { return q.type === "フェルミ" ? 5 : 15; }
+function stars(n) { return "★".repeat(n); }
+
+function pool() {
+  return questions.filter(q =>
+    (typeFilter === "all" || q.type === typeFilter) &&
+    (levelFilter === 0 || q.level === levelFilter));
+}
+
+function pickQuestion() {
+  const p = pool();
+  if (p.length === 0) { current = null; return; }
+  const unattempted = p.filter(q => !(q.id in grades));
+  const source = unattempted.length > 0 ? unattempted : p;
+  let next = source[Math.floor(Math.random() * source.length)];
+  if (current && source.length > 1) {
+    while (next.id === current.id) next = source[Math.floor(Math.random() * source.length)];
+  }
+  current = next;
+  hintShown = false;
+  stopTimer();
+  timerSec = minutesFor(current) * 60;
+  timeUp = false;
+}
+
+function setType(t) {
+  typeFilter = t;
+  document.querySelectorAll("nav [data-type]").forEach(b =>
+    b.classList.toggle("active", b.dataset.type === t));
+  pickQuestion(); render();
+}
+function setLevel(l) {
+  levelFilter = l;
+  document.querySelectorAll("nav [data-level]").forEach(b =>
+    b.classList.toggle("active", Number(b.dataset.level) === l));
+  pickQuestion(); render();
+}
+
+function fmt(sec) {
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return m + ":" + String(s).padStart(2, "0");
+}
+
+function startTimer() {
+  if (timerId || timeUp) return;
+  timerId = setInterval(() => {
+    timerSec--;
+    if (timerSec <= 0) { timerSec = 0; timeUp = true; stopTimer(); }
+    renderTimer();
+  }, 1000);
+  render();
+}
+function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+function pauseTimer() { stopTimer(); render(); }
+function resetTimer() {
+  stopTimer();
+  timerSec = minutesFor(current) * 60;
+  timeUp = false;
+  render();
+}
+
+function toggleHint() { hintShown = !hintShown; render(); }
+
+function grade(mark) {
+  grades[current.id] = mark;
+  saveGrades();
+  render();
+}
+
+function nextQuestion() { pickQuestion(); render(); }
+
+function resetProgress() {
+  grades = {};
+  saveGrades();
+  render();
+}
+
+function renderTimer() {
+  const el = document.getElementById("timer");
+  if (!el) return;
+  el.textContent = timeUp ? "0:00" : fmt(timerSec);
+  el.className = "timer" + (timeUp ? " up" : (timerSec <= 60 ? " warning" : ""));
+  const msg = document.getElementById("timeup");
+  if (msg) msg.style.display = timeUp ? "inline" : "none";
+}
+
+function renderProgress() {
+  const attempted = Object.keys(grades).length;
+  const best = Object.values(grades).filter(g => g === "◎").length;
+  document.getElementById("progress").textContent =
+    "挑戦済み " + attempted + "/" + questions.length + "問（◎ " + best + "問）";
+}
+
+function render() {
+  renderProgress();
+  const card = document.getElementById("qcard");
+  if (!current) {
+    card.innerHTML = '<div class="empty">この条件に合う問題がありません。フィルタを変えてください。</div>';
+    return;
+  }
+  const q = current;
+  const done = grades[q.id];
+  card.innerHTML =
+    '<div class="badges">' +
+      '<span class="badge num">問' + q.id + "</span>" +
+      '<span class="badge">' + q.type + "・" + q.sub + "</span>" +
+      '<span class="badge level">' + stars(q.level) + "</span>" +
+      '<span class="badge">目安 ' + minutesFor(q) + "分</span>" +
+      (done ? '<span class="badge done">前回: ' + done + "</span>" : "") +
+    "</div>" +
+    '<div class="qtext">' + q.q + "</div>" +
+    '<div class="timer-row">' +
+      '<span class="timer" id="timer"></span>' +
+      (timerId
+        ? '<button onclick="pauseTimer()">一時停止</button>'
+        : '<button class="primary" onclick="startTimer()">スタート</button>') +
+      '<button onclick="resetTimer()">リセット</button>' +
+      '<span class="timeup-msg" id="timeup" style="display:none">時間切れ！ここまでの内容で結論を言い切る練習を</span>' +
+    "</div>" +
+    (hintShown
+      ? '<div class="hint-box"><strong>ヒント：</strong>' + q.hint + "</div>"
+      : "") +
+    '<div class="actions">' +
+      '<button onclick="toggleHint()">' + (hintShown ? "ヒントを隠す" : "ヒントを見る") + "</button>" +
+      '<button class="next" onclick="nextQuestion()">次の問題へ</button>' +
+    "</div>" +
+    '<div class="grade-section">' +
+      "<p>解き終えたら自己採点（紙に「前提→構造→計算/分析→結論」を書き切れたか）</p>" +
+      '<div class="grade-buttons">' +
+        '<button class="' + (done === "◎" ? "selected" : "") + '" onclick="grade(\'◎\')">◎ 完走<small>構造化して結論まで言い切れた</small></button>' +
+        '<button class="' + (done === "○" ? "selected" : "") + '" onclick="grade(\'○\')">○ 途中まで<small>構造化はできたが結論が弱い</small></button>' +
+        '<button class="' + (done === "△" ? "selected" : "") + '" onclick="grade(\'△\')">△ 詰まった<small>分解の切り口が出なかった→ヒント確認</small></button>' +
+      "</div>" +
+    "</div>";
+  renderTimer();
+}
+
+pickQuestion();
+render();
+</script>
+</body>
+</html>
