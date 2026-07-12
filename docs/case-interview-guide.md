@@ -447,7 +447,11 @@ title: ケース面接 完全ガイド（内容と対策）
 
 ## 関連ページ
 
+- [学習ポータル（HTML）](case-interview-portal.html) ← 全教材のフェーズ別ナビと進捗ダッシュボード
 - [ケース面接で覚えておくべき数値まとめ](case-interview-key-numbers.md) ← フェルミ推定・市場規模の概算に使う基礎データ集
+- [暗算・概算ドリル（HTML）](case-math-drill.html) ← 桁を間違えない速い概算の特訓
+- [行動面接（フィット面接）対策ガイド](fit-interview-guide.md) ← ケースとセットで課されるもう一つの面接
+- [模擬面接 採点ルーブリック（印刷用HTML）](case-interview-rubric.html) ← ペア練習の面接官役用採点表
 - [数値暗記フラッシュカード（HTML）](case-numbers-flashcards.html) ← 上記数値をブラウザでクイズ形式に暗記
 - [ケース面接 頻出お題集（練習問題バンク50問）](case-interview-question-bank.md) ← 難易度・ヒント付きの1人練習用お題リスト
 - [練習トレーナー（HTML）](case-practice-trainer.html) ← お題50問をタイマー・自己採点つきでランダム出題

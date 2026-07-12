@@ -137,4 +137,5 @@ title: ケース面接 頻出お題集（練習問題バンク）
 - [業界別ビジネスモデル・KPIガイド](industry-business-models.md) ← お題の業界の収益構造を先に押さえる
 - [数値暗記フラッシュカード（HTML）](case-numbers-flashcards.html) ← ブラウザで暗記練習
 - [模擬面接フル対話スクリプト](case-interview-mock-script.md) ← 会話の流れを再現
+- [模擬面接 採点ルーブリック（印刷用HTML）](case-interview-rubric.html) ← ペア練習でこのお題集を使うときの採点表
 - [ガイド一覧に戻る](index.md)

@@ -153,6 +153,7 @@ title: ケース面接 模擬面接フル対話スクリプト
 ## 関連ページ
 
 - [模擬面接シミュレーター（HTML）](case-mock-simulator.html) ← このスクリプトをステップ実行して練習
+- [模擬面接 採点ルーブリック（印刷用HTML）](case-interview-rubric.html) ← ペア練習で面接官役が使う採点表
 - [ケース面接 完全ガイド（内容と対策）](case-interview-guide.md) ← 型とフレームワークの解説
 - [ケース面接 頻出お題集](case-interview-question-bank.md) ← このお題以外で練習する
 - [業界別ビジネスモデル・KPIガイド](industry-business-models.md) ← ジムを含む頻出8業界の収益構造
