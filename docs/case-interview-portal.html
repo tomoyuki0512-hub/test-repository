@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ケース面接 学習ポータル</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; color: #333; }
+    header { background: #24292e; color: #fff; padding: 22px 24px; }
+    header h1 { font-size: 1.3rem; margin-bottom: 4px; }
+    header p { font-size: 0.85rem; color: #bbb; }
+    main { max-width: 1000px; margin: 22px auto; padding: 0 16px 40px; }
+    .dash {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px; margin-bottom: 26px;
+    }
+    .stat {
+      background: #fff; border-radius: 10px; padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .stat .label { font-size: 0.78rem; color: #888; margin-bottom: 6px; }
+    .stat .value { font-size: 1.5rem; font-weight: bold; color: #0366d6; }
+    .stat .sub { font-size: 0.75rem; color: #999; margin-top: 4px; }
+    .stat.empty .value { color: #bbb; font-size: 1.1rem; }
+    h2 {
+      font-size: 1.02rem; margin: 26px 0 10px; padding-left: 10px;
+      border-left: 5px solid #0366d6; color: #24292e;
+    }
+    h2 small { font-weight: normal; color: #888; font-size: 0.78rem; margin-left: 8px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+    a.card {
+      background: #fff; border-radius: 10px; padding: 16px 18px; text-decoration: none;
+      color: inherit; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: block;
+      border: 2px solid transparent; transition: border-color 0.1s;
+    }
+    a.card:hover { border-color: #0366d6; }
+    .card .title { font-weight: bold; color: #0366d6; font-size: 0.95rem; margin-bottom: 6px; }
+    .card .desc { font-size: 0.82rem; color: #555; line-height: 1.5; }
+    .card .kind {
+      display: inline-block; font-size: 0.68rem; padding: 1px 8px; border-radius: 8px;
+      margin-bottom: 8px; background: #e8f0fe; color: #0366d6;
+    }
+    .card .kind.tool { background: #dcffe4; color: #1a7f37; }
+    .card .kind.print { background: #fff3cd; color: #8a6d00; }
+    .schedule {
+      background: #fff; border-radius: 10px; padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 0.85rem;
+    }
+    .schedule table { width: 100%; border-collapse: collapse; }
+    .schedule th, .schedule td { border: 1px solid #e1e4e8; padding: 6px 10px; text-align: left; line-height: 1.5; }
+    .schedule th { background: #f0f3f6; }
+    footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #888; }
+    footer a { color: #0366d6; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>🎯 ケース面接 学習ポータル</h1>
+  <p>学ぶ → 覚える → 解く → 仕上げる → 直前確認。全教材と進捗の入り口です。</p>
+</header>
+<main>
+  <div class="dash" id="dash"></div>
+
+  <h2>① 学ぶ<small>まず型と知識を入れる（3ヶ月プランの1ヶ月目）</small></h2>
+  <div class="cards">
+    <a class="card" href="case-interview-guide.md"><span class="kind">読み物</span>
+      <div class="title">ケース面接 完全ガイド</div>
+      <div class="desc">出題内容・ファーム別形式・解き方の型・フレームワーク・例題と模範解答・3ヶ月スケジュール。全体の本編。</div></a>
+    <a class="card" href="industry-business-models.md"><span class="kind">読み物</span>
+      <div class="title">業界別ビジネスモデル・KPIガイド</div>
+      <div class="desc">コンビニ・外食・航空・ホテル・SaaS・ジム等8業界の収益構造とKPI相場観。構造化が速くなる。</div></a>
+    <a class="card" href="fit-interview-guide.md"><span class="kind">読み物</span>
+      <div class="title">行動面接（フィット）対策ガイド</div>
+      <div class="desc">ケースとセットで課されるフィット面接。STAR法・頻出質問20・エピソード棚卸し・逆質問集。</div></a>
+  </div>
+
+  <h2>② 覚える<small>数値を暗記して概算を速くする（1ヶ月目後半〜）</small></h2>
+  <div class="cards">
+    <a class="card" href="case-interview-key-numbers.md"><span class="kind">読み物</span>
+      <div class="title">覚えておくべき数値まとめ</div>
+      <div class="desc">人口・GDP・市場規模・店舗数・世界・企業規模。フェルミ推定の武器になる暗記値リスト。</div></a>
+    <a class="card" href="case-numbers-flashcards.html"><span class="kind tool">ツール</span>
+      <div class="title">数値暗記フラッシュカード</div>
+      <div class="desc">約60枚をクイズ形式で暗記。カテゴリフィルタ・シャッフル・「覚えた」進捗保存つき。</div></a>
+    <a class="card" href="case-math-drill.html"><span class="kind tool">ツール</span>
+      <div class="title">暗算・概算ドリル</div>
+      <div class="desc">2桁掛け算・%計算・大数の桁感覚を4択×10問×20秒で特訓。正答率を記録。</div></a>
+  </div>
+
+  <h2>③ 解く<small>1人練習で型を回す（2ヶ月目）</small></h2>
+  <div class="cards">
+    <a class="card" href="case-interview-question-bank.md"><span class="kind">読み物</span>
+      <div class="title">頻出お題集（50問）</div>
+      <div class="desc">フェルミ25問＋ビジネスケース20問＋政策系5問。難易度と分解式ヒント付き。</div></a>
+    <a class="card" href="case-practice-trainer.html"><span class="kind tool">ツール</span>
+      <div class="title">練習トレーナー</div>
+      <div class="desc">お題50問をランダム出題。タイマー（フェルミ5分/ケース15分）・ヒント・自己採点◎○△の記録。</div></a>
+  </div>
+
+  <h2>④ 仕上げる<small>会話として完成させる（3ヶ月目・模擬面接）</small></h2>
+  <div class="cards">
+    <a class="card" href="case-interview-mock-script.md"><span class="kind">読み物</span>
+      <div class="title">模擬面接フル対話スクリプト</div>
+      <div class="desc">候補者リード型30分の面接官とのやり取りを再現。要所に💡解説つき。</div></a>
+    <a class="card" href="case-mock-simulator.html"><span class="kind tool">ツール</span>
+      <div class="title">模擬面接シミュレーター</div>
+      <div class="desc">面接官の台詞→自分で声に出して答える→模範回答と解説を開く、のステップ練習。</div></a>
+    <a class="card" href="case-interview-rubric.html"><span class="kind print">印刷用</span>
+      <div class="title">採点ルーブリック（面接官役用）</div>
+      <div class="desc">ペア練習用の採点表。11項目×5段階の行動アンカーつき。A4・1枚。</div></a>
+  </div>
+
+  <h2>⑤ 直前<small>前日〜当日の最終確認</small></h2>
+  <div class="cards">
+    <a class="card" href="case-interview-cheatsheet.html"><span class="kind print">印刷用</span>
+      <div class="title">直前チートシート</div>
+      <div class="desc">解き方フロー・分解式・フレームワーク・最重要数値・当日チェックリストをA4×2枚に凝縮。</div></a>
+  </div>
+
+  <h2>3ヶ月プランとの対応</h2>
+  <div class="schedule">
+    <table>
+      <tr><th>時期</th><th>フェーズ</th><th>主に使う教材</th></tr>
+      <tr><td>1ヶ月目</td><td>① 学ぶ ＋ ② 覚える</td><td>完全ガイド・業界ガイド → 数値まとめ・フラッシュカード・ドリル</td></tr>
+      <tr><td>2ヶ月目</td><td>③ 解く</td><td>お題集・練習トレーナー（フェルミ毎日1問→ケース週2〜3問）</td></tr>
+      <tr><td>3ヶ月目</td><td>④ 仕上げる</td><td>シミュレーター → ペア模擬面接（ルーブリックで採点）週2回以上</td></tr>
+      <tr><td>直前</td><td>⑤ 直前 ＋ フィット</td><td>チートシート・フィット対策の最終確認</td></tr>
+    </table>
+  </div>
+</main>
+<footer>
+  <a href="index.md">ガイド一覧に戻る</a> ／ 進捗はこのブラウザの記録（localStorage）から集計しています。
+</footer>
+<script>
+// 各ツールの localStorage キーから進捗を集計（キー名はツール実装と一致させること）
+const TRAINER_TOTAL = 50;   // case-practice-trainer.html の問題数
+const CARDS_TOTAL = 61;     // case-numbers-flashcards.html のカード枚数
+
+function readJSON(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch (e) { return fallback; }
+}
+
+function statHtml(label, value, sub, empty) {
+  return '<div class="stat' + (empty ? " empty" : "") + '"><div class="label">' + label +
+    '</div><div class="value">' + value + '</div><div class="sub">' + sub + "</div></div>";
+}
+
+function renderDash() {
+  const grades = readJSON("case-trainer-grades", {});           // case-practice-trainer.html
+  const memorized = readJSON("case-numbers-memorized", []);     // case-numbers-flashcards.html
+  const drill = readJSON("case-math-drill-stats", null);        // case-math-drill.html
+
+  const attempted = Object.keys(grades).length;
+  const best = Object.values(grades).filter(g => g === "◎").length;
+
+  let html = "";
+  html += attempted > 0
+    ? statHtml("お題練習（トレーナー）", attempted + "/" + TRAINER_TOTAL + "問", "◎完走 " + best + "問")
+    : statHtml("お題練習（トレーナー）", "未挑戦", "③のトレーナーから始める", true);
+  html += memorized.length > 0
+    ? statHtml("数値暗記（フラッシュカード）", memorized.length + "/" + CARDS_TOTAL + "枚", "「覚えた」にした枚数")
+    : statHtml("数値暗記（フラッシュカード）", "未挑戦", "②のフラッシュカードから", true);
+  html += (drill && drill.sets > 0)
+    ? statHtml("暗算ドリル", "ベスト " + drill.best + "%", drill.sets + "セット・累計 " + drill.totalCorrect + "/" + drill.totalQuestions + "問正解")
+    : statHtml("暗算ドリル", "未挑戦", "②のドリルで概算を特訓", true);
+  document.getElementById("dash").innerHTML = html;
+}
+renderDash();
+</script>
+</body>
+</html>
