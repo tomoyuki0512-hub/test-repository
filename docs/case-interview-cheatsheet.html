@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ケース面接 直前チートシート</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #e9e9e9; color: #222; font-size: 10.5px; }
+    .toolbar {
+      background: #24292e; color: #fff; padding: 12px 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .toolbar h1 { font-size: 1rem; flex: 1; }
+    .toolbar button {
+      padding: 7px 18px; border: none; border-radius: 5px; cursor: pointer;
+      font-size: 0.85rem; background: #2ea44f; color: #fff;
+    }
+    .toolbar a { color: #9ecbff; font-size: 0.78rem; }
+    .sheet {
+      background: #fff; width: 210mm; min-height: 297mm; margin: 16px auto;
+      padding: 10mm 9mm; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    .sheet-title {
+      font-size: 15px; font-weight: bold; border-bottom: 2.5px solid #24292e;
+      padding-bottom: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .sheet-title small { font-size: 9px; color: #888; font-weight: normal; }
+    .cols { display: flex; gap: 8px; }
+    .col { flex: 1; min-width: 0; }
+    section { border: 1px solid #ccc; border-radius: 4px; padding: 6px 8px; margin-bottom: 8px; break-inside: avoid; }
+    h2 {
+      font-size: 11.5px; background: #24292e; color: #fff; margin: -6px -8px 6px;
+      padding: 3px 8px; border-radius: 3px 3px 0 0;
+    }
+    h3 { font-size: 10.5px; color: #0356a6; margin: 5px 0 2px; }
+    p, li { line-height: 1.45; }
+    ul, ol { padding-left: 15px; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    th, td { border: 1px solid #ddd; padding: 2px 4px; text-align: left; line-height: 1.35; }
+    th { background: #f0f3f6; font-weight: bold; }
+    .formula {
+      background: #f6f8fa; border-left: 3px solid #0366d6; padding: 4px 6px;
+      margin: 3px 0; font-size: 10px; line-height: 1.5; white-space: pre-wrap;
+    }
+    .flow { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; font-size: 9.5px; }
+    .flow span { background: #e8f0fe; border-radius: 3px; padding: 3px 6px; font-weight: bold; color: #0356a6; }
+    .flow em { font-style: normal; color: #888; }
+    .check li { list-style: none; margin: 2px 0; }
+    .check li::before { content: "☐ "; font-size: 11px; }
+    .ng { color: #c0392b; font-weight: bold; }
+    .ok { color: #1a7f37; font-weight: bold; }
+    @media print {
+      body { background: #fff; }
+      .toolbar { display: none; }
+      .sheet { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+      @page { size: A4; margin: 9mm; }
+    }
+  </style>
+</head>
+<body>
+<div class="toolbar">
+  <h1>ケース面接 直前チートシート（A4・2枚）</h1>
+  <a href="case-interview-guide.md">詳細は完全ガイドへ</a>
+  <button onclick="window.print()">🖨 印刷する</button>
+</div>
+
+<!-- ============ 1枚目：型・フレームワーク・失敗対策 ============ -->
+<div class="sheet">
+  <div class="sheet-title">ケース面接 チートシート ①型・フレーム編 <small>詳細: case-interview-guide.md</small></div>
+
+  <section>
+    <h2>解き方の基本フロー（6ステップ）</h2>
+    <div class="flow">
+      <span>① 前提確認</span><em>→</em><span>② ゴール定義（定量）</span><em>→</em><span>③ 構造化</span><em>→</em>
+      <span>④ 分析・ボトルネック特定</span><em>→</em><span>⑤ 打ち手（優先順位）</span><em>→</em><span>⑥ 結論ファースト</span>
+    </div>
+    <ul style="margin-top:4px">
+      <li>不明点は仮置きして「〜と仮定して進めます」と宣言（質問攻めNG）</li>
+      <li>ゴールは「3年で売上1.5倍」のように必ず数字に落とす</li>
+      <li>打ち手は<b>インパクト × 実現可能性</b>で優先順位。結論はPREP（結論→理由→例→結論）で30秒〜1分</li>
+    </ul>
+  </section>
+
+  <div class="cols">
+    <div class="col">
+      <section>
+        <h2>主要な分解式（これだけは書けるように）</h2>
+        <div class="formula">利益 = 売上 − コスト（固定費＋変動費）</div>
+        <div class="formula">売上 = 客数 × 客単価
+客数 = 新規 + リピート ／ 客単価 = 単価 × 購入点数</div>
+        <div class="formula">店舗売上 = 席数 × 回転率 × 営業時間 × 客単価（＋テイクアウト）</div>
+        <div class="formula">会員数（ストック）= 期初 + 新規入会 − 退会</div>
+        <div class="formula">市場規模 = 対象人口 × 利用率 × 頻度 × 単価</div>
+        <div class="formula">稼働型 = 台数(部屋数) × 稼働率 × 単価　（ホテル・タクシー・航空）</div>
+      </section>
+      <section>
+        <h2>フェルミ推定 5ステップ</h2>
+        <ol>
+          <li>求める数の<b>式を立てる</b>（需要側/供給側を宣言）</li>
+          <li>変数を分解（年齢層・世帯・時間帯）</li>
+          <li>数値を仮置き（裏面の暗記値を使う）</li>
+          <li>概数で計算（<b>桁だけは絶対に間違えない</b>・単位を明示）</li>
+          <li>妥当性チェック（オーダーが常識的か）</li>
+        </ol>
+      </section>
+    </div>
+    <div class="col">
+      <section>
+        <h2>フレームワーク早見</h2>
+        <table>
+          <tr><th>フレーム</th><th>用途・中身</th></tr>
+          <tr><td>3C</td><td>市場・顧客 / 競合 / 自社</td></tr>
+          <tr><td>4P</td><td>Product / Price / Place / Promotion</td></tr>
+          <tr><td>バリューチェーン</td><td>調達→製造→物流→販売→アフター</td></tr>
+          <tr><td>PEST</td><td>政治 / 経済 / 社会 / 技術（マクロ）</td></tr>
+          <tr><td>5Forces</td><td>競合・新規参入・代替品・売り手・買い手</td></tr>
+          <tr><td>AIDMA</td><td>認知→興味→欲求→記憶→行動</td></tr>
+        </table>
+        <p style="margin-top:3px">※フレームは「当てはめる」でなく分解の<b>出発点</b>。お題に合わせて作り変える</p>
+      </section>
+      <section>
+        <h2>タイプ別の初手</h2>
+        <table>
+          <tr><th>タイプ</th><th>初手の構え</th></tr>
+          <tr><td>売上向上</td><td>売上分解→ボトルネック特定が先</td></tr>
+          <tr><td>利益改善</td><td>「どこで赤字か」の特定が先（店舗別・路線別）</td></tr>
+          <tr><td>参入すべきか</td><td>判断基準を先に立てる（魅力度×勝ち筋×方式）</td></tr>
+          <tr><td>M&A</td><td>戦略適合×単独価値×シナジー×価格上限まで</td></tr>
+          <tr><td>公共政策</td><td>需要−供給のギャップ分解</td></tr>
+        </table>
+      </section>
+    </div>
+  </div>
+
+  <section>
+    <h2>よくある失敗 → その場での立て直し</h2>
+    <table>
+      <tr><th style="width:40%">失敗</th><th>立て直し</th></tr>
+      <tr><td class="ng">いきなり打ち手を並べる</td><td class="ok">「まず構造を整理します」と宣言して分解に戻る</td></tr>
+      <tr><td class="ng">黙って考え込む（10秒以上）</td><td class="ok">「少し整理させてください」と言って枠組み（時系列・顧客層別）を作り直す</td></tr>
+      <tr><td class="ng">数字の桁ミス</td><td class="ok">単位（万・億・兆）を声に出して明示、最後にオーダー確認</td></tr>
+      <tr><td class="ng">面接官の誘導を無視</td><td class="ok">「その観点も構造に加えます」と意図を確認して取り込む</td></tr>
+      <tr><td class="ng">結論が曖昧</td><td class="ok">「結論は◯◯です。理由は3つ」と言い切ってから補足</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>当日チェックリスト</h2>
+    <ul class="check cols" style="display:flex;flex-wrap:wrap">
+      <li style="width:49%">お題を復唱し、前提・ゴールを確認した</li>
+      <li style="width:49%">分析の全体像（構造）を先に共有した</li>
+      <li style="width:49%">考えを声に出しながら進めた</li>
+      <li style="width:49%">数字の単位・桁を明示した</li>
+      <li style="width:49%">打ち手をインパクト×実現性で優先順位づけした</li>
+      <li style="width:49%">結論ファーストで簡潔にまとめた</li>
+      <li style="width:49%">面接官のヒント・反論を素直に取り込んだ</li>
+      <li style="width:49%">逆質問を1つ用意してある</li>
+    </ul>
+  </section>
+</div>
+
+<!-- ============ 2枚目：最重要数値 ============ -->
+<div class="sheet">
+  <div class="sheet-title">ケース面接 チートシート ②最重要数値編 <small>詳細: case-interview-key-numbers.md（数値は概数）</small></div>
+
+  <div class="cols">
+    <div class="col">
+      <section>
+        <h2>人口・世帯（最優先で暗記）</h2>
+        <table>
+          <tr><td>日本の総人口</td><td><b>約1.2億人</b></td></tr>
+          <tr><td>世帯数</td><td><b>約5,500万世帯</b>（1世帯2.2人）</td></tr>
+          <tr><td>1学年の人口</td><td><b>約100万人</b></td></tr>
+          <tr><td>生産年齢（15〜64歳）</td><td>約7,400万人（6割）</td></tr>
+          <tr><td>65歳以上</td><td>約3,600万人（29%）</td></tr>
+          <tr><td>就業者数</td><td>約6,700万人</td></tr>
+          <tr><td>東京都 / 23区</td><td>約1,400万 / 約1,000万人</td></tr>
+          <tr><td>三大都市圏</td><td>人口の約半分</td></tr>
+        </table>
+      </section>
+      <section>
+        <h2>経済・家計</h2>
+        <table>
+          <tr><td>日本のGDP</td><td><b>約600兆円</b>（約4兆ドル）</td></tr>
+          <tr><td>国家予算（一般会計）</td><td>約110兆円</td></tr>
+          <tr><td>平均給与</td><td>約460万円/年</td></tr>
+          <tr><td>世帯消費支出</td><td>2人以上 約29万/月・単身 約16万/月</td></tr>
+          <tr><td>為替</td><td>1ドル ≒ 150円前後</td></tr>
+          <tr><td>労働時間</td><td>約2,000時間/年（8h×20日×12月）</td></tr>
+        </table>
+      </section>
+      <section>
+        <h2>世界</h2>
+        <table>
+          <tr><td>世界人口</td><td><b>約80億人</b></td></tr>
+          <tr><td>中国 / インド</td><td>各 約14億人</td></tr>
+          <tr><td>米国 / インドネシア</td><td>約3.4億 / 約2.8億人</td></tr>
+          <tr><td>GDP: 米 / 中 / 世界</td><td>約28兆 / 約18兆 / 約110兆ドル</td></tr>
+        </table>
+      </section>
+    </div>
+    <div class="col">
+      <section>
+        <h2>市場規模（日本・年間）</h2>
+        <table>
+          <tr><td>外食</td><td>約25兆円</td><td>EC物販</td><td>約15兆円</td></tr>
+          <tr><td>コンビニ</td><td>約11〜12兆円</td><td>アパレル</td><td>約9兆円</td></tr>
+          <tr><td>自動車</td><td>約50兆円</td><td>広告費</td><td>約7兆円</td></tr>
+          <tr><td>ドラッグストア</td><td>約8兆円</td><td>ゲーム</td><td>約2〜3兆円</td></tr>
+          <tr><td>化粧品</td><td>約2.5兆円</td><td>ペット</td><td>約1.8兆円</td></tr>
+        </table>
+      </section>
+      <section>
+        <h2>店舗数・インフラ（フェルミ定番）</h2>
+        <table>
+          <tr><td>コンビニ</td><td><b>約56,000店</b></td><td>電柱</td><td>約3,600万本</td></tr>
+          <tr><td>セブン-イレブン</td><td>約21,000店</td><td>信号機</td><td>約20万基</td></tr>
+          <tr><td>スタバ（日本）</td><td>約1,900店</td><td>GS</td><td>約27,000箇所</td></tr>
+          <tr><td>マクドナルド</td><td>約3,000店</td><td>小学校</td><td>約19,000校</td></tr>
+          <tr><td>郵便局</td><td>約24,000局</td><td>自販機</td><td>数百万台</td></tr>
+        </table>
+        <h3>コンビニ1店舗（頻出アンカー）</h3>
+        <table>
+          <tr><td>来客</td><td>800〜1,000人/日</td><td>客単価</td><td>約700円</td></tr>
+          <tr><td>日販</td><td><b>約50〜70万円</b></td><td>商圏</td><td>約2,000人/店</td></tr>
+        </table>
+      </section>
+      <section>
+        <h2>企業規模のアンカー（売上）</h2>
+        <table>
+          <tr><td>トヨタ</td><td><b>約45兆円</b></td><td>NTT・ソニー</td><td>各 約13兆円</td></tr>
+          <tr><td>三菱商事・ホンダ</td><td>各 約20兆円</td><td>セブン&アイ</td><td>約11兆円</td></tr>
+        </table>
+        <p>目安：トップ企業 数十兆円／大手 数兆〜10兆円／上場大企業 数千億〜1兆円。営業利益率は製造・小売で数%〜10%程度</p>
+      </section>
+      <section>
+        <h2>便利な係数</h2>
+        <table>
+          <tr><td>1日</td><td>1,440分 / 86,400秒</td><td>営業日</td><td>約240日/年</td></tr>
+          <tr><td>スマホ保有率</td><td>約8割</td><td>車保有</td><td>約8,200万台</td></tr>
+          <tr><td>パレート</td><td colspan="3">上位2割が全体の8割を生む（80:20）</td></tr>
+        </table>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>
