@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ケース面接 暗算・概算ドリル</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; color: #333; }
+    header {
+      background: #24292e; color: #fff; padding: 16px 24px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    header h1 { font-size: 1.15rem; flex: 1; min-width: 220px; }
+    .stats-label { font-size: 0.8rem; color: #ccc; }
+    header button {
+      padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer;
+      font-size: 0.8rem; background: #444; color: #ccc;
+    }
+    main { max-width: 640px; margin: 28px auto; padding: 0 16px; }
+    .panel {
+      background: #fff; border-radius: 10px; padding: 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    .meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .qnum { font-size: 0.85rem; color: #888; }
+    .timer {
+      font-size: 1.4rem; font-weight: bold; font-variant-numeric: tabular-nums;
+      color: #24292e;
+    }
+    .timer.warning { color: #d73a49; }
+    .qtext { font-size: 1.45rem; font-weight: bold; line-height: 1.5; margin-bottom: 22px; color: #24292e; }
+    .type-badge {
+      display: inline-block; font-size: 0.72rem; padding: 2px 10px; border-radius: 10px;
+      background: #e8f0fe; color: #0366d6; margin-bottom: 10px;
+    }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .choices button {
+      padding: 16px 10px; border: 2px solid #d1d5da; border-radius: 8px;
+      background: #fff; font-size: 1.05rem; font-weight: bold; cursor: pointer;
+    }
+    .choices button:hover { border-color: #0366d6; }
+    .choices button.correct { border-color: #2ea44f; background: #dcffe4; }
+    .choices button.wrong { border-color: #d73a49; background: #ffe5e8; }
+    .feedback { margin-top: 16px; font-size: 0.95rem; font-weight: bold; min-height: 24px; }
+    .feedback.good { color: #1a7f37; }
+    .feedback.bad { color: #d73a49; }
+    .next-row { margin-top: 14px; }
+    .next-row button, .start-panel button {
+      padding: 12px 26px; border: none; border-radius: 8px; cursor: pointer;
+      background: #0366d6; color: #fff; font-size: 1rem;
+    }
+    .start-panel { text-align: center; }
+    .start-panel h2 { font-size: 1.15rem; margin-bottom: 12px; }
+    .start-panel p { font-size: 0.9rem; color: #555; line-height: 1.7; margin-bottom: 18px; }
+    .result h2 { font-size: 1.2rem; margin-bottom: 14px; text-align: center; }
+    .result .big { font-size: 2.4rem; font-weight: bold; text-align: center; color: #0366d6; margin-bottom: 8px; }
+    .result p { text-align: center; color: #555; font-size: 0.9rem; margin-bottom: 6px; }
+    .result .best { color: #1a7f37; font-weight: bold; }
+    .result .next-row { text-align: center; }
+    footer { text-align: center; padding: 24px; font-size: 0.8rem; color: #888; }
+    footer a { color: #0366d6; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>暗算・概算ドリル</h1>
+  <span class="stats-label" id="stats"></span>
+  <button onclick="resetStats()">記録リセット</button>
+</header>
+<main>
+  <div class="panel" id="panel"></div>
+</main>
+<footer>
+  数値の素材は <a href="case-interview-key-numbers.md">数値まとめ</a> の暗記値。
+  桁を声に出して確認する癖をつけましょう（単位：万→億→兆）。
+</footer>
+<script>
+// ====== 生成ロジック（UI非依存） ======
+
+// 3有効数字に丸めて 万/億/兆 で表記
+function fmtNum(n) {
+  const units = [[1e12, "兆"], [1e8, "億"], [1e4, "万"]];
+  for (const [u, label] of units) {
+    if (n >= u) {
+      let v = n / u;
+      v = Number(v.toPrecision(3));
+      if (v >= 10000) { continue; }
+      return trimZero(v) + label;
+    }
+  }
+  return trimZero(Number(n.toPrecision(3))).toString();
+}
+function trimZero(v) {
+  return String(v).replace(/\.0+$/, "").replace(/(\.\d*?)0+$/, "$1");
+}
+function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// 数値まとめの暗記値を素材にする
+const BIG_BASES = [
+  { label: "日本の人口 1.2億人", v: 1.2e8, unit: "人" },
+  { label: "世帯数 5,500万世帯", v: 5.5e7, unit: "世帯" },
+  { label: "コンビニ 5.6万店", v: 5.6e4, unit: "店" },
+  { label: "就業者 6,700万人", v: 6.7e7, unit: "人" },
+  { label: "東京都 1,400万人", v: 1.4e7, unit: "人" },
+  { label: "電柱 3,600万本", v: 3.6e7, unit: "本" },
+  { label: "自動車 8,200万台", v: 8.2e7, unit: "台" },
+  { label: "世界人口 80億人", v: 8e9, unit: "人" },
+];
+
+function makeDistractors(correct, fmtFn) {
+  const cands = [correct * 10, correct / 10, correct * 100, correct / 100,
+                 correct * 2, correct / 2, correct * 5, correct * 1.5];
+  const out = [];
+  const cf = fmtFn(correct);
+  for (const c of cands) {
+    const f = fmtFn(c);
+    if (f !== cf && !out.includes(f)) out.push(f);
+    if (out.length === 3) break;
+  }
+  return out;
+}
+
+// タイプ1：2桁×2桁
+function genMult2d() {
+  const a = ri(12, 79), b = ri(12, 79);
+  const correct = a * b;
+  const set = new Set([correct]);
+  const dis = [];
+  while (dis.length < 3) {
+    const d = correct + pick([a, -a, b, -b, 100, -100, a * 10 - a * 9]);
+    if (d > 0 && !set.has(d)) { set.add(d); dis.push(d); }
+  }
+  return { type: "2桁の掛け算", q: a + " × " + b + " は？",
+           correct: String(correct), distractors: dis.map(String),
+           expl: a + "×" + b + " = " + correct };
+}
+
+// タイプ2：%計算
+function genPercent() {
+  const base = pick(BIG_BASES);
+  const p = pick([10, 20, 25, 30, 40, 50, 60, 75, 80]);
+  const correct = base.v * p / 100;
+  return { type: "%計算", q: base.label + " の " + p + "% は？",
+           correct: fmtNum(correct) + base.unit,
+           distractors: makeDistractors(correct, fmtNum).map(f => f + base.unit),
+           expl: fmtNum(base.v) + " × " + p + "% = " + fmtNum(correct) + base.unit };
+}
+
+// タイプ3：大数の掛け算（人口×単価などの桁感覚）
+function genBigMult() {
+  const base = pick(BIG_BASES);
+  const mult = pick([
+    { label: "× 100円", v: 100, unit: "円" },
+    { label: "× 500円", v: 500, unit: "円" },
+    { label: "× 700円", v: 700, unit: "円" },
+    { label: "× 3,000円", v: 3000, unit: "円" },
+    { label: "× 週1回 × 52週", v: 52, unit: "回" },
+    { label: "× 月2万円 × 12ヶ月", v: 240000, unit: "円" },
+  ]);
+  const correct = base.v * mult.v;
+  return { type: "大数の掛け算（桁感覚）", q: base.label + " " + mult.label + " は？",
+           correct: "約" + fmtNum(correct) + mult.unit,
+           distractors: makeDistractors(correct, fmtNum).map(f => "約" + f + mult.unit),
+           expl: fmtNum(base.v) + " × " + fmtNum(mult.v) + " = 約" + fmtNum(correct) + mult.unit };
+}
+
+// タイプ4：大数の割り算（1あたり量）
+function genBigDiv() {
+  const pair = pick([
+    { q: "コンビニ市場 12兆円 ÷ 5.6万店 ＝ 1店舗あたり年間売上は？", a: 12e12 / 5.6e4, unit: "円" },
+    { q: "GDP 600兆円 ÷ 人口1.2億人 ＝ 1人あたりは？", a: 600e12 / 1.2e8, unit: "円" },
+    { q: "外食市場 25兆円 ÷ 人口1.2億人 ＝ 1人あたり年間は？", a: 25e12 / 1.2e8, unit: "円" },
+    { q: "広告費 7兆円 ÷ 世帯数5,500万 ＝ 1世帯あたりは？", a: 7e12 / 5.5e7, unit: "円" },
+    { q: "人口 1.2億人 ÷ コンビニ5.6万店 ＝ 1店舗あたり人口は？", a: 1.2e8 / 5.6e4, unit: "人" },
+    { q: "トヨタ売上 45兆円 ÷ 365日 ＝ 1日あたりは？", a: 45e12 / 365, unit: "円" },
+  ]);
+  return { type: "大数の割り算（1あたり量）", q: pair.q,
+           correct: "約" + fmtNum(pair.a) + pair.unit,
+           distractors: makeDistractors(pair.a, fmtNum).map(f => "約" + f + pair.unit),
+           expl: "答え：約" + fmtNum(pair.a) + pair.unit };
+}
+
+const GENERATORS = [genMult2d, genPercent, genBigMult, genBigDiv];
+
+function genQuestion() {
+  const g = pick(GENERATORS);
+  const q = g();
+  // 選択肢をシャッフル
+  const choices = [q.correct, ...q.distractors];
+  for (let i = choices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [choices[i], choices[j]] = [choices[j], choices[i]];
+  }
+  q.choices = choices;
+  return q;
+}
+
+// ====== UI ======
+const SET_SIZE = 10;
+const TIME_PER_Q = 20;
+const LS_KEY = "case-math-drill-stats";
+
+let stats = JSON.parse(localStorage.getItem(LS_KEY) || '{"best":0,"sets":0,"totalCorrect":0,"totalQuestions":0}');
+let state = "start"; // start | playing | answered | result
+let qIndex = 0, correctCount = 0, totalTime = 0;
+let currentQ = null, timeLeft = 0, timerId = null, qStart = 0;
+
+function saveStats() { localStorage.setItem(LS_KEY, JSON.stringify(stats)); }
+function resetStats() {
+  stats = { best: 0, sets: 0, totalCorrect: 0, totalQuestions: 0 };
+  saveStats(); renderHeader();
+}
+
+function startSet() {
+  state = "playing"; qIndex = 0; correctCount = 0; totalTime = 0;
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (qIndex >= SET_SIZE) { finishSet(); return; }
+  currentQ = genQuestion();
+  timeLeft = TIME_PER_Q;
+  qStart = Date.now();
+  state = "playing";
+  stopTimer();
+  timerId = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) { answer(null); } else { renderTimer(); }
+  }, 1000);
+  render();
+}
+
+function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+
+function answer(choice) {
+  if (state !== "playing") return;
+  stopTimer();
+  totalTime += (Date.now() - qStart) / 1000;
+  currentQ.picked = choice;
+  currentQ.isCorrect = (choice === currentQ.correct);
+  if (currentQ.isCorrect) correctCount++;
+  state = "answered";
+  render();
+}
+
+function proceed() { qIndex++; nextQuestion(); }
+
+function finishSet() {
+  stopTimer();
+  state = "result";
+  const pct = Math.round((correctCount / SET_SIZE) * 100);
+  stats.sets++;
+  stats.totalCorrect += correctCount;
+  stats.totalQuestions += SET_SIZE;
+  stats.isBest = pct > stats.best;
+  if (stats.isBest) stats.best = pct;
+  saveStats();
+  render();
+}
+
+function renderHeader() {
+  document.getElementById("stats").textContent =
+    stats.sets > 0
+      ? "ベスト " + stats.best + "%・累計 " + stats.totalCorrect + "/" + stats.totalQuestions + "問正解（" + stats.sets + "セット）"
+      : "記録なし（1セット10問）";
+}
+
+function renderTimer() {
+  const el = document.getElementById("timer");
+  if (el) {
+    el.textContent = timeLeft + "秒";
+    el.className = "timer" + (timeLeft <= 5 ? " warning" : "");
+  }
+}
+
+function render() {
+  renderHeader();
+  const panel = document.getElementById("panel");
+  if (state === "start") {
+    panel.innerHTML =
+      '<div class="start-panel"><h2>概算スピードを鍛える（1セット10問）</h2>' +
+      "<p>2桁の掛け算・%計算・大数の桁感覚・1あたり量の4タイプをランダム出題。<br>" +
+      "1問<strong>20秒</strong>。ケース面接では「速く・桁を間違えない」ことが最優先です。<br>" +
+      "答えは概数（3桁精度）。単位（万・億・兆）に注目して選んでください。</p>" +
+      '<button onclick="startSet()">スタート</button></div>';
+    return;
+  }
+  if (state === "result") {
+    const pct = Math.round((correctCount / SET_SIZE) * 100);
+    panel.innerHTML =
+      '<div class="result"><h2>セット終了！</h2>' +
+      '<div class="big">' + correctCount + "/" + SET_SIZE + "問正解（" + pct + "%）</div>" +
+      "<p>平均回答時間 " + (totalTime / SET_SIZE).toFixed(1) + "秒/問</p>" +
+      (stats.isBest ? '<p class="best">🎉 ベスト記録更新！</p>' : '<p>ベスト記録 ' + stats.best + "%</p>") +
+      '<div class="next-row"><button onclick="startSet()">もう1セット</button></div></div>';
+    return;
+  }
+  // playing / answered
+  const q = currentQ;
+  let html =
+    '<div class="meta-row"><span class="qnum">第' + (qIndex + 1) + "問 / " + SET_SIZE + "問（正解 " + correctCount + "）</span>" +
+    '<span class="timer" id="timer"></span></div>' +
+    '<span class="type-badge">' + q.type + "</span>" +
+    '<div class="qtext">' + q.q + "</div>" +
+    '<div class="choices">' +
+    q.choices.map(c => {
+      let cls = "";
+      if (state === "answered") {
+        if (c === q.correct) cls = "correct";
+        else if (c === q.picked) cls = "wrong";
+      }
+      return '<button class="' + cls + '" onclick="answer(\'' + c.replace(/'/g, "\\'") + '\')">' + c + "</button>";
+    }).join("") +
+    "</div>";
+  if (state === "answered") {
+    html += '<div class="feedback ' + (q.isCorrect ? "good" : "bad") + '">' +
+      (q.picked === null ? "⏱ 時間切れ！ " : (q.isCorrect ? "✔ 正解！ " : "✘ 不正解。")) + q.expl + "</div>" +
+      '<div class="next-row"><button onclick="proceed()">' + (qIndex === SET_SIZE - 1 ? "結果を見る" : "次の問題") + "</button></div>";
+  } else {
+    html += '<div class="feedback"></div>';
+  }
+  panel.innerHTML = html;
+  renderTimer();
+}
+
+render();
+</script>
+</body>
+</html>
