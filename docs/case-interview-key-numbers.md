@@ -207,5 +207,7 @@ title: ケース面接で覚えておくべき数値まとめ
 
 - [ケース面接 完全ガイド（内容と対策）](case-interview-guide.md) ← 出題内容・解き方・対策方法の本編
 - [数値暗記フラッシュカード（HTML）](case-numbers-flashcards.html) ← このページの数値をクイズ形式で暗記できるツール
+- [直前チートシート（印刷用HTML）](case-interview-cheatsheet.html) ← 最重要数値をA4に凝縮した印刷用
+- [業界別ビジネスモデル・KPIガイド](industry-business-models.md) ← 業界ごとのKPI相場観とあわせて使う
 - [ケース面接 頻出お題集（練習問題バンク50問）](case-interview-question-bank.md) ← 暗記した数値を実戦で使う練習に
 - [ガイド一覧に戻る](index.md)

@@ -450,5 +450,9 @@ title: ケース面接 完全ガイド（内容と対策）
 - [ケース面接で覚えておくべき数値まとめ](case-interview-key-numbers.md) ← フェルミ推定・市場規模の概算に使う基礎データ集
 - [数値暗記フラッシュカード（HTML）](case-numbers-flashcards.html) ← 上記数値をブラウザでクイズ形式に暗記
 - [ケース面接 頻出お題集（練習問題バンク50問）](case-interview-question-bank.md) ← 難易度・ヒント付きの1人練習用お題リスト
+- [練習トレーナー（HTML）](case-practice-trainer.html) ← お題50問をタイマー・自己採点つきでランダム出題
 - [模擬面接フル対話スクリプト](case-interview-mock-script.md) ← 候補者リード型30分の会話を再現・解説
+- [模擬面接シミュレーター（HTML）](case-mock-simulator.html) ← 上記スクリプトをステップ実行して練習
+- [業界別ビジネスモデル・KPIガイド](industry-business-models.md) ← 頻出8業界の収益構造・KPI相場観
+- [直前チートシート（印刷用HTML）](case-interview-cheatsheet.html) ← 型・分解式・数値をA4×2枚に凝縮
 - [ガイド一覧に戻る](index.md)
