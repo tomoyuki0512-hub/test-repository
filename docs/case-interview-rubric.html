@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ケース面接 模擬面接 採点ルーブリック</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #e9e9e9; color: #222; font-size: 10.5px; }
+    .toolbar {
+      background: #24292e; color: #fff; padding: 12px 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .toolbar h1 { font-size: 1rem; flex: 1; }
+    .toolbar button {
+      padding: 7px 18px; border: none; border-radius: 5px; cursor: pointer;
+      font-size: 0.85rem; background: #2ea44f; color: #fff;
+    }
+    .toolbar a { color: #9ecbff; font-size: 0.78rem; }
+    .sheet {
+      background: #fff; width: 210mm; min-height: 297mm; margin: 16px auto;
+      padding: 9mm 8mm; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    .sheet-title {
+      font-size: 15px; font-weight: bold; border-bottom: 2.5px solid #24292e;
+      padding-bottom: 4px; margin-bottom: 6px;
+    }
+    .meta-line { display: flex; gap: 18px; margin-bottom: 8px; font-size: 10px; color: #444; }
+    .meta-line span { border-bottom: 1px solid #999; min-width: 120px; padding: 0 4px 1px; }
+    .howto {
+      border: 1px solid #ccc; border-radius: 4px; padding: 5px 8px; margin-bottom: 8px;
+      font-size: 9.5px; line-height: 1.5; background: #f8f9fa;
+    }
+    .howto b { color: #0356a6; }
+    table { width: 100%; border-collapse: collapse; font-size: 9.5px; table-layout: fixed; }
+    th, td { border: 1px solid #bbb; padding: 3px 5px; vertical-align: top; line-height: 1.4; }
+    th { background: #24292e; color: #fff; font-weight: bold; padding: 4px 5px; }
+    col.c-item { width: 13%; }
+    col.c1, col.c3, col.c5 { width: 25%; }
+    col.c-score { width: 12%; }
+    td.item { font-weight: bold; background: #f0f3f6; }
+    td.item small { display: block; font-weight: normal; color: #777; font-size: 8.5px; margin-top: 1px; }
+    td.score { text-align: center; font-size: 11px; color: #999; }
+    .section-label { background: #dde6f0 !important; color: #0356a6 !important; font-weight: bold; }
+    .total-row { display: flex; gap: 10px; margin-top: 8px; align-items: stretch; }
+    .total-box {
+      border: 2px solid #24292e; border-radius: 4px; padding: 6px 12px;
+      font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px;
+    }
+    .total-box .blank { border-bottom: 2px solid #24292e; min-width: 60px; display: inline-block; text-align: center; font-size: 15px; }
+    .scale-guide { flex: 1; border: 1px solid #ccc; border-radius: 4px; padding: 5px 8px; font-size: 9px; line-height: 1.5; }
+    .memo { border: 1px solid #ccc; border-radius: 4px; margin-top: 8px; padding: 5px 8px; }
+    .memo h3 { font-size: 10px; color: #0356a6; margin-bottom: 2px; }
+    .memo .lines { height: 52px; background: repeating-linear-gradient(#fff, #fff 12px, #ddd 12px, #ddd 13px); }
+    @media print {
+      body { background: #fff; }
+      .toolbar { display: none; }
+      .sheet { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+      @page { size: A4; margin: 8mm; }
+    }
+  </style>
+</head>
+<body>
+<div class="toolbar">
+  <h1>模擬面接 採点ルーブリック（面接官役用・A4 1枚）</h1>
+  <a href="case-interview-guide.md">評価観点の詳細は完全ガイドへ</a>
+  <button onclick="window.print()">🖨 印刷する</button>
+</div>
+
+<div class="sheet">
+  <div class="sheet-title">ケース面接 模擬面接 採点シート</div>
+  <div class="meta-line">
+    <div>日付：<span>　</span></div>
+    <div>回答者：<span>　</span></div>
+    <div>面接官役：<span>　</span></div>
+    <div>お題：<span style="min-width:220px">　</span></div>
+  </div>
+
+  <div class="howto">
+    <b>使い方：</b>①面接中はメモに徹し、採点は<b>面接終了後</b>につける（採点しながら聞くと面接官役の質が下がる）。
+    ②各項目は 1・3・5 の行動アンカーを基準に、間なら 2・4 をつける。
+    ③フィードバックは点数の羅列でなく「<b>良かった点1つ＋次に直す点1つ</b>」に絞って伝える。
+    ④お題は<a href="case-interview-question-bank.md">頻出お題集</a>から。
+  </div>
+
+  <table>
+    <colgroup><col class="c-item"><col class="c1"><col class="c3"><col class="c5"><col class="c-score"></colgroup>
+    <tr><th>項目</th><th>1点の状態</th><th>3点の状態</th><th>5点の状態</th><th>点数(1-5)</th></tr>
+
+    <tr><td colspan="5" class="section-label">序盤（問題設定）</td></tr>
+    <tr>
+      <td class="item">① 前提確認<small>定義・スコープ</small></td>
+      <td>確認せず思い込みで開始</td>
+      <td>いくつか確認するが質問攻め、または仮置きの宣言がない</td>
+      <td>定義・具体像・スコープを短く確認し、不明点は仮置きを宣言</td>
+      <td class="score">　</td>
+    </tr>
+    <tr>
+      <td class="item">② ゴール定量化</td>
+      <td>「売上を上げる」のまま進める</td>
+      <td>数値目標に触れるが以後使わない</td>
+      <td>「3年で1.5倍」等に定量化し、以後の打ち手をそこから逆算</td>
+      <td class="score">　</td>
+    </tr>
+
+    <tr><td colspan="5" class="section-label">中盤（構造化・分析）</td></tr>
+    <tr>
+      <td class="item">③ 構造化<small>MECE</small></td>
+      <td>分解せず打ち手を羅列</td>
+      <td>分解するが漏れ/ダブりがある、フレームの当てはめ止まり</td>
+      <td>お題に合った分解を自作し、全体像を宣言してから進める</td>
+      <td class="score">　</td>
+    </tr>
+    <tr>
+      <td class="item">④ 仮説思考</td>
+      <td>情報を集めるだけで仮説がない</td>
+      <td>仮説はあるが検証せず結論に飛ぶ</td>
+      <td>「◯◯が原因では」と仮説を立て、データで検証・修正する</td>
+      <td class="score">　</td>
+    </tr>
+    <tr>
+      <td class="item">⑤ 定量分析<small>桁の正確さ</small></td>
+      <td>計算しない、または桁を間違える</td>
+      <td>計算するが遅い・単位が曖昧</td>
+      <td>もらった数字を即計算して意味に変換。単位・桁を明示</td>
+      <td class="score">　</td>
+    </tr>
+    <tr>
+      <td class="item">⑥ ボトルネック特定</td>
+      <td>どこが問題か特定せず打ち手へ</td>
+      <td>特定するが根拠が薄い</td>
+      <td>データで論点を絞り込み「ここが最大の問題」と言い切る</td>
+      <td class="score">　</td>
+    </tr>
+
+    <tr><td colspan="5" class="section-label">終盤（打ち手・結論）</td></tr>
+    <tr>
+      <td class="item">⑦ 打ち手の質</td>
+      <td>思いつきの羅列</td>
+      <td>複数出すが優先順位がない</td>
+      <td>インパクト×実現性で優先順位づけ、効果を概算で示す</td>
+      <td class="score">　</td>
+    </tr>
+    <tr>
+      <td class="item">⑧ 結論ファースト</td>
+      <td>結論がない/曖昧なまま終了</td>
+      <td>結論はあるが長い・構造がない</td>
+      <td>「結論は◯◯。理由は3つ」と1分以内で言い切り、リスクにも言及</td>
+      <td class="score">　</td>
+    </tr>
+
+    <tr><td colspan="5" class="section-label">全体（進め方）</td></tr>
+    <tr>
+      <td class="item">⑨ 誘導への対応</td>
+      <td>ヒントを無視 or 丸呑み</td>
+      <td>気づくが構造に組み込めない</td>
+      <td>意図を確認し、自分の構造の中に位置づけて取り込む</td>
+      <td class="score">　</td>
+    </tr>
+    <tr>
+      <td class="item">⑩ コミュニケーション</td>
+      <td>長い沈黙、独り言、一方的</td>
+      <td>話せるが冗長・対話が少ない</td>
+      <td>考えを声に出し、詰まったら「整理させてください」と宣言。対話で進める</td>
+      <td class="score">　</td>
+    </tr>
+    <tr>
+      <td class="item">⑪ 時間管理</td>
+      <td>序盤で時間切れ、結論に届かず</td>
+      <td>結論に届くが駆け足</td>
+      <td>配分を意識し、余裕をもって結論・質疑まで完走</td>
+      <td class="score">　</td>
+    </tr>
+  </table>
+
+  <div class="total-row">
+    <div class="total-box">合計 <span class="blank">　</span> / 55点</div>
+    <div class="scale-guide">
+      <b>目安：</b>〜25点＝基礎の型から（ガイド第4章＋1人練習を増やす）／
+      26〜40点＝実戦継続（週2回の模擬面接＋弱い項目を意識）／
+      41点〜＝仕上げ段階（本番形式・時間短縮・想定外のお題で負荷をかける）
+    </div>
+  </div>
+
+  <div class="memo">
+    <h3>良かった点（1つ）</h3>
+    <div class="lines"></div>
+  </div>
+  <div class="memo">
+    <h3>次に直す点（1つ）＋具体的な練習方法</h3>
+    <div class="lines"></div>
+  </div>
+</div>
+</body>
+</html>
