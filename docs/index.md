@@ -95,7 +95,13 @@ title: ガイド一覧
 
 ## 認証・セキュリティ
 
-- [SSO（シングルサインオン）完全ガイド](sso-guide.md) ← 仕組み・SAML/OAuth/OIDCの違い・導入手順を誰でもわかるように
+- [SSO（シングルサインオン）完全ガイド](sso/README.md) ← まずはここから（30秒サマリ・全体マップ・読者別ルート）
+  - [① SSOの基礎](sso/01-sso-basics.md) ← たとえ話・登場人物・基本フロー図解
+  - [② SAMLを詳しく](sso/02-saml.md) ← 企業SSOの定番。シーケンス図とXML実物
+  - [③ OAuth 2.0を詳しく](sso/03-oauth2.md) ← 「認可」の仕組み・PKCE・攻撃シナリオ
+  - [④ OIDCを詳しく](sso/04-oidc.md) ← JWTデコード追体験・「Googleでログイン」の裏側観察
+  - [⑤ セキュリティとMFA・パスキー](sso/05-security-mfa.md) ← 攻撃シナリオ別の守り方
+  - [⑥ 導入と運用](sso/06-deployment-ops.md) ← Entra ID/Okta手順・SCIM・トラブル対処・用語集
 
 ## デザイン・画像
 
