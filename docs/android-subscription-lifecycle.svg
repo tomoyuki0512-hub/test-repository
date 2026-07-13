@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 745" width="100%" style="max-width:960px;font-family:'Helvetica Neue',Arial,'Hiragino Sans','Noto Sans JP',sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#37474f"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#e53935"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2e7d32"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="745" fill="#ffffff"/>
+  <text x="480" y="34" font-size="20" font-weight="bold" fill="#263238" text-anchor="middle">Android（Google Play）サブスクリプションの状態遷移図</text>
+  <text x="480" y="56" font-size="12" fill="#607d8b" text-anchor="middle">Play Developer API subscriptionsv2 のステータス＋ RTDN 通知タイプ（括弧内は SubscriptionNotificationType の定数と種別値）</text>
+
+  <!-- ===== Edges ===== -->
+
+  <!-- Start -> Active -->
+  <path d="M480,108 L480,150" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="490" y="134" font-size="11" fill="#37474f">購入 (PURCHASED (4))</text>
+
+  <!-- Active self-loop: renew -->
+  <path d="M445,158 C430,120 530,120 515,158" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="480" y="118" font-size="11" fill="#2e7d32" text-anchor="middle">更新成功 (RENEWED (2))</text>
+
+  <!-- Active <-> Canceled -->
+  <path d="M575,180 L675,180" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="625" y="143" font-size="10.5" fill="#37474f" text-anchor="middle">解約</text>
+  <text x="625" y="156" font-size="9" fill="#90a4ae" text-anchor="middle">(CANCELED (3))</text>
+  <path d="M675,206 L575,206" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="625" y="247" font-size="10.5" fill="#2e7d32" text-anchor="middle">期間内に再開</text>
+  <text x="625" y="260" font-size="9" fill="#7cb342" text-anchor="middle">(RESTARTED (7))</text>
+
+  <!-- Active <-> Grace -->
+  <path d="M385,180 L265,180" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="320" y="130" font-size="10.5" fill="#37474f" text-anchor="middle">更新失敗・猶予あり</text>
+  <text x="320" y="143" font-size="9" fill="#90a4ae" text-anchor="middle">(IN_GRACE_PERIOD (6))</text>
+  <path d="M265,206 L385,206" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="320" y="250" font-size="10.5" fill="#2e7d32" text-anchor="middle">支払い回復 (RENEWED (2))</text>
+
+  <!-- Grace -> OnHold -->
+  <path d="M170,232 L170,350" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="182" y="288" font-size="10.5" fill="#37474f">猶予期間終了</text>
+  <text x="182" y="302" font-size="9.5" fill="#90a4ae">(ON_HOLD (5))</text>
+
+  <!-- Active -> OnHold direct (no grace) -->
+  <path d="M410,232 C330,300 290,300 240,352" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="330" y="300" font-size="10.5" fill="#37474f">更新失敗・猶予なし</text>
+  <text x="330" y="314" font-size="9.5" fill="#90a4ae">(ON_HOLD (5))</text>
+
+  <!-- OnHold -> Active recover -->
+  <path d="M265,378 C400,360 430,300 455,232" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="405" y="348" font-size="10.5" fill="#2e7d32" text-anchor="middle">支払い回復 (RECOVERED (1))</text>
+
+  <!-- OnHold -> Expired -->
+  <path d="M170,422 C200,520 270,575 373,610" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="245" y="505" font-size="10.5" fill="#37474f">未回復のまま期間終了で失効</text>
+  <text x="245" y="519" font-size="9.5" fill="#90a4ae">(EXPIRED (13))</text>
+
+  <!-- Active <-> Paused -->
+  <path d="M572,222 C620,280 640,330 672,372" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <rect x="585" y="270" width="84" height="28" rx="4" fill="#ffffff" opacity="0.9"/>
+  <text x="627" y="282" font-size="10.5" fill="#37474f" text-anchor="middle">一時停止</text>
+  <text x="627" y="294" font-size="9" fill="#90a4ae" text-anchor="middle">(PAUSED (10))</text>
+  <path d="M672,388 C600,330 580,280 558,226" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <rect x="548" y="322" width="92" height="28" rx="4" fill="#ffffff" opacity="0.9"/>
+  <text x="594" y="334" font-size="10.5" fill="#2e7d32" text-anchor="middle">再開日到来</text>
+  <text x="594" y="346" font-size="9" fill="#7cb342" text-anchor="middle">(RENEWED (2))</text>
+
+  <!-- Paused -> OnHold -->
+  <path d="M675,400 C520,470 380,470 268,415" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <rect x="382" y="472" width="180" height="18" rx="4" fill="#ffffff" opacity="0.9"/>
+  <text x="472" y="485" font-size="10.5" fill="#37474f" text-anchor="middle">再開時の課金失敗 (ON_HOLD (5))</text>
+
+  <!-- Canceled -> Expired -->
+  <path d="M760,222 C680,350 620,470 577,600" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <rect x="646" y="308" width="86" height="30" rx="4" fill="#ffffff" opacity="0.9"/>
+  <text x="689" y="320" font-size="10.5" fill="#37474f" text-anchor="middle">期限到来</text>
+  <text x="689" y="333" font-size="9" fill="#90a4ae" text-anchor="middle">(EXPIRED (13))</text>
+
+  <!-- Expired -> Active resubscribe -->
+  <path d="M495,578 C540,450 540,300 505,226" fill="none" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <rect x="500" y="408" width="112" height="42" rx="4" fill="#ffffff" opacity="0.9"/>
+  <text x="556" y="420" font-size="10.5" fill="#2e7d32" text-anchor="middle">再購入</text>
+  <text x="556" y="433" font-size="9.5" fill="#7cb342" text-anchor="middle">(PURCHASED (4) ・</text>
+  <text x="556" y="445" font-size="9.5" fill="#7cb342" text-anchor="middle">新purchaseToken)</text>
+
+  <!-- Any -> Revoked (refund/revoke) -->
+  <path d="M575,200 C820,235 950,400 880,578" fill="none" stroke="#e53935" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowRed)"/>
+  <text x="858" y="480" font-size="10.5" fill="#e53935" text-anchor="end">返金承認・取り消し</text>
+  <text x="858" y="494" font-size="9.5" fill="#ef9a9a" text-anchor="end">(REVOKED (12))</text>
+  <text x="858" y="508" font-size="9" fill="#ef9a9a" text-anchor="end">※任意の状態から</text>
+
+  <!-- Revoked -> Expired -->
+  <path d="M675,616 L577,616" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="626" y="637" font-size="9" fill="#90a4ae" text-anchor="middle">続けて失効通知</text>
+  <text x="626" y="648" font-size="9" fill="#90a4ae" text-anchor="middle">(EXPIRED (13))</text>
+
+  <!-- ===== Nodes ===== -->
+
+  <!-- Start -->
+  <rect x="375" y="66" width="210" height="42" rx="21" fill="#ede7f6" stroke="#5e35b1" stroke-width="1.8"/>
+  <text x="480" y="92" font-size="13.5" font-weight="bold" fill="#4527a0" text-anchor="middle">新規購入 / 初回課金</text>
+
+  <!-- Active -->
+  <rect x="375" y="150" width="200" height="72" rx="12" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="475" y="182" font-size="15" font-weight="bold" fill="#1b5e20" text-anchor="middle">有効（Active）</text>
+  <text x="475" y="202" font-size="11" fill="#388e3c" text-anchor="middle">STATE_ACTIVE・自動更新ON</text>
+  <text x="475" y="216" font-size="10" fill="#66bb6a" text-anchor="middle">利用可</text>
+
+  <!-- Canceled -->
+  <rect x="675" y="150" width="200" height="72" rx="12" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="775" y="180" font-size="14" font-weight="bold" fill="#0d47a1" text-anchor="middle">解約済み（Canceled）</text>
+  <text x="775" y="199" font-size="10.5" fill="#1976d2" text-anchor="middle">STATE_CANCELED・期限まで有効</text>
+  <text x="775" y="213" font-size="10" fill="#64b5f6" text-anchor="middle">解約予約（利用可）</text>
+
+  <!-- Grace -->
+  <rect x="70" y="150" width="195" height="72" rx="12" fill="#fff8e1" stroke="#f9a825" stroke-width="2"/>
+  <text x="167" y="180" font-size="14" font-weight="bold" fill="#e65100" text-anchor="middle">請求猶予期間</text>
+  <text x="167" y="199" font-size="10" fill="#f57f17" text-anchor="middle">STATE_IN_GRACE_PERIOD</text>
+  <text x="167" y="213" font-size="10" fill="#fbc02d" text-anchor="middle">利用可（支払い再試行中）</text>
+
+  <!-- OnHold -->
+  <rect x="70" y="350" width="195" height="72" rx="12" fill="#fff3e0" stroke="#fb8c00" stroke-width="2"/>
+  <text x="167" y="380" font-size="14" font-weight="bold" fill="#bf360c" text-anchor="middle">Account Hold</text>
+  <text x="167" y="399" font-size="10" fill="#e64a19" text-anchor="middle">STATE_ON_HOLD</text>
+  <text x="167" y="413" font-size="10" fill="#ff8a65" text-anchor="middle">利用不可（60日−猶予の間 再請求）</text>
+
+  <!-- Paused -->
+  <rect x="675" y="350" width="200" height="72" rx="12" fill="#e0f7fa" stroke="#00acc1" stroke-width="2"/>
+  <text x="775" y="380" font-size="14" font-weight="bold" fill="#006064" text-anchor="middle">一時停止（Paused）</text>
+  <text x="775" y="399" font-size="10" fill="#00838f" text-anchor="middle">STATE_PAUSED ※要事前有効化</text>
+  <text x="775" y="413" font-size="10" fill="#4dd0e1" text-anchor="middle">利用不可・課金なし（1〜3ヶ月）</text>
+
+  <!-- Expired -->
+  <rect x="375" y="580" width="200" height="72" rx="12" fill="#eceff1" stroke="#78909c" stroke-width="2"/>
+  <text x="475" y="612" font-size="15" font-weight="bold" fill="#37474f" text-anchor="middle">失効（Expired）</text>
+  <text x="475" y="632" font-size="11" fill="#546e7a" text-anchor="middle">STATE_EXPIRED</text>
+  <text x="475" y="646" font-size="10" fill="#90a4ae" text-anchor="middle">利用不可</text>
+
+  <!-- Revoked -->
+  <rect x="675" y="580" width="200" height="72" rx="12" fill="#fdecea" stroke="#e53935" stroke-width="2"/>
+  <text x="775" y="612" font-size="14" font-weight="bold" fill="#b71c1c" text-anchor="middle">取り消し（Revoked）</text>
+  <text x="775" y="632" font-size="10.5" fill="#c62828" text-anchor="middle">開発者のrevoke / 返金承認</text>
+  <text x="775" y="646" font-size="10" fill="#ef5350" text-anchor="middle">即時 利用不可</text>
+
+  <!-- Legend -->
+  <rect x="40" y="672" width="880" height="60" rx="8" fill="#fafafa" stroke="#cfd8dc" stroke-width="1"/>
+  <text x="56" y="692" font-size="11" font-weight="bold" fill="#455a64">凡例</text>
+  <line x1="56" y1="710" x2="96" y2="710" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="104" y="714" font-size="10.5" fill="#455a64">回復・更新（利用継続/再開）</text>
+  <line x1="300" y1="710" x2="340" y2="710" stroke="#37474f" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="348" y="714" font-size="10.5" fill="#455a64">通常遷移</text>
+  <line x1="470" y1="710" x2="510" y2="710" stroke="#e53935" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowRed)"/>
+  <text x="518" y="714" font-size="10.5" fill="#455a64">返金・取り消し（任意の状態から）</text>
+  <text x="912" y="714" font-size="10" fill="#90a4ae" text-anchor="end">STATE_*＝subscriptionsv2 の subscriptionState</text>
+</svg>

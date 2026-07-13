@@ -140,6 +140,8 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
 
 ### 2-2. ステータス遷移フロー（Android）
 
+> 🖼️ 図で見たい場合は **[Android サブスクリプション状態遷移図（SVG）](android-subscription-lifecycle.md)** を参照（subscriptionState・通知タイプ対応表つき）。
+
 ```
 新規購入
   └─ SUBSCRIPTION_PURCHASED
