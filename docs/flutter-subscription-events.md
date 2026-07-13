@@ -49,6 +49,8 @@ App Store はサブスクリプションの状態変化を **JWS（JSON Web Sign
 
 ### 1-2. ステータス遷移フロー（iOS）
 
+> 🖼️ 図で見たい場合は **[iOS サブスクリプション状態遷移図（SVG）](ios-subscription-lifecycle.md)** を参照（status値・通知タイプ対応表つき）。
+
 ```
 新規購入
   └─ SUBSCRIBED / INITIAL_BUY
