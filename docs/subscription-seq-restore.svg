@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 970 538" width="100%" style="max-width:970px;font-family:'Helvetica Neue',Arial,'Hiragino Sans','Noto Sans JP',sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#37474f"/></marker><marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#78909c"/></marker></defs>
+<rect x="0" y="0" width="970" height="538" fill="#ffffff"/>
+<text x="485" y="26" font-size="16" font-weight="bold" fill="#263238" text-anchor="middle">② 購入復元（restorePurchases）フロー</text>
+<text x="485" y="44" font-size="11" fill="#607d8b" text-anchor="middle">機種変更・再インストール時に権利を取り戻す（iOS審査要件）</text>
+<line x1="105" y1="96" x2="105" y2="514" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="295" y1="96" x2="295" y2="514" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="485" y1="96" x2="485" y2="514" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="675" y1="96" x2="675" y2="514" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="865" y1="96" x2="865" y2="514" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="30" y="50" width="150" height="46" rx="10" fill="#ede7f6" stroke="#5e35b1" stroke-width="1.8"/>
+<text x="105" y="78" font-size="12.5" font-weight="bold" fill="#4527a0" text-anchor="middle">ユーザー</text>
+<rect x="220" y="50" width="150" height="46" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="1.8"/>
+<text x="295" y="71" font-size="12" font-weight="bold" fill="#1b5e20" text-anchor="middle">Flutterアプリ</text>
+<text x="295" y="86" font-size="10" fill="#1b5e20" text-anchor="middle">(in_app_purchase)</text>
+<rect x="410" y="50" width="150" height="46" rx="10" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.8"/>
+<text x="485" y="71" font-size="12" font-weight="bold" fill="#0d47a1" text-anchor="middle">ストア</text>
+<text x="485" y="86" font-size="10" fill="#0d47a1" text-anchor="middle">(App Store / Play)</text>
+<rect x="600" y="50" width="150" height="46" rx="10" fill="#fff3e0" stroke="#fb8c00" stroke-width="1.8"/>
+<text x="675" y="78" font-size="12.5" font-weight="bold" fill="#bf360c" text-anchor="middle">自前バックエンド</text>
+<rect x="790" y="50" width="150" height="46" rx="10" fill="#eceff1" stroke="#78909c" stroke-width="1.8"/>
+<text x="865" y="71" font-size="12" font-weight="bold" fill="#37474f" text-anchor="middle">DB</text>
+<text x="865" y="86" font-size="10" fill="#37474f" text-anchor="middle">(subscriptions)</text>
+<text x="200" y="147" font-size="11" fill="#37474f" text-anchor="middle">「購入を復元」をタップ</text>
+<line x1="105" y1="154" x2="295" y2="154" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="390" y="187" font-size="11" fill="#37474f" text-anchor="middle">restorePurchases()</text>
+<line x1="295" y1="194" x2="485" y2="194" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="390" y="227" font-size="11" fill="#78909c" text-anchor="middle">purchaseStream: PurchaseStatus.restored（過去の購入）</text>
+<line x1="485" y1="234" x2="295" y2="234" stroke="#78909c" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ad)"/>
+<text x="485" y="267" font-size="11" fill="#37474f" text-anchor="middle">POST /iap/verify（レシート / purchaseToken）</text>
+<line x1="295" y1="274" x2="675" y2="274" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="580" y="307" font-size="11" fill="#37474f" text-anchor="middle">最新ステータスを照会</text>
+<line x1="675" y1="314" x2="485" y2="314" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="580" y="347" font-size="11" fill="#78909c" text-anchor="middle">ACTIVE・有効期限</text>
+<line x1="485" y1="354" x2="675" y2="354" stroke="#78909c" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ad)"/>
+<text x="770" y="387" font-size="11" fill="#37474f" text-anchor="middle">user_id と購入情報を紐付け・権利UPSERT</text>
+<line x1="675" y1="394" x2="865" y2="394" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="485" y="427" font-size="11" fill="#78909c" text-anchor="middle">200 OK（entitlement）</text>
+<line x1="675" y1="434" x2="295" y2="434" stroke="#78909c" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ad)"/>
+<text x="200" y="467" font-size="11" fill="#37474f" text-anchor="middle">「購入を復元しました」</text>
+<line x1="295" y1="474" x2="105" y2="474" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="486" width="878" height="26" rx="5" fill="#fffde7" stroke="#f9a825" stroke-width="1"/>
+<text x="485" y="503" font-size="10.5" fill="#795548" text-anchor="middle">別ユーザーIDに紐付く購入が来た場合の扱い（付け替え/拒否）は事前にポリシーを決めておく</text>
+</svg>
