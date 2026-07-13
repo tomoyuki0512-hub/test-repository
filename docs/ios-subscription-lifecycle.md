@@ -55,6 +55,8 @@ App Store Server API の `status` フィールドの値に対応します。
 
 ## Android との対応
 
+> 🖼️ Android版も同じスタイルで作図しています → **[Android サブスクリプション状態遷移図（SVG）](android-subscription-lifecycle.md)**
+
 | Android（Google Play） | iOS（App Store）の相当 |
 | --- | --- |
 | `SUBSCRIPTION_STATE_ACTIVE` | 有効（Active, status 1） |

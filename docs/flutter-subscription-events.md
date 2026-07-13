@@ -49,6 +49,8 @@ App Store はサブスクリプションの状態変化を **JWS（JSON Web Sign
 
 ### 1-2. ステータス遷移フロー（iOS）
 
+> 🖼️ 図で見たい場合は **[iOS サブスクリプション状態遷移図（SVG）](ios-subscription-lifecycle.md)** を参照（status値・通知タイプ対応表つき）。
+
 ```
 新規購入
   └─ SUBSCRIBED / INITIAL_BUY
@@ -137,6 +139,8 @@ Google Play は **Pub/Sub** を通じてバックエンドへ通知します。
 > ⚠️ 数値は連番ではなく欠番（14〜16・21 など）がある。新しい型が追加されうるため、未知の型は無視して処理を続ける実装にする。
 
 ### 2-2. ステータス遷移フロー（Android）
+
+> 🖼️ 図で見たい場合は **[Android サブスクリプション状態遷移図（SVG）](android-subscription-lifecycle.md)** を参照（subscriptionState・通知タイプ対応表つき）。
 
 ```
 新規購入

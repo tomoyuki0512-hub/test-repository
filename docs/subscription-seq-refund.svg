@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 970 504" width="100%" style="max-width:970px;font-family:'Helvetica Neue',Arial,'Hiragino Sans','Noto Sans JP',sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#37474f"/></marker><marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#78909c"/></marker></defs>
+<rect x="0" y="0" width="970" height="504" fill="#ffffff"/>
+<text x="485" y="26" font-size="16" font-weight="bold" fill="#263238" text-anchor="middle">⑤ 返金・取り消し（Revoke）フロー</text>
+<text x="485" y="44" font-size="11" fill="#607d8b" text-anchor="middle">ユーザーはストアに直接返金申請する（開発者は関与できない）</text>
+<line x1="105" y1="96" x2="105" y2="480" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="295" y1="96" x2="295" y2="480" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="485" y1="96" x2="485" y2="480" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="675" y1="96" x2="675" y2="480" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="865" y1="96" x2="865" y2="480" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="30" y="50" width="150" height="46" rx="10" fill="#ede7f6" stroke="#5e35b1" stroke-width="1.8"/>
+<text x="105" y="78" font-size="12.5" font-weight="bold" fill="#4527a0" text-anchor="middle">ユーザー</text>
+<rect x="220" y="50" width="150" height="46" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="1.8"/>
+<text x="295" y="71" font-size="12" font-weight="bold" fill="#1b5e20" text-anchor="middle">Flutterアプリ</text>
+<text x="295" y="86" font-size="10" fill="#1b5e20" text-anchor="middle">(in_app_purchase)</text>
+<rect x="410" y="50" width="150" height="46" rx="10" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.8"/>
+<text x="485" y="71" font-size="12" font-weight="bold" fill="#0d47a1" text-anchor="middle">ストア</text>
+<text x="485" y="86" font-size="10" fill="#0d47a1" text-anchor="middle">(App Store / Play)</text>
+<rect x="600" y="50" width="150" height="46" rx="10" fill="#fff3e0" stroke="#fb8c00" stroke-width="1.8"/>
+<text x="675" y="78" font-size="12.5" font-weight="bold" fill="#bf360c" text-anchor="middle">自前バックエンド</text>
+<rect x="790" y="50" width="150" height="46" rx="10" fill="#eceff1" stroke="#78909c" stroke-width="1.8"/>
+<text x="865" y="71" font-size="12" font-weight="bold" fill="#37474f" text-anchor="middle">DB</text>
+<text x="865" y="86" font-size="10" fill="#37474f" text-anchor="middle">(subscriptions)</text>
+<text x="295" y="147" font-size="11" fill="#37474f" text-anchor="middle">返金申請（ストアのサポート窓口へ直接）</text>
+<line x1="105" y1="154" x2="485" y2="154" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M485,178 C541,178 541,200 491,200" fill="none" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="549" y="186" font-size="11" fill="#37474f">審査・承認</text>
+<text x="580" y="233" font-size="11" fill="#37474f" text-anchor="middle">iOS: REFUND / REVOKE ・ Android: SUBSCRIPTION_REVOKED</text>
+<line x1="485" y1="240" x2="675" y2="240" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="770" y="273" font-size="11" fill="#37474f" text-anchor="middle">status = REVOKED（権利を即時剥奪）</text>
+<line x1="675" y1="280" x2="865" y2="280" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="770" y="313" font-size="11" fill="#37474f" text-anchor="middle">subscription_events に記録（返金率の分析用）</text>
+<line x1="675" y1="320" x2="865" y2="320" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="485" y="353" font-size="11" fill="#37474f" text-anchor="middle">GET /me/subscription（起動時）</text>
+<line x1="295" y1="360" x2="675" y2="360" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="485" y="393" font-size="11" fill="#78909c" text-anchor="middle">権利なし</text>
+<line x1="675" y1="400" x2="295" y2="400" stroke="#78909c" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ad)"/>
+<text x="200" y="433" font-size="11" fill="#37474f" text-anchor="middle">利用終了の案内画面</text>
+<line x1="295" y1="440" x2="105" y2="440" stroke="#37474f" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="452" width="878" height="26" rx="5" fill="#fffde7" stroke="#f9a825" stroke-width="1"/>
+<text x="485" y="469" font-size="10.5" fill="#795548" text-anchor="middle">iOSの REFUND（アクセス継続の返金）と REVOKE（権利剥奪）は別イベント。REVOKE のみ即時停止する</text>
+</svg>

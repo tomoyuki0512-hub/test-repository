@@ -33,13 +33,15 @@ title: サブスクリプション資料 総合インデックス（はじめに
 |---|---|---|
 | 1 | 本ページ（用語集・全体像） | 共通言語と登場人物 |
 | 2 | [要件定義資料](flutter-subscription-guide.md) | 実装要件の全体像（パッケージ・検証・ライフサイクル） |
-| 3 | [イベント・ステータス一覧](flutter-subscription-events.md) | iOS/Androidの全通知イベントと意味 |
+| 3 | [イベント・ステータス一覧](flutter-subscription-events.md)＋[状態遷移図 iOS](ios-subscription-lifecycle.md)/[Android](android-subscription-lifecycle.md) | 全通知イベントの意味と状態遷移の全体像 |
 | 4 | [システム構成設計](flutter-subscription-system-design.md) | DB設計・API設計・Webhook処理 |
-| 5 | [システム構成図](flutter-subscription-architecture-diagram.md) | インフラ構成（Mermaid / Python Diagrams） |
+| 5 | [シーケンス図集](subscription-sequence-diagrams.md) | 購入・復元・Webhook・課金失敗・返金の処理の流れ |
+| 6 | [実装コード例 Flutter編](flutter-subscription-code-client.md) / [バックエンド編](flutter-subscription-code-backend.md) | `in_app_purchase`・検証・Webhookの実装コード |
+| 7 | [システム構成図](flutter-subscription-architecture-diagram.md) | インフラ構成（Mermaid / Python Diagrams） |
 
 ### PM・PdM・QA 向け
 
-要件定義資料の「チェックリスト（第14章）」と、イベント一覧の「ステータス遷移フロー」を押さえると、仕様の抜け漏れとテスト観点を確認できます。
+要件定義資料の「チェックリスト（第14章）」と、[状態遷移図](ios-subscription-lifecycle.md)・イベント一覧の「ステータス遷移フロー」を押さえると、仕様の抜け漏れとテスト観点を確認できます。テスト実務は[テスト・QAガイド](flutter-subscription-testing.md)の**状態遷移テストチェックリスト**を使ってください。リリース後は[運用ガイド](flutter-subscription-operations.md)・[法務・表記ガイド](flutter-subscription-legal-jp.md)へ。
 
 ---
 
@@ -134,14 +136,39 @@ title: サブスクリプション資料 総合インデックス（はじめに
 
 ## 5. ドキュメント一覧
 
+### 事業・企画
+
 | ドキュメント | 主な読者 | 内容 |
 |---|---|---|
 | [事業視点ガイド](flutter-subscription-business.md) | 事業部・企画 | 料金戦略・KPI・手数料の収益影響・トライアル設計・ロードマップ |
+| [法務・表記ガイド（日本）](flutter-subscription-legal-jp.md) | 事業部・法務 | 特商法（定期購入の表示義務）・景表法・消費者契約法の実務チェックリスト |
+
+### 仕様・設計
+
+| ドキュメント | 主な読者 | 内容 |
+|---|---|---|
 | [要件定義資料](flutter-subscription-guide.md) | 開発・PM | IAPの全要件（パッケージ・支払い・審査・検証・ライフサイクル・解約・返金） |
 | [イベント・ステータス一覧](flutter-subscription-events.md) | 開発・QA | iOS/Androidの全通知イベントと発生タイミング・遷移フロー |
-| [解約・再加入 UX設計ガイド](flutter-subscription-ux.md) | 企画・デザイン・開発 | 解約後／失効後の画面設計・再開導線・課金タイミングの表記 |
 | [システム構成設計](flutter-subscription-system-design.md) | バックエンド開発 | DB設計・API設計・Webhook処理・セキュリティ |
+| [解約・再加入 UX設計ガイド](flutter-subscription-ux.md) | 企画・デザイン・開発 | 解約後／失効後の画面設計・再開導線・課金タイミングの表記 |
+
+### 図解（SVG）
+
+| ドキュメント | 主な読者 | 内容 |
+|---|---|---|
+| [iOS 状態遷移図](ios-subscription-lifecycle.md) | 開発・QA | App Storeサブスクの状態遷移を1枚に図解（status値・通知タイプ対応） |
+| [Android 状態遷移図](android-subscription-lifecycle.md) | 開発・QA | Google Playサブスクの状態遷移を1枚に図解（RTDN対応） |
+| [シーケンス図集](subscription-sequence-diagrams.md) | 開発 | 購入・復元・Webhook・課金失敗・返金の5フロー |
 | [システム構成図](flutter-subscription-architecture-diagram.md) | 開発・インフラ | 構成図（Mermaid / Python Diagrams）と作図手順 |
+
+### 実装・テスト・運用
+
+| ドキュメント | 主な読者 | 内容 |
+|---|---|---|
+| [実装コード例 Flutter編](flutter-subscription-code-client.md) | モバイル開発 | `in_app_purchase` の初期化・購入・復元・purchaseStream処理 |
+| [実装コード例 バックエンド編](flutter-subscription-code-backend.md) | バックエンド開発 | JWS検証・Server API・Pub/Sub受信・冪等化・acknowledge |
+| [テスト・QAガイド](flutter-subscription-testing.md) | 開発・QA | Sandbox/テストトラック実務・課金失敗の再現・遷移別チェックリスト |
+| [運用ガイド（Runbook）](flutter-subscription-operations.md) | 開発・CS | 日次リコンサイル・監視・障害対応・返金/問い合わせ対応 |
 
 ---
 
@@ -155,4 +182,4 @@ title: サブスクリプション資料 総合インデックス（はじめに
 - Google: [Google Play Billing 概要](https://developer.android.com/google/play/billing) ／ [RTDN リファレンス](https://developer.android.com/google/play/billing/rtdn-reference) ／ [手数料の解説](https://support.google.com/googleplay/android-developer/answer/16954621)
 - Flutter: [in_app_purchase（pub.dev）](https://pub.dev/packages/in_app_purchase) ／ [In-app purchases overview](https://docs.flutter.dev/resources/in-app-purchases-overview)
 
-> **更新日:** 2026-05-20 ／ 手数料・SDK要件・法規制は変動が激しいため、各章末の日付と一次情報（Apple Developer / Android Developers）を必ず確認してください。
+> **更新日:** 2026-07-13（図解・実装コード例・テスト・運用・法務の各ドキュメントを追加） ／ 手数料・SDK要件・法規制は変動が激しいため、各章末の日付と一次情報（Apple Developer / Android Developers）を必ず確認してください。
