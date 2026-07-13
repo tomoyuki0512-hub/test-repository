@@ -73,6 +73,13 @@ title: ガイド一覧
 - [システム構成設計](flutter-subscription-system-design.md)
 - [システム構成図（Mermaid / Python Diagrams）](flutter-subscription-architecture-diagram.md)
 - [iOS サブスクリプション状態遷移図（SVG）](ios-subscription-lifecycle.md) ← AndroidのライフサイクルにないiOS版をSVGで作図
+- [Android サブスクリプション状態遷移図（SVG）](android-subscription-lifecycle.md) ← iOS版と同スタイルでGoogle Play版も作図
+- [主要フロー シーケンス図集（SVG）](subscription-sequence-diagrams.md) ← 購入・復元・Webhook・課金失敗・返金の5フロー
+- [実装コード例 Flutter編（in_app_purchase）](flutter-subscription-code-client.md) ← 購入・復元・purchaseStream処理のコード
+- [実装コード例 バックエンド編](flutter-subscription-code-backend.md) ← JWS検証・Server API・Pub/Sub・冪等化のコード
+- [テスト・QAガイド](flutter-subscription-testing.md) ← Sandbox/テストトラック実務・状態遷移テストチェックリスト
+- [運用ガイド（Runbook）](flutter-subscription-operations.md) ← リコンサイル・監視・障害対応・返金/CS対応
+- [法務・表記ガイド（日本）](flutter-subscription-legal-jp.md) ← 特商法・景表法・消費者契約法の実務チェックリスト
 - [サブスクリプション & RevenueCat 総合ガイド](../revenuecat-subscription-guide.md) ← メリット/デメリット・費用・開発のし易さ・開発ステップ数とサーバー/保守の削減効果
 
 ## 年金・社会保障
