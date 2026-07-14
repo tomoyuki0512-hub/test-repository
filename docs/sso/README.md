@@ -63,13 +63,15 @@ flowchart TB
 | ④ | [OIDCを詳しく](04-oidc.md) | IDトークン(JWT)を実際にデコードする追体験・「Googleでログイン」をDevToolsで観察・3技術の比較と選び方 |
 | ⑤ | [セキュリティとMFA・パスキー](05-security-mfa.md) | 攻撃シナリオ別の対策・MFA方式の強さ比較・パスキーがフィッシングに強い理由 |
 | ⑥ | [導入と運用](06-deployment-ops.md) | 導入10ステップ・Entra ID/Oktaの画面レベル手順・SCIM・製品比較・トラブル対処表・用語集 |
+| ⑦ | [シングルログアウト（SLO）](07-slo.md) | 「3層セッション」の考え方・SAML SLO・OIDCの3方式（バックチャネルログアウト）・実務の落としどころ |
+| ⑧ | [OIDCログイン実装ハンズオン](08-oidc-hands-on.md) | Auth0+Node.jsで実際に動かす全手順（コード付き）・Flutter組み込み例・自前実装の検証チェックリスト |
 
 ### 読者タイプ別のおすすめルート
 
 - **とりあえず概要だけ知りたい** → このページ ＋ [①基礎](01-sso-basics.md) だけでOK
-- **「Googleでログイン」を実装したい開発者** → [①基礎](01-sso-basics.md) → [③OAuth 2.0](03-oauth2.md) → [④OIDC](04-oidc.md)
-- **社内SaaSをSSO化したい情シス担当** → [①基礎](01-sso-basics.md) → [②SAML](02-saml.md) → [⑥導入と運用](06-deployment-ops.md) →（余力があれば [⑤セキュリティ](05-security-mfa.md)）
-- **セキュリティ観点で評価したい** → [⑤セキュリティ](05-security-mfa.md) → [③OAuth 2.0](03-oauth2.md)の攻撃シナリオ → [⑥導入と運用](06-deployment-ops.md)のトラブル表
+- **「Googleでログイン」を実装したい開発者** → [①基礎](01-sso-basics.md) → [③OAuth 2.0](03-oauth2.md) → [④OIDC](04-oidc.md) → [⑧実装ハンズオン](08-oidc-hands-on.md)
+- **社内SaaSをSSO化したい情シス担当** → [①基礎](01-sso-basics.md) → [②SAML](02-saml.md) → [⑥導入と運用](06-deployment-ops.md) →（余力があれば [⑤セキュリティ](05-security-mfa.md)・[⑦SLO](07-slo.md)）
+- **セキュリティ観点で評価したい** → [⑤セキュリティ](05-security-mfa.md) → [③OAuth 2.0](03-oauth2.md)の攻撃シナリオ → [⑦SLO](07-slo.md) → [⑥導入と運用](06-deployment-ops.md)のトラブル表
 - **用語だけ引きたい** → [⑥導入と運用の用語集](06-deployment-ops.md#7-用語集シリーズ全体)
 
 ---
