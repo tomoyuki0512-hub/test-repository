@@ -109,6 +109,8 @@ title: ガイド一覧
   - [④ OIDCを詳しく](sso/04-oidc.md) ← JWTデコード追体験・「Googleでログイン」の裏側観察
   - [⑤ セキュリティとMFA・パスキー](sso/05-security-mfa.md) ← 攻撃シナリオ別の守り方
   - [⑥ 導入と運用](sso/06-deployment-ops.md) ← Entra ID/Okta手順・SCIM・トラブル対処・用語集
+  - [⑦ シングルログアウト（SLO）](sso/07-slo.md) ← 「3層セッション」で理解するログアウトの難しさと実務解
+  - [⑧ OIDCログイン実装ハンズオン](sso/08-oidc-hands-on.md) ← Auth0+Node.jsで実際に動かす。Flutter例・検証チェックリスト付き
 
 ## デザイン・画像
 
