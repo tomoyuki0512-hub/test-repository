@@ -55,6 +55,8 @@ sequenceDiagram
     RP-->>U: 「この人は本物」と確認 → ログイン完了!
 ```
 
+*（図が表示されない環境用：[SVG版](svg/04-oidc-1.svg)）*
+
 > 用語メモ：OIDCではSPのことを **RP（Relying Party）**、IdPのことを **OP（OpenID Provider）** と呼びます。役割は同じです。
 
 ---
@@ -173,6 +175,8 @@ flowchart TD
     Q1 -->|他社サービスのデータを<br/>読む権限だけ欲しい| A3[OAuth 2.0<br/>ログインではなく認可ならこれ]
     Q1 -->|ゼロから新規で迷ったら| A2
 ```
+
+*（図が表示されない環境用：[SVG版](svg/04-oidc-2.svg)）*
 
 ---
 
