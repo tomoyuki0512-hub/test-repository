@@ -95,4 +95,4 @@ title: ⑮ デザイナーとの協働【深掘り編】
 
 ---
 
-[← 総合インデックスに戻る](README.md) ｜ 前章: [⑭ レガシーコードとアジャイル](14-legacy-code.md) ｜ [用語集・チートシート](glossary.md)
+次章: [⑯ スプリント完全シミュレーション](16-sprint-simulation.md) ｜ [← 総合インデックス](README.md) ｜ [用語集・チートシート](glossary.md)
