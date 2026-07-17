@@ -138,6 +138,9 @@ title: 用語集・チートシート
 | 経営層・顧客への説明に困っている | [⑦](07-metrics-adoption.md) → [⑫](12-agile-in-japan.md) |
 | デザイン待ちで開発が止まる | [⑮](15-design-collaboration.md) |
 | 導入を主導する立場になった | [⑦](07-metrics-adoption.md) → [⑬](13-agile-coaching.md) |
+| イベントの実際の空気感・進め方が想像できない | [⑯](16-sprint-simulation.md) |
+| 自組織に近い事例・説得材料が欲しい | [⑰](17-case-studies.md) |
+| 今日から使えるひな形が欲しい | [⑱](18-templates.md) |
 
 ### 会話で使う判断基準ワンライナー
 
