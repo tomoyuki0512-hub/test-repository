@@ -35,6 +35,11 @@ title: ガイド一覧
   - [⑤ 技術プラクティス](agile/05-engineering-practices.md) ← TDD・CI/CD・リファクタリング・技術的負債
   - [⑥ 大規模アジャイル](agile/06-scaling.md) ← SAFe・LeSS・Scrum@Scaleの比較と選び方
   - [⑦ メトリクスと導入・アンチパターン](agile/07-metrics-adoption.md) ← Four Keys・失敗パターン・導入ステップ
+  - [⑧ チームと文化（深掘り編）](agile/08-team-and-culture.md) ← 自己組織化・心理的安全性・インセプションデッキ
+  - [⑨ プロダクトディスカバリー（深掘り編）](agile/09-product-discovery.md) ← 仮説駆動・ストーリーマッピング・OKR・RICE
+  - [⑩ アジャイルテスト（深掘り編）](agile/10-agile-testing.md) ← テスト4象限・BDD・探索的テスト・QAの役割
+  - [⑪ ふりかえりの技法（深掘り編）](agile/11-retrospectives.md) ← 5ステップ構造・手法カタログ・形骸化への処方箋
+  - [⑫ 日本の実務とアジャイル（深掘り編）](agile/12-agile-in-japan.md) ← 準委任契約・IPAモデル契約・偽装アジャイルの見分け方
 
 ## Claude Codeを使ったアプリ開発
 
