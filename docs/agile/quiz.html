@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アジャイル開発 理解度クイズ</title>
+<style>
+  :root {
+    --bg: #f6f8fa; --card: #ffffff; --text: #1f2933; --sub: #616e7c;
+    --accent: #0e7c66; --accent-soft: #e0f2ee; --border: #d9e2ec;
+    --ok: #2f855a; --ok-soft: #e6f4ea; --ng: #c53030; --ng-soft: #fdecea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15191e; --card: #1f252c; --text: #e4e9ee; --sub: #9aa5b1;
+      --accent: #34b096; --accent-soft: #123f36; --border: #323c46;
+      --ok: #48bb78; --ok-soft: #1c3527; --ng: #f56565; --ng-soft: #3b2023;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.7; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  header p { color: var(--sub); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+          padding: 20px; margin-top: 20px; }
+  .modes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .modes button, .btn { border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 8px; padding: 10px 16px; font-size: 0.95rem; cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .meta { display: flex; justify-content: space-between; font-size: 0.85rem;
+          color: var(--sub); margin-bottom: 10px; }
+  .q { font-size: 1.05rem; font-weight: 700; margin-bottom: 14px; }
+  ul.choices { list-style: none; }
+  ul.choices li { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    margin-bottom: 8px; cursor: pointer; }
+  ul.choices li:hover { border-color: var(--accent); }
+  ul.choices li.correct { background: var(--ok-soft); border-color: var(--ok); font-weight: 700; }
+  ul.choices li.wrong { background: var(--ng-soft); border-color: var(--ng); }
+  ul.choices li.disabled { pointer-events: none; }
+  .feedback { display: none; margin-top: 14px; border-radius: 10px; padding: 14px; font-size: 0.95rem; }
+  .feedback.ok { display: block; background: var(--ok-soft); border: 1px solid var(--ok); }
+  .feedback.ng { display: block; background: var(--ng-soft); border: 1px solid var(--ng); }
+  .feedback .verdict { font-weight: 700; margin-bottom: 6px; }
+  .feedback a { color: var(--accent); font-weight: 600; }
+  .nav { margin-top: 16px; text-align: right; }
+  .bar { height: 8px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+  .bar > div { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s; }
+  .result h2 { font-size: 1.3rem; margin-bottom: 8px; }
+  .result .score { font-size: 2.4rem; font-weight: 800; color: var(--accent); }
+  .result p { color: var(--sub); font-size: 0.95rem; margin-top: 6px; }
+  .result .advice { margin-top: 14px; color: var(--text); font-size: 0.95rem;
+    background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; }
+  .review { margin-top: 16px; font-size: 0.9rem; }
+  .review li { margin-bottom: 6px; margin-left: 1.2em; }
+  .review a { color: var(--accent); }
+  .hidden { display: none; }
+  footer { margin-top: 32px; font-size: 0.85rem; color: var(--sub); text-align: center; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>✅ アジャイル開発 理解度クイズ</h1>
+    <p>4択×即時解説。間違えた問題には復習すべき章へのリンクが付きます。ベストスコアはこのブラウザに保存されます。</p>
+  </header>
+
+  <div class="card" id="startCard">
+    <div class="q">出題範囲を選んでください</div>
+    <div class="modes">
+      <button data-mode="basic">基礎編（①〜⑦）16問</button>
+      <button data-mode="deep">深掘り編（⑧〜⑮）12問</button>
+      <button data-mode="all">全範囲シャッフル 28問</button>
+      <button data-mode="random10">おまかせ10問</button>
+    </div>
+    <p id="best" style="margin-top:14px; color:var(--sub); font-size:0.9rem;"></p>
+  </div>
+
+  <div class="card hidden" id="quizCard">
+    <div class="meta"><span id="qnum"></span><span id="qcat"></span></div>
+    <div class="q" id="qtext"></div>
+    <ul class="choices" id="choices"></ul>
+    <div class="feedback" id="feedback"></div>
+    <div class="nav"><button class="btn primary hidden" id="nextBtn">次の問題 →</button></div>
+    <div class="bar"><div id="qbar"></div></div>
+  </div>
+
+  <div class="card hidden result" id="resultCard">
+    <h2>結果</h2>
+    <div class="score" id="scoreText"></div>
+    <p id="scoreSub"></p>
+    <div class="advice" id="advice"></div>
+    <div class="review" id="reviewBox"></div>
+    <div class="nav" style="text-align:left; margin-top:20px;">
+      <button class="btn primary" id="retryBtn">もう一度</button>
+      <button class="btn" id="homeBtn">範囲選択へ戻る</button>
+    </div>
+  </div>
+
+  <footer><a href="portal.html">🏃 学習ポータル</a> ｜ <a href="README.md">📚 総合インデックス</a></footer>
+</div>
+
+<script>
+(function () {
+  // q: 問題文 / c: 選択肢 / a: 正解index / e: 解説 / ch: 章リンク / cat: basic|deep
+  var QS = [
+    {cat:"basic", ch:["01-agile-basics.md","① アジャイルの基礎"],
+     q:"アジャイルマニフェストの4つの価値。「包括的なドキュメントよりも○○を」——○○は？",
+     c:["詳細な計画","動くソフトウェア","迅速な会議","少ないコード"], a:1,
+     e:"「左側にも価値があるが、右側により価値をおく」という相対表現。ドキュメントを書かないという意味ではない点に注意。"},
+    {cat:"basic", ch:["01-agile-basics.md","① アジャイルの基礎"],
+     q:"アジャイルで開発が「速くなる」最大の理由として最も適切なのは？",
+     c:["エンジニアの作業速度が上がるから","会議が減るから","間違ったものを作り込むムダと手戻りが減るから","ドキュメント作成を省略するから"], a:2,
+     e:"本質は速く作ることではなく、フィードバックにより「作らないもの」を早く決め、手戻りを小さくすること。"},
+    {cat:"basic", ch:["02-scrum.md","② スクラム"],
+     q:"スクラムで定義されている役割（責任）に含まれないものは？",
+     c:["プロダクトオーナー","スクラムマスター","開発者","プロジェクトマネージャー"], a:3,
+     e:"スクラムの役割はPO・SM・開発者の3つだけ。PMという役割は定義されていない。"},
+    {cat:"basic", ch:["02-scrum.md","② スクラム"],
+     q:"デイリースクラムの本来の目的は？",
+     c:["マネージャーへの進捗報告","開発者同士の同期と、その日の計画の調整","タスクの割り振り","残業の確認"], a:1,
+     e:"報告会ではなく、開発者がスプリントゴールに向けて自ら再計画する場。報告会化は代表的アンチパターン。"},
+    {cat:"basic", ch:["02-scrum.md","② スクラム"],
+     q:"スプリント中に緊急でない割り込み依頼が来た。原則的な対応は？",
+     c:["すぐ着手する","バックログに積み、次スプリントの計画で判断する","断って二度と受け付けない","チーム全員で残業して対応"], a:1,
+     e:"スプリントゴールを守るのが原則。依頼はバックログ経由で優先順位を判断する。POが防波堤になる。"},
+    {cat:"basic", ch:["03-kanban-xp.md","③ カンバン・XP"],
+     q:"カンバンのWIP制限の狙いを最もよく表す標語は？",
+     c:["Stop Starting, Start Finishing","Move Fast and Break Things","Done is better than perfect","You Aren't Gonna Need It"], a:0,
+     e:"「始めるのをやめ、終わらせることを始めよ」。同時仕掛りを絞ることで流れが速くなり、詰まりが見える。"},
+    {cat:"basic", ch:["03-kanban-xp.md","③ カンバン・XP"],
+     q:"運用・保守・問い合わせ対応など割り込みが多い仕事に向くとされる手法は？",
+     c:["スクラム","カンバン","SAFe","ウォーターフォール"], a:1,
+     e:"固定スプリントを持たず、いつでも優先順位を変えられる連続フローのカンバンが向く。"},
+    {cat:"basic", ch:["04-requirements-estimation.md","④ 要求と見積り"],
+     q:"ストーリーポイントにフィボナッチ数列（1,2,3,5,8,13…）を使う主な理由は？",
+     c:["計算が簡単だから","大きい作業ほど不確実なので、粗い間隔で精度の錯覚を防ぐため","伝統だから","ツールがそうなっているから"], a:1,
+     e:"「12と13の違い」の議論は無意味。大きいものほど間隔を粗くし、8や13は分割検討のシグナルとする。"},
+    {cat:"basic", ch:["04-requirements-estimation.md","④ 要求と見積り"],
+     q:"プランニングポーカーの最大の価値は？",
+     c:["正確な工数が出ること","見積りのズレから認識の違い・考慮漏れを発見できること","ゲームで楽しく見積もれること","POに数字で約束できること"], a:1,
+     e:"最大と最小を出した人の理由説明で前提の違いが炙り出される。数字そのものより認識合わせが本体。"},
+    {cat:"basic", ch:["04-requirements-estimation.md","④ 要求と見積り"],
+     q:"良いユーザーストーリーの条件「INVEST」のSは？",
+     c:["Simple（単純）","Small（小さい）","Speedy（速い）","Stable（安定）"], a:1,
+     e:"1スプリントに収まる小ささ。大きいストーリー（エピック）は価値が届く単位で縦に分割する。"},
+    {cat:"basic", ch:["05-engineering-practices.md","⑤ 技術プラクティス"],
+     q:"TDDのサイクルの正しい順序は？",
+     c:["実装 → テスト → リリース","レッド → グリーン → リファクタ","設計 → 実装 → レビュー","グリーン → レッド → デプロイ"], a:1,
+     e:"失敗するテストを先に書き（レッド）、最小実装で通し（グリーン）、テストを保ったまま整理する（リファクタ）。"},
+    {cat:"basic", ch:["05-engineering-practices.md","⑤ 技術プラクティス"],
+     q:"テストピラミッドで最も数を厚くすべき層は？",
+     c:["E2E/UIテスト","統合テスト","ユニットテスト","手動テスト"], a:2,
+     e:"速く安定なユニットテストを土台に厚く。E2E偏重の逆三角形は「アイスクリームコーン」アンチパターン。"},
+    {cat:"basic", ch:["06-scaling.md","⑥ 大規模アジャイル"],
+     q:"「システムの構造は、それを作る組織のコミュニケーション構造を写し取る」— この法則は？",
+     c:["グッドハートの法則","コンウェイの法則","パーキンソンの法則","ムーアの法則"], a:1,
+     e:"逆に望むアーキテクチャに合わせてチームを編成するのが「逆コンウェイ戦略」。大規模化の定石。"},
+    {cat:"basic", ch:["07-metrics-adoption.md","⑦ メトリクスと導入"],
+     q:"ベロシティの正しい使い方は？",
+     c:["チーム間の生産性比較","人事評価の材料","チーム内での完了時期の予測","経営への成果報告のKPI"], a:2,
+     e:"ベロシティはチーム固有の内部指標。比較や評価に使うとポイントがインフレし、予測にすら使えなくなる。"},
+    {cat:"basic", ch:["07-metrics-adoption.md","⑦ メトリクスと導入"],
+     q:"「指標が目標になると、それは良い指標であることをやめる」— この法則は？",
+     c:["コンウェイの法則","ブルックスの法則","グッドハートの法則","ピーターの法則"], a:2,
+     e:"ベロシティ目標→ポイントインフレ、カバレッジ目標→無意味なテスト量産。指標は改善の会話の材料に留める。"},
+    {cat:"basic", ch:["07-metrics-adoption.md","⑦ メトリクスと導入"],
+     q:"DORAのFour Keysに含まれないものは？",
+     c:["デプロイ頻度","変更のリードタイム","ベロシティ","サービス復元時間（MTTR）"], a:2,
+     e:"Four Keysはデプロイ頻度・変更リードタイム・変更障害率・復元時間。ベロシティは含まれない。"},
+    {cat:"deep", ch:["08-team-and-culture.md","⑧ チームと文化"],
+     q:"心理的安全性の定義として最も適切なのは？",
+     c:["衝突や指摘のない和やかな雰囲気","対人リスクを取っても罰されないという共有信念","失敗が起きないよう管理された状態","上司が優しいこと"], a:1,
+     e:"「ぬるさ」ではない。基準が高く、かつ率直に話せる状態が学習するチーム（Edmondson）。"},
+    {cat:"deep", ch:["08-team-and-culture.md","⑧ チームと文化"],
+     q:"タックマンモデルで、意見の衝突が噴出する「混乱期（Storming）」への正しい向き合い方は？",
+     c:["手法が合わない証拠なので導入を中止する","メンバーを入れ替える","健全な通過点として衝突を避けずに扱う","衝突が収まるまで会議を減らす"], a:2,
+     e:"混乱期は機能期への通過点。ここで解散・手法のせいにするのが最悪手。メンバー入れ替えは段階を逆戻りさせる。"},
+    {cat:"deep", ch:["09-product-discovery.md","⑨ プロダクトディスカバリー"],
+     q:"「アウトカム」の説明として正しいのは？",
+     c:["リリースした機能の数","ユーザーや事業に起きた計測可能な変化","書いたコードの行数","消化したストーリーポイント"], a:1,
+     e:"アウトプット（作った物）と区別する。「検索機能を出した」ではなく「購入率が8%上がった」がアウトカム。"},
+    {cat:"deep", ch:["09-product-discovery.md","⑨ プロダクトディスカバリー"],
+     q:"ユーザーストーリーマッピングでリリース1として切り出すべきなのは？",
+     c:["最も重要な1機能を完璧に作る","ユーザーの行動の流れ全体を最低限薄く通す","技術的に簡単なものから作る","声の大きい顧客の要望から作る"], a:1,
+     e:"「検索だけ完璧」より「探す〜受け取るの全行程が最低限動く」（歩けるスケルトン）が先。"},
+    {cat:"deep", ch:["10-agile-testing.md","⑩ アジャイルテスト"],
+     q:"「スリーアミーゴス」とは何をする活動？",
+     c:["3人でコードレビューする","実装前にビジネス・開発・テストの三者で受け入れ条件を具体例で話す","3チーム合同のデイリー","3ヶ月ごとの大規模テスト"], a:1,
+     e:"実装前に「ちょうど5,000円は？クーポン適用後は？」というズレを潰すのが最も安いテスト。"},
+    {cat:"deep", ch:["10-agile-testing.md","⑩ アジャイルテスト"],
+     q:"自動テストに対する探索的テストの役割は？",
+     c:["自動テストの完全な代替","既知のバグの再発防止","未知の壊れ方の発見","カバレッジを上げること"], a:2,
+     e:"自動テストが「既知の壊れ方の再発防止」、探索的テストは学習しながら「未知の壊れ方」を見つける知的活動。"},
+    {cat:"deep", ch:["11-retrospectives.md","⑪ ふりかえりの技法"],
+     q:"ふりかえりで決めるTry（改善アクション）の適切な数は？",
+     c:["出たアイデア全部","10個","1〜2個に絞る","0個でよい"], a:2,
+     e:"10個決めるのは0個と同じ。絞って具体化し、スプリントバックログに載せ、次回冒頭で効果を確認する。"},
+    {cat:"deep", ch:["12-agile-in-japan.md","⑫ 日本の実務"],
+     q:"アジャイル開発と相性が良いとされる契約形態は？",
+     c:["一括請負契約","準委任契約","派遣契約","ライセンス契約"], a:1,
+     e:"仕様固定前提の請負は「変化への対応」と矛盾。IPAのアジャイル版モデル契約も準委任が基本形。"},
+    {cat:"deep", ch:["13-agile-coaching.md","⑬ アジャイルコーチング"],
+     q:"守破離の「守」の段階のチームに対する適切な関わり方は？",
+     c:["最初から自由にアレンジさせる","型どおりにやらせ、型の意図も添えて教える","放置して見守る","すべての判断を代行する"], a:1,
+     e:"判断基準がない段階ではティーチングが中心。「守の省略」は形骸化の、「守への固執」は思考停止のもと。"},
+    {cat:"deep", ch:["14-legacy-code.md","⑭ レガシーコード"],
+     q:"レガシーコードにまず書く「仕様化テスト」とは？",
+     c:["あるべき正しい仕様のテスト","現在の実際の振る舞いをそのまま記録するテスト","性能要件のテスト","画面デザインのテスト"], a:1,
+     e:"正しさの検証より先に現状を固定し、その網に守られて変更する。バグらしき挙動も記録と修正を混ぜない。"},
+    {cat:"deep", ch:["14-legacy-code.md","⑭ レガシーコード"],
+     q:"ストラングラーフィグパターンの説明として正しいのは？",
+     c:["旧システムを停止して一気に書き直す","旧システムを稼働させたまま機能単位で新実装に置き換える","古いコードを全て削除する","リリースを凍結して品質を上げる"], a:1,
+     e:"入口にルーティング層を置き、スプリントごとに新側の担当範囲を拡大。常に本番で動くため学習が続く。"},
+    {cat:"deep", ch:["15-design-collaboration.md","⑮ デザイナーとの協働"],
+     q:"デザイン活動の先行はどの程度が適切とされる？",
+     c:["先行させない（完全同時）","半〜1スプリント","3スプリント以上先まで作り置き","全画面完成後に開発開始"], a:1,
+     e:"先行しすぎたデザイン在庫は実装からの学びが反映されず腐る。作り置きはムダ（リーンの原則）。"}
+  ];
+
+  var BEST_KEY = 'agile-quiz-best-v1';
+  var order = [], idx = 0, score = 0, mode = 'all', wrongs = [];
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function pool(m) {
+    var idxs = QS.map(function (_, i) { return i; });
+    if (m === 'basic') idxs = idxs.filter(function (i) { return QS[i].cat === 'basic'; });
+    if (m === 'deep') idxs = idxs.filter(function (i) { return QS[i].cat === 'deep'; });
+    shuffle(idxs);
+    if (m === 'random10') idxs = idxs.slice(0, 10);
+    return idxs;
+  }
+  function el(id) { return document.getElementById(id); }
+  function show(id, on) { el(id).classList.toggle('hidden', !on); }
+
+  function renderBest() {
+    var best = {};
+    try { best = JSON.parse(localStorage.getItem(BEST_KEY)) || {}; } catch (e) {}
+    var names = { basic: '基礎編', deep: '深掘り編', all: '全範囲', random10: 'おまかせ10問' };
+    var parts = Object.keys(best).map(function (k) { return names[k] + ' ' + best[k] + '%'; });
+    el('best').textContent = parts.length ? '🏆 ベストスコア: ' + parts.join(' ／ ') : '';
+  }
+
+  function start(m) {
+    mode = m; order = pool(m); idx = 0; score = 0; wrongs = [];
+    show('startCard', false); show('resultCard', false); show('quizCard', true);
+    renderQ();
+  }
+
+  function renderQ() {
+    var q = QS[order[idx]];
+    el('qnum').textContent = '問 ' + (idx + 1) + ' / ' + order.length;
+    el('qcat').textContent = q.ch[1];
+    el('qtext').textContent = q.q;
+    el('qbar').style.width = Math.round(idx / order.length * 100) + '%';
+    var fb = el('feedback'); fb.className = 'feedback'; fb.innerHTML = '';
+    show('nextBtn', false);
+    var ul = el('choices'); ul.innerHTML = '';
+    q.c.forEach(function (text, i) {
+      var li = document.createElement('li');
+      li.textContent = text;
+      li.addEventListener('click', function () { answer(i, li); });
+      ul.appendChild(li);
+    });
+  }
+
+  function answer(i, li) {
+    var q = QS[order[idx]];
+    var lis = el('choices').children;
+    for (var k = 0; k < lis.length; k++) lis[k].classList.add('disabled');
+    lis[q.a].classList.add('correct');
+    var ok = (i === q.a);
+    if (ok) { score++; } else { li.classList.add('wrong'); wrongs.push(q); }
+    var fb = el('feedback');
+    fb.className = 'feedback ' + (ok ? 'ok' : 'ng');
+    fb.innerHTML = '<div class="verdict">' + (ok ? '⭕ 正解！' : '❌ 不正解') + '</div>' +
+      '<div>' + q.e + '</div>' +
+      '<div style="margin-top:6px;">📖 詳しくは <a href="' + q.ch[0] + '">' + q.ch[1] + '</a></div>';
+    el('nextBtn').textContent = (idx === order.length - 1) ? '結果を見る →' : '次の問題 →';
+    show('nextBtn', true);
+  }
+
+  el('nextBtn').addEventListener('click', function () {
+    idx++;
+    if (idx < order.length) { renderQ(); } else { finish(); }
+  });
+
+  function finish() {
+    show('quizCard', false); show('resultCard', true);
+    var pct = Math.round(score / order.length * 100);
+    el('scoreText').textContent = pct + '点';
+    el('scoreSub').textContent = order.length + '問中 ' + score + '問正解';
+    var adv;
+    if (pct === 100) adv = '💯 完璧です！ 次は⑯のシミュレーションや⑱のテンプレートで、知識を現場の行動に変えましょう。';
+    else if (pct >= 80) adv = '🎉 合格ラインです。間違えた章だけ読み直せば盤石です。';
+    else if (pct >= 60) adv = '📖 基礎はできています。下の復習リンクの章をもう一度読んでから再挑戦を。';
+    else adv = '🌱 まずは①→②→⑦の順にじっくり読み直すのがおすすめです。焦らずいきましょう。';
+    el('advice').textContent = adv;
+    var rb = el('reviewBox');
+    if (wrongs.length) {
+      var seen = {}, html = '<strong>復習リンク（間違えた問題の章）</strong><ul>';
+      wrongs.forEach(function (q) {
+        if (!seen[q.ch[0]]) { seen[q.ch[0]] = 1;
+          html += '<li><a href="' + q.ch[0] + '">' + q.ch[1] + '</a></li>'; }
+      });
+      rb.innerHTML = html + '</ul>';
+    } else { rb.innerHTML = ''; }
+    var best = {};
+    try { best = JSON.parse(localStorage.getItem(BEST_KEY)) || {}; } catch (e) {}
+    if (!(mode in best) || pct > best[mode]) {
+      best[mode] = pct; localStorage.setItem(BEST_KEY, JSON.stringify(best));
+    }
+  }
+
+  el('retryBtn').addEventListener('click', function () { start(mode); });
+  el('homeBtn').addEventListener('click', function () {
+    show('resultCard', false); show('startCard', true); renderBest();
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.modes button'), function (b) {
+    b.addEventListener('click', function () { start(b.dataset.mode); });
+  });
+
+  renderBest();
+})();
+</script>
+</body>
+</html>
