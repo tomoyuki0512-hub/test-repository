@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スクラムイベント ファシリテーションタイマー</title>
+<style>
+  :root {
+    --bg: #f6f8fa; --card: #ffffff; --text: #1f2933; --sub: #616e7c;
+    --accent: #0e7c66; --accent-soft: #e0f2ee; --border: #d9e2ec;
+    --warn: #c05621; --over: #c53030; --over-soft: #fdecea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15191e; --card: #1f252c; --text: #e4e9ee; --sub: #9aa5b1;
+      --accent: #34b096; --accent-soft: #123f36; --border: #323c46;
+      --warn: #ed8936; --over: #f56565; --over-soft: #3b2023;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { font-size: 1.45rem; margin-bottom: 4px; }
+  header p { color: var(--sub); font-size: 0.9rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+          padding: 18px 20px; margin-top: 18px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; }
+  .presets button { border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 20px; padding: 8px 16px; font-size: 0.9rem; cursor: pointer; }
+  .presets button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .hint { font-size: 0.85rem; color: var(--sub); margin-top: 10px; min-height: 1.3em; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  th { color: var(--sub); font-weight: 600; font-size: 0.8rem; }
+  tr.current { background: var(--accent-soft); }
+  tr.done-row { opacity: 0.5; }
+  tr.done-row .pname { text-decoration: line-through; }
+  td input.mins { width: 58px; padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--bg); color: var(--text); font-size: 0.9rem; }
+  td .goal { color: var(--sub); font-size: 0.82rem; }
+  .timerbox { text-align: center; padding: 26px 20px; }
+  .phase-label { font-size: 1.05rem; font-weight: 700; }
+  .phase-goal { color: var(--sub); font-size: 0.88rem; margin-top: 2px; min-height: 1.3em; }
+  .clock { font-variant-numeric: tabular-nums; font-size: 4.6rem; font-weight: 800;
+    letter-spacing: 2px; margin: 6px 0; color: var(--accent); }
+  .clock.warn { color: var(--warn); }
+  .clock.over { color: var(--over); animation: blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0.35; } }
+  .overnote { font-size: 0.9rem; color: var(--over); font-weight: 700; min-height: 1.3em; }
+  .controls { display: flex; justify-content: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .controls button { border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 10px; padding: 12px 22px; font-size: 1rem; cursor: pointer; }
+  .controls button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .total { font-size: 0.85rem; color: var(--sub); margin-top: 14px; }
+  .bar { height: 8px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .bar > div { height: 100%; width: 0%; background: var(--accent); transition: width 0.5s; }
+  .opts { display: flex; gap: 16px; align-items: center; margin-top: 12px; flex-wrap: wrap;
+    font-size: 0.88rem; color: var(--sub); }
+  .opts label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  footer { margin-top: 30px; font-size: 0.85rem; color: var(--sub); text-align: center; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>⏱️ スクラムイベント ファシリテーションタイマー</h1>
+    <p>イベントを選ぶとアジェンダとタイムボックスがセットされます。分数は編集可能。時間切れでチャイムが鳴り、次のフェーズへ進めます。</p>
+  </header>
+
+  <div class="card">
+    <div class="presets" id="presets"></div>
+    <div class="hint" id="presetHint"></div>
+    <table>
+      <thead><tr><th style="width:45%">フェーズ</th><th style="width:40%">この時間の問い</th><th>分</th></tr></thead>
+      <tbody id="phaseRows"></tbody>
+    </table>
+    <div class="opts">
+      <label><input type="checkbox" id="soundOn" checked> 🔔 チャイムを鳴らす</label>
+      <label><input type="checkbox" id="autoNext"> ⏭️ 時間切れで自動的に次へ</label>
+      <span id="totalText"></span>
+    </div>
+  </div>
+
+  <div class="card timerbox">
+    <div class="phase-label" id="phaseLabel">イベントを選んで「開始」を押してください</div>
+    <div class="phase-goal" id="phaseGoal"></div>
+    <div class="clock" id="clock">--:--</div>
+    <div class="overnote" id="overnote"></div>
+    <div class="controls">
+      <button class="primary" id="startBtn">▶ 開始</button>
+      <button id="nextBtn">次のフェーズ ⏭</button>
+      <button id="resetBtn">リセット</button>
+    </div>
+    <div class="total" id="progressText"></div>
+    <div class="bar"><div id="pbar"></div></div>
+  </div>
+
+  <footer>
+    タイムボックスの考え方は <a href="02-scrum.md">② スクラム</a>・進行のコツは <a href="11-retrospectives.md">⑪ ふりかえりの技法</a>・アジェンダのひな形は <a href="18-templates.md">⑱ テンプレート集</a> ｜ <a href="portal.html">🏃 学習ポータル</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var PRESETS = {
+    daily: { name: 'デイリースクラム', hint: '15分厳守。問題解決は終了後に必要な人だけで（②章）。',
+      phases: [
+        { n: 'ボードを見ながら同期', g: 'ゴール達成のため今日何が最重要か？', m: 13 },
+        { n: 'ブロッカー確認', g: '誰の助けが要る？ 続きの議論は誰と誰？', m: 2 }
+      ]},
+    planning: { name: 'スプリントプランニング', hint: '2週間スプリントの現実的な構成例（上限は4時間・②章）。',
+      phases: [
+        { n: 'Why: スプリントゴール決め', g: 'このスプリントはなぜ価値がある？（1文に）', m: 20 },
+        { n: 'What: 項目の選択', g: 'ベロシティを目安に上位から。詰め込みすぎていない？', m: 40 },
+        { n: 'How: タスク分解', g: '最初の数日分が着手可能な粒度になっている？', m: 45 },
+        { n: '確認とクローズ', g: 'ゴール・選択項目・不安を全員で確認したか？', m: 15 }
+      ]},
+    refinement: { name: 'バックログリファインメント', hint: '週1・60分の定例が目安。次の1〜2スプリント分をReadyに（④章）。',
+      phases: [
+        { n: '項目の説明', g: 'POから背景と価値を説明。質問は自由に', m: 15 },
+        { n: '受け入れ条件の具体化', g: 'Given-When-Thenで。エッジケースは？（⑩章）', m: 20 },
+        { n: '分割の検討', g: '8pt超は分割候補。価値が届く単位で縦に割る', m: 10 },
+        { n: '見積り（ポーカー）', g: '最大と最小の理由を聞く。ズレこそ収穫', m: 15 }
+      ]},
+    review: { name: 'スプリントレビュー', hint: '進捗報告会ではなくフィードバックの場（②章）。スライド禁止・実物デモで。',
+      phases: [
+        { n: 'ゴールの再共有', g: '何を目指したスプリントだったか', m: 5 },
+        { n: 'デモ', g: '動くもので。未完了も隠さず共有', m: 20 },
+        { n: '計測結果の共有', g: '前回リリース分のアウトカムの数字は？（⑨章）', m: 10 },
+        { n: 'フィードバック・対話', g: '「これを見て、次に何をすべき？」', m: 20 },
+        { n: '今後の見通し', g: 'バックログ上位と予測（確約ではない）', m: 5 }
+      ]},
+    retro: { name: 'レトロスペクティブ', hint: '5ステップ構造（⑪章）。まず各自書いてから共有。Tryは1〜2個に絞る。',
+      phases: [
+        { n: 'チェックイン', g: '全員が一度声を出す。今の気分をひとこと', m: 5 },
+        { n: '前回Tryの確認', g: '実行した？ 効果は？ 続ける／やめる？', m: 5 },
+        { n: 'データ収集', g: '事実と感情を出し切る（書く時間を先に）', m: 25 },
+        { n: '深掘り', g: 'ドット投票で1テーマ。人ではなく仕組みを掘る', m: 20 },
+        { n: 'Try決定', g: '1〜2個。担当・期限・効果の確認方法まで', m: 20 },
+        { n: 'クローズ', g: '決定の確認とROTI（この時間の価値を1-5で）', m: 5 }
+      ]},
+    poker: { name: 'プランニングポーカー（1項目）', hint: '1項目あたりの目安。収束しなければ「分割」も立派な結論（④章）。',
+      phases: [
+        { n: '説明と質疑', g: 'POが背景を説明。前提の確認はここで', m: 4 },
+        { n: '同時にカードを出す', g: '相談せず一斉に。同調を防ぐ', m: 1 },
+        { n: '最大・最小の理由', g: '考慮の違い・前提のズレを聞き出す', m: 4 },
+        { n: '再投票と決定', g: '収束しないなら分割かスパイクへ', m: 3 }
+      ]},
+    custom: { name: 'カスタム', hint: '分数を自由に編集してください。フェーズ名は用途に合わせて読み替えを。',
+      phases: [
+        { n: 'フェーズ1', g: '', m: 10 },
+        { n: 'フェーズ2', g: '', m: 10 },
+        { n: 'フェーズ3', g: '', m: 10 }
+      ]}
+  };
+
+  var current = 'retro', phases = [], phaseIdx = -1, remaining = 0, timer = null, running = false;
+
+  function el(id) { return document.getElementById(id); }
+  function fmt(sec) {
+    var neg = sec < 0; sec = Math.abs(sec);
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return (neg ? '-' : '') + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function beep(times) {
+    if (!el('soundOn').checked) return;
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      for (var i = 0; i < times; i++) {
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 880; o.type = 'sine';
+        var t = ctx.currentTime + i * 0.35;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+        o.start(t); o.stop(t + 0.32);
+      }
+    } catch (e) {}
+  }
+
+  function loadPreset(key) {
+    current = key; stop(); phaseIdx = -1;
+    phases = PRESETS[key].phases.map(function (p) { return { n: p.n, g: p.g, m: p.m }; });
+    el('presetHint').textContent = PRESETS[key].hint;
+    Array.prototype.forEach.call(document.querySelectorAll('#presets button'), function (b) {
+      b.classList.toggle('active', b.dataset.key === key);
+    });
+    renderRows(); renderTimerIdle();
+  }
+
+  function renderRows() {
+    var tb = el('phaseRows'); tb.innerHTML = '';
+    phases.forEach(function (p, i) {
+      var tr = document.createElement('tr');
+      if (i === phaseIdx) tr.className = 'current';
+      else if (phaseIdx > i) tr.className = 'done-row';
+      var td1 = document.createElement('td');
+      td1.innerHTML = '<span class="pname">' + (i === phaseIdx ? '▶ ' : '') + p.n + '</span>';
+      var td2 = document.createElement('td');
+      td2.innerHTML = '<span class="goal">' + p.g + '</span>';
+      var td3 = document.createElement('td');
+      var inp = document.createElement('input');
+      inp.type = 'number'; inp.min = 1; inp.max = 240; inp.value = p.m; inp.className = 'mins';
+      inp.addEventListener('change', function () {
+        p.m = Math.max(1, parseInt(inp.value, 10) || 1);
+        if (i === phaseIdx && !running) { remaining = p.m * 60; renderClock(); }
+        renderTotal();
+      });
+      td3.appendChild(inp);
+      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+      tb.appendChild(tr);
+    });
+    renderTotal();
+  }
+
+  function renderTotal() {
+    var total = phases.reduce(function (s, p) { return s + p.m; }, 0);
+    el('totalText').textContent = '合計タイムボックス: ' + total + '分';
+  }
+
+  function renderTimerIdle() {
+    el('phaseLabel').textContent = PRESETS[current].name + ' — 「開始」でスタート';
+    el('phaseGoal').textContent = '';
+    el('clock').textContent = fmt(phases.length ? phases[0].m * 60 : 0);
+    el('clock').className = 'clock';
+    el('overnote').textContent = '';
+    el('progressText').textContent = '';
+    el('pbar').style.width = '0%';
+    el('startBtn').textContent = '▶ 開始';
+  }
+
+  function startPhase(i) {
+    phaseIdx = i;
+    remaining = phases[i].m * 60;
+    el('phaseLabel').textContent = '【' + (i + 1) + '/' + phases.length + '】 ' + phases[i].n;
+    el('phaseGoal').textContent = phases[i].g;
+    el('overnote').textContent = '';
+    renderRows(); renderClock(); renderProgress();
+  }
+
+  function renderClock() {
+    var c = el('clock');
+    c.textContent = fmt(remaining);
+    var total = phases[phaseIdx] ? phases[phaseIdx].m * 60 : 1;
+    c.className = 'clock' + (remaining < 0 ? ' over' : (remaining <= total * 0.2 ? ' warn' : ''));
+    el('overnote').textContent = remaining < 0 ? '⏰ タイムボックス超過！ まとめに入るか、続きの扱いを決めて次へ' : '';
+  }
+
+  function renderProgress() {
+    var done = 0;
+    for (var i = 0; i < phaseIdx; i++) done += phases[i].m;
+    var total = phases.reduce(function (s, p) { return s + p.m; }, 0);
+    var cur = phases[phaseIdx] ? Math.min(phases[phaseIdx].m * 60 - Math.max(remaining, 0), phases[phaseIdx].m * 60) / 60 : 0;
+    el('progressText').textContent = 'イベント全体: ' + Math.min(Math.round((done + cur) / total * 100), 100) + '% 経過';
+    el('pbar').style.width = Math.min(Math.round((done + cur) / total * 100), 100) + '%';
+  }
+
+  function tick() {
+    remaining--;
+    if (remaining === 0) {
+      beep(3);
+      if (el('autoNext').checked) { next(); return; }
+    }
+    renderClock(); renderProgress();
+  }
+
+  function start() {
+    if (running) { pause(); return; }
+    if (phaseIdx < 0) startPhase(0);
+    running = true;
+    el('startBtn').textContent = '⏸ 一時停止';
+    timer = setInterval(tick, 1000);
+  }
+  function pause() {
+    running = false; clearInterval(timer);
+    el('startBtn').textContent = '▶ 再開';
+  }
+  function stop() {
+    running = false; clearInterval(timer);
+    el('startBtn').textContent = '▶ 開始';
+  }
+  function next() {
+    if (phaseIdx < 0) return;
+    if (phaseIdx + 1 < phases.length) {
+      beep(1);
+      startPhase(phaseIdx + 1);
+    } else {
+      stop(); beep(3);
+      el('phaseLabel').textContent = '🎉 ' + PRESETS[current].name + ' 終了！';
+      el('phaseGoal').textContent = '決定事項の記録を忘れずに（⑱章のテンプレートへ）';
+      el('clock').textContent = '00:00'; el('clock').className = 'clock';
+      el('overnote').textContent = '';
+      el('pbar').style.width = '100%';
+      phaseIdx = -1; renderRows();
+    }
+  }
+
+  el('startBtn').addEventListener('click', start);
+  el('nextBtn').addEventListener('click', function () { if (phaseIdx >= 0) next(); });
+  el('resetBtn').addEventListener('click', function () { loadPreset(current); });
+
+  var order = ['daily', 'planning', 'refinement', 'review', 'retro', 'poker', 'custom'];
+  var pdiv = el('presets');
+  order.forEach(function (k) {
+    var b = document.createElement('button');
+    b.textContent = PRESETS[k].name; b.dataset.key = k;
+    b.addEventListener('click', function () { loadPreset(k); });
+    pdiv.appendChild(b);
+  });
+
+  loadPreset('retro');
+})();
+</script>
+</body>
+</html>
