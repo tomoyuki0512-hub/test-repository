@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アジャイル開発 学習ポータル</title>
+<style>
+  :root {
+    --bg: #f6f8fa; --card: #ffffff; --text: #1f2933; --sub: #616e7c;
+    --accent: #0e7c66; --accent-soft: #e0f2ee; --border: #d9e2ec;
+    --basic: #2b6cb0; --deep: #805ad5; --practice: #c05621;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15191e; --card: #1f252c; --text: #e4e9ee; --sub: #9aa5b1;
+      --accent: #34b096; --accent-soft: #123f36; --border: #323c46;
+      --basic: #63a4e0; --deep: #b794f4; --practice: #ed8936;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.7; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  header p { color: var(--sub); font-size: 0.95rem; }
+  .progress-box { background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; margin: 20px 0; }
+  .progress-box .label { display: flex; justify-content: space-between;
+    font-size: 0.9rem; color: var(--sub); margin-bottom: 8px; }
+  .bar { height: 12px; background: var(--accent-soft); border-radius: 6px; overflow: hidden; }
+  .bar > div { height: 100%; width: 0%; background: var(--accent); border-radius: 6px;
+    transition: width 0.4s ease; }
+  .routes { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px; margin: 20px 0; }
+  .routes h2 { font-size: 1.05rem; margin-bottom: 10px; }
+  .route-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .route-btns button { border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 20px; padding: 6px 14px; font-size: 0.85rem; cursor: pointer; }
+  .route-btns button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .route-note { font-size: 0.85rem; color: var(--sub); margin-top: 10px; min-height: 1.4em; }
+  section.phase { margin-top: 28px; }
+  .phase-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .phase-head .tag { font-size: 0.75rem; font-weight: 700; color: #fff;
+    border-radius: 6px; padding: 2px 10px; }
+  .tag.basic { background: var(--basic); } .tag.deep { background: var(--deep); }
+  .tag.practice { background: var(--practice); }
+  .phase-head h2 { font-size: 1.15rem; }
+  .phase-head .sub { font-size: 0.85rem; color: var(--sub); }
+  ul.items { list-style: none; }
+  ul.items li { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  ul.items li.done { opacity: 0.65; }
+  ul.items li.done .t { text-decoration: line-through; }
+  ul.items input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent);
+    cursor: pointer; flex-shrink: 0; }
+  ul.items .body { flex: 1; min-width: 0; }
+  ul.items a { color: var(--text); font-weight: 600; text-decoration: none; }
+  ul.items a:hover { color: var(--accent); text-decoration: underline; }
+  ul.items .d { font-size: 0.82rem; color: var(--sub); }
+  ul.items li.highlight { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .reset { margin-top: 28px; text-align: center; }
+  .reset button { border: 1px solid var(--border); background: var(--card); color: var(--sub);
+    border-radius: 8px; padding: 8px 18px; font-size: 0.85rem; cursor: pointer; }
+  footer { margin-top: 32px; font-size: 0.85rem; color: var(--sub); text-align: center; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🏃 アジャイル開発 学習ポータル</h1>
+    <p>全19教材のフェーズ別ナビ。読み終えたらチェック — 進捗はこのブラウザに保存されます。</p>
+  </header>
+
+  <div class="progress-box">
+    <div class="label"><span>読了進捗</span><span id="ptext">0 / 0</span></div>
+    <div class="bar"><div id="pbar"></div></div>
+  </div>
+
+  <div class="routes">
+    <h2>🧭 読者別ルート（選ぶと該当章が光ります）</h2>
+    <div class="route-btns" id="routeBtns">
+      <button data-route="all" class="active">すべて</button>
+      <button data-route="beginner">はじめての人</button>
+      <button data-route="dev">開発者</button>
+      <button data-route="po">PO・企画</button>
+      <button data-route="sm">スクラムマスター</button>
+      <button data-route="mgr">マネージャー・導入推進</button>
+      <button data-route="designer">デザイナー</button>
+    </div>
+    <div class="route-note" id="routeNote"></div>
+  </div>
+
+  <section class="phase">
+    <div class="phase-head"><span class="tag basic">基礎編</span>
+      <h2>考え方と定番手法</h2><span class="sub">まずここから順番に</span></div>
+    <ul class="items">
+      <li data-id="readme" data-routes="beginner dev po sm mgr designer"><input type="checkbox">
+        <div class="body"><a href="README.md">総合インデックス</a>
+        <div class="d">30秒サマリ・章構成・用語ミニ辞典</div></div></li>
+      <li data-id="c01" data-routes="beginner dev po sm mgr designer"><input type="checkbox">
+        <div class="body"><a href="01-agile-basics.md">① アジャイルの基礎</a>
+        <div class="d">歴史・マニフェスト・ウォーターフォール比較・向き不向き</div></div></li>
+      <li data-id="c02" data-routes="beginner dev po sm"><input type="checkbox">
+        <div class="body"><a href="02-scrum.md">② スクラム</a>
+        <div class="d">3ロール・5イベント・3作成物・DoD・スプリントの流れ</div></div></li>
+      <li data-id="c03" data-routes="dev mgr"><input type="checkbox">
+        <div class="body"><a href="03-kanban-xp.md">③ カンバン・XP・その他手法</a>
+        <div class="d">WIP制限・XPプラクティス・リーン・手法の選び方</div></div></li>
+      <li data-id="c04" data-routes="po dev"><input type="checkbox">
+        <div class="body"><a href="04-requirements-estimation.md">④ 要求と見積り</a>
+        <div class="d">ユーザーストーリー・INVEST・ストーリーポイント・プランニングポーカー</div></div></li>
+      <li data-id="c05" data-routes="dev"><input type="checkbox">
+        <div class="body"><a href="05-engineering-practices.md">⑤ 技術プラクティス</a>
+        <div class="d">TDD・CI/CD・リファクタリング・トランクベース開発</div></div></li>
+      <li data-id="c06" data-routes="mgr"><input type="checkbox">
+        <div class="body"><a href="06-scaling.md">⑥ 大規模アジャイル</a>
+        <div class="d">SAFe・LeSS・Scrum@Scale・コンウェイの法則</div></div></li>
+      <li data-id="c07" data-routes="beginner mgr sm"><input type="checkbox">
+        <div class="body"><a href="07-metrics-adoption.md">⑦ メトリクスと導入・アンチパターン</a>
+        <div class="d">Four Keys・グッドハートの法則・導入ステップ</div></div></li>
+    </ul>
+  </section>
+
+  <section class="phase">
+    <div class="phase-head"><span class="tag deep">深掘り編</span>
+      <h2>実務でつまずくテーマ</h2><span class="sub">必要なところをつまみ読みOK</span></div>
+    <ul class="items">
+      <li data-id="c08" data-routes="sm mgr"><input type="checkbox">
+        <div class="body"><a href="08-team-and-culture.md">⑧ チームと文化</a>
+        <div class="d">自己組織化・心理的安全性・タックマンモデル・インセプションデッキ</div></div></li>
+      <li data-id="c09" data-routes="po designer"><input type="checkbox">
+        <div class="body"><a href="09-product-discovery.md">⑨ プロダクトディスカバリー</a>
+        <div class="d">デュアルトラック・仮説駆動・ストーリーマッピング・OKR・RICE</div></div></li>
+      <li data-id="c10" data-routes="dev"><input type="checkbox">
+        <div class="body"><a href="10-agile-testing.md">⑩ アジャイルテスト</a>
+        <div class="d">テスト4象限・シフトレフト・BDD・探索的テスト</div></div></li>
+      <li data-id="c11" data-routes="sm"><input type="checkbox">
+        <div class="body"><a href="11-retrospectives.md">⑪ ふりかえりの技法</a>
+        <div class="d">5ステップ構造・手法カタログ・形骸化への処方箋</div></div></li>
+      <li data-id="c12" data-routes="mgr"><input type="checkbox">
+        <div class="body"><a href="12-agile-in-japan.md">⑫ 日本の実務とアジャイル</a>
+        <div class="d">準委任契約・IPAモデル契約・偽装アジャイル・始め方</div></div></li>
+      <li data-id="c13" data-routes="sm mgr"><input type="checkbox">
+        <div class="body"><a href="13-agile-coaching.md">⑬ アジャイルコーチング</a>
+        <div class="d">守破離・4つの帽子・抵抗のマネジメント・システム思考</div></div></li>
+      <li data-id="c14" data-routes="dev"><input type="checkbox">
+        <div class="body"><a href="14-legacy-code.md">⑭ レガシーコードとアジャイル</a>
+        <div class="d">仕様化テスト・Seam・ストラングラーフィグ</div></div></li>
+      <li data-id="c15" data-routes="designer po"><input type="checkbox">
+        <div class="body"><a href="15-design-collaboration.md">⑮ デザイナーとの協働</a>
+        <div class="d">1スプリント先行モデル・デザインシステム・ユーザーテスト</div></div></li>
+    </ul>
+  </section>
+
+  <section class="phase">
+    <div class="phase-head"><span class="tag practice">実践編</span>
+      <h2>現場に持ち込む</h2><span class="sub">読んだら手を動かす</span></div>
+    <ul class="items">
+      <li data-id="c16" data-routes="beginner sm dev po"><input type="checkbox">
+        <div class="body"><a href="16-sprint-simulation.md">⑯ スプリント完全シミュレーション</a>
+        <div class="d">会話例と💡解説で追う2週間。概念が現場でどう動くか</div></div></li>
+      <li data-id="c17" data-routes="mgr sm"><input type="checkbox">
+        <div class="body"><a href="17-case-studies.md">⑰ ケーススタディ集</a>
+        <div class="d">スタートアップ・受託SIer・大企業・失敗事例の4つの物語</div></div></li>
+      <li data-id="c18" data-routes="sm po dev"><input type="checkbox">
+        <div class="body"><a href="18-templates.md">⑱ テンプレート集</a>
+        <div class="d">DoD・ワーキングアグリーメント・ADR・ポストモーテム等10種</div></div></li>
+      <li data-id="glossary" data-routes="beginner dev po sm mgr designer"><input type="checkbox">
+        <div class="body"><a href="glossary.md">用語集・チートシート</a>
+        <div class="d">全章横断の用語辞典・「困った時どの章？」逆引き表</div></div></li>
+    </ul>
+  </section>
+
+  <div class="reset"><button id="resetBtn">進捗をリセット</button></div>
+
+  <footer><a href="README.md">📚 総合インデックス（Markdown版）</a> ｜ <a href="../index.md">ガイド一覧へ戻る</a></footer>
+</div>
+
+<script>
+(function () {
+  var KEY = 'agile-portal-progress-v1';
+  var items = Array.prototype.slice.call(document.querySelectorAll('ul.items li'));
+  var routeNotes = {
+    all: '',
+    beginner: '基礎の考え方 → スクラム → 落とし穴 → シミュレーションで疑似体験、の順がおすすめ。',
+    dev: '考え方と回し方のあと、⑤⑩⑭の技術3章が本丸です。',
+    po: '④の要求と見積りと、⑨のディスカバリーがPOの二本柱です。',
+    sm: '②を土台に、⑧⑪⑬の「人とプロセスの支援」3章を深く。',
+    mgr: '⑦の導入と計測から入り、⑥⑫⑰で組織展開の判断材料を。',
+    designer: '①で共通言語を作り、⑨⑮で協働の実務へ。'
+  };
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function save(state) { localStorage.setItem(KEY, JSON.stringify(state)); }
+
+  function render() {
+    var state = load(), done = 0;
+    items.forEach(function (li) {
+      var checked = !!state[li.dataset.id];
+      li.querySelector('input').checked = checked;
+      li.classList.toggle('done', checked);
+      if (checked) done++;
+    });
+    document.getElementById('ptext').textContent = done + ' / ' + items.length;
+    document.getElementById('pbar').style.width =
+      (items.length ? Math.round(done / items.length * 100) : 0) + '%';
+  }
+
+  items.forEach(function (li) {
+    li.querySelector('input').addEventListener('change', function () {
+      var state = load();
+      if (this.checked) { state[li.dataset.id] = true; } else { delete state[li.dataset.id]; }
+      save(state); render();
+    });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    if (confirm('読了チェックをすべてリセットしますか？')) {
+      localStorage.removeItem(KEY); render();
+    }
+  });
+
+  var btns = Array.prototype.slice.call(document.querySelectorAll('#routeBtns button'));
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btns.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var route = btn.dataset.route;
+      items.forEach(function (li) {
+        var routes = (li.dataset.routes || '').split(' ');
+        li.classList.toggle('highlight', route !== 'all' && routes.indexOf(route) !== -1);
+      });
+      document.getElementById('routeNote').textContent = routeNotes[route] || '';
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
