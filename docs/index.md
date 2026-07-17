@@ -25,6 +25,17 @@ title: ガイド一覧
 - [データベースの種類まとめ](database-types-guide.md)
 - [問い合わせページの作り方](contact-guide.md)
 
+## アジャイル開発
+
+- [アジャイル開発 完全ガイド（総合インデックス）](agile/README.md) ← まずはここから（30秒サマリ・読者別ルート・用語辞典）
+  - [① アジャイルの基礎](agile/01-agile-basics.md) ← 歴史・マニフェスト・ウォーターフォール比較・向き不向き
+  - [② スクラム](agile/02-scrum.md) ← 3ロール・5イベント・3作成物と1スプリントの流れ
+  - [③ カンバン・XP・その他手法](agile/03-kanban-xp.md) ← WIP制限・XPプラクティス・手法の選び方
+  - [④ 要求と見積り](agile/04-requirements-estimation.md) ← ユーザーストーリー・ストーリーポイント・プランニングポーカー
+  - [⑤ 技術プラクティス](agile/05-engineering-practices.md) ← TDD・CI/CD・リファクタリング・技術的負債
+  - [⑥ 大規模アジャイル](agile/06-scaling.md) ← SAFe・LeSS・Scrum@Scaleの比較と選び方
+  - [⑦ メトリクスと導入・アンチパターン](agile/07-metrics-adoption.md) ← Four Keys・失敗パターン・導入ステップ
+
 ## Claude Codeを使ったアプリ開発
 
 - [Claude Codeでアプリ開発する方法](claude-code-dev-guide.md)
