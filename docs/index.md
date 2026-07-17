@@ -40,6 +40,10 @@ title: ガイド一覧
   - [⑩ アジャイルテスト（深掘り編）](agile/10-agile-testing.md) ← テスト4象限・BDD・探索的テスト・QAの役割
   - [⑪ ふりかえりの技法（深掘り編）](agile/11-retrospectives.md) ← 5ステップ構造・手法カタログ・形骸化への処方箋
   - [⑫ 日本の実務とアジャイル（深掘り編）](agile/12-agile-in-japan.md) ← 準委任契約・IPAモデル契約・偽装アジャイルの見分け方
+  - [⑬ アジャイルコーチング（深掘り編）](agile/13-agile-coaching.md) ← 守破離・4つの帽子・抵抗のマネジメント
+  - [⑭ レガシーコードとアジャイル（深掘り編）](agile/14-legacy-code.md) ← 仕様化テスト・Seam・ストラングラーフィグ
+  - [⑮ デザイナーとの協働（深掘り編）](agile/15-design-collaboration.md) ← 1スプリント先行モデル・デザインシステム
+  - [用語集・チートシート](agile/glossary.md) ← 全章横断の用語辞典と「困った時どの章？」逆引き表
 
 ## Claude Codeを使ったアプリ開発
 
