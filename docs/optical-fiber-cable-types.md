@@ -4,7 +4,7 @@ title: 光ファイバー ケーブル・コードと接続部材ガイド
 
 # ③ 光ファイバー ケーブル・コードと接続部材ガイド
 
-> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [① 入門](optical-fiber-guide.md) ｜ [② ネットワーク全体像](optical-fiber-network-guide.md) ｜ **③ ケーブル・部材** ｜ [④ 施工・測定](optical-fiber-fieldwork-guide.md) ｜ [⑤ メーカー比較](optical-fiber-vendors.md) ｜ [⑥ 住友電工](sumitomo-electric-optical-fiber.md) ｜ [✅ クイズ](optical-fiber-quiz.html)
+> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [🏠 ポータル](optical-fiber-portal.html) ｜ [①](optical-fiber-guide.md) [②](optical-fiber-network-guide.md) **③** [④](optical-fiber-fieldwork-guide.md) [⑤](optical-fiber-vendors.md) [⑥](sumitomo-electric-optical-fiber.md) [⑦](optical-fiber-transmission-deep-dive.md) [⑧](optical-fiber-transceiver-guide.md) [⑨](optical-fiber-career-guide.md) ｜ [✅ クイズ](optical-fiber-quiz.html) ｜ [🧮 計算機](optical-fiber-calculator.html)
 
 「テープスロット型と層より型って何が違う？」「単心・メガネ・FOコードの使い分けは？」
 「ケーブルとコードはどう呼び分ける？」「成端箱とクロージャって結局なに？」
