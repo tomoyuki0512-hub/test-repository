@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光リンク設計 計算機（dB電卓・損失バジェット）</title>
+<style>
+  :root {
+    --bg: #f6f8fa; --card: #ffffff; --text: #1f2933; --sub: #616e7c;
+    --accent: #0b6aa8; --accent-soft: #e0edf6; --border: #d9e2ec;
+    --ok: #2f855a; --ok-soft: #e6f4ea; --ng: #c53030; --ng-soft: #fdecea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15191e; --card: #1f252c; --text: #e4e9ee; --sub: #9aa5b1;
+      --accent: #4aa3dd; --accent-soft: #12303f; --border: #323c46;
+      --ok: #48bb78; --ok-soft: #1c3527; --ng: #f56565; --ng-soft: #3b2023;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.7; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  header p { color: var(--sub); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+          padding: 20px; margin-top: 20px; }
+  .card h2 { font-size: 1.1rem; margin-bottom: 4px; }
+  .card .lead { color: var(--sub); font-size: 0.88rem; margin-bottom: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  label { display: block; font-size: 0.82rem; color: var(--sub); margin-bottom: 4px; }
+  input[type=number], select { width: 100%; padding: 9px 10px; border: 1px solid var(--border);
+    border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+  .chips button { border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 20px; padding: 5px 13px; font-size: 0.83rem; cursor: pointer; }
+  .chips button:hover { border-color: var(--accent); }
+  .result-line { margin-top: 14px; padding: 12px 14px; border-radius: 10px;
+    background: var(--accent-soft); font-size: 1.0rem; }
+  .result-line strong { font-size: 1.25rem; }
+  table.breakdown { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.9rem; }
+  table.breakdown th, table.breakdown td { text-align: left; padding: 7px 8px;
+    border-bottom: 1px solid var(--border); }
+  table.breakdown td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .verdict { margin-top: 14px; padding: 14px; border-radius: 10px; font-size: 1.0rem; }
+  .verdict.ok { background: var(--ok-soft); border: 1px solid var(--ok); }
+  .verdict.ng { background: var(--ng-soft); border: 1px solid var(--ng); }
+  .verdict strong { font-size: 1.2rem; }
+  .minibar { height: 14px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 7px; overflow: hidden; margin-top: 10px; }
+  .minibar > div { height: 100%; background: var(--accent); transition: width 0.3s; }
+  .note { font-size: 0.8rem; color: var(--sub); margin-top: 10px; }
+  footer { margin-top: 32px; font-size: 0.85rem; color: var(--sub); text-align: center; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🧮 光リンク設計 計算機</h1>
+    <p>dBの直感をつかむ電卓と、損失バジェット（<a href="optical-fiber-fieldwork-guide.md" style="color:var(--accent)">④施工・測定ガイド §4</a>）の設計計算機。数値を変えると即座に再計算されます。</p>
+  </header>
+
+  <div class="card">
+    <h2>1. dB ⇄ 倍率 電卓</h2>
+    <div class="lead">「-3dBで半分、-10dBで1/10」を体で覚えるための変換器。</div>
+    <div class="grid">
+      <div>
+        <label>dB値（負=損失、正=利得）</label>
+        <input type="number" id="dbIn" value="-3" step="0.1">
+      </div>
+      <div>
+        <label>残る光の割合（%）</label>
+        <input type="number" id="pctIn" value="50.1" step="0.1">
+      </div>
+    </div>
+    <div class="chips" id="dbChips">
+      <button data-db="-3">-3dB</button>
+      <button data-db="-10">-10dB</button>
+      <button data-db="-17">-17dB（32分岐相当）</button>
+      <button data-db="-20">-20dB</button>
+      <button data-db="-30">-30dB</button>
+      <button data-db="3">+3dB（2倍）</button>
+    </div>
+    <div class="result-line" id="dbResult"></div>
+    <div class="note">計算式：倍率 = 10^(dB/10)。dBm は 1mW を 0dBm とした絶対値（例：-25dBm = 0.0032mW）。</div>
+  </div>
+
+  <div class="card">
+    <h2>2. 損失バジェット計算機</h2>
+    <div class="lead">経路の損失を足し上げ、送受信の体力（バジェット）に収まるか合否判定します。プリセットから始めるのがおすすめ。</div>
+    <div class="chips" id="presetChips">
+      <button data-preset="gepon">FTTH（GE-PON・32分岐）</button>
+      <button data-preset="p2p10g">拠点間 10G-LR（10km）</button>
+      <button data-preset="dc">DC内 400G-DR4（500m）</button>
+    </div>
+    <div class="grid">
+      <div>
+        <label>送信パワー（dBm）</label>
+        <input type="number" id="tx" value="2" step="0.5">
+      </div>
+      <div>
+        <label>受信感度（dBm）＝これ未満で受信不能</label>
+        <input type="number" id="rx" value="-27" step="0.5">
+      </div>
+      <div>
+        <label>ファイバ長（km）</label>
+        <input type="number" id="len" value="5" step="0.1" min="0">
+      </div>
+      <div>
+        <label>ファイバ損失（dB/km）</label>
+        <select id="fiberLoss">
+          <option value="0.35" selected>0.35（1310nm・標準SM）</option>
+          <option value="0.2">0.2（1550nm・標準SM）</option>
+          <option value="0.17">0.17（G.654.E 超低損失）</option>
+          <option value="3.0">3.0（MMF 850nm）</option>
+        </select>
+      </div>
+      <div>
+        <label>融着接続点の数（×0.05dB）</label>
+        <input type="number" id="splices" value="4" step="1" min="0">
+      </div>
+      <div>
+        <label>コネクタ接続点の数（×0.5dB）</label>
+        <input type="number" id="conns" value="3" step="1" min="0">
+      </div>
+      <div>
+        <label>光スプリッタ（PONの分岐）</label>
+        <select id="splitter">
+          <option value="0">なし（専用線・P2P）</option>
+          <option value="3.7">1:2（約3.7dB）</option>
+          <option value="7.3">1:4（約7.3dB）</option>
+          <option value="10.5">1:8（約10.5dB）</option>
+          <option value="13.8">1:16（約13.8dB）</option>
+          <option value="17.1" selected>1:32（約17.1dB）</option>
+          <option value="20.4">1:64（約20.4dB）</option>
+        </select>
+      </div>
+      <div>
+        <label>設計マージン（経年・修理予備、dB）</label>
+        <input type="number" id="margin" value="3" step="0.5" min="0">
+      </div>
+    </div>
+    <table class="breakdown" id="breakdown"></table>
+    <div class="verdict" id="verdict"></div>
+    <div class="minibar"><div id="budgetBar"></div></div>
+    <div class="note">スプリッタ損失は理論分岐損＋過剰損の代表値。実設計は機器仕様書の最小送信パワー・最悪受信感度で行ってください（→ <a href="optical-fiber-fieldwork-guide.md" style="color:var(--accent)">④ §4-2</a>）。</div>
+  </div>
+
+  <footer><a href="optical-fiber-portal.html">🏠 学習ポータル</a> ｜ <a href="optical-fiber-overview.md">📚 総合インデックス</a> ｜ <a href="optical-fiber-quiz.html">✅ クイズ</a></footer>
+</div>
+
+<script>
+(function () {
+  function el(id) { return document.getElementById(id); }
+  function fmt(x, digits) { return Number(x).toFixed(digits === undefined ? 2 : digits); }
+
+  // --- 1. dB電卓 ---
+  function ratioFromDb(db) { return Math.pow(10, db / 10); }
+  function dbFromRatio(r) { return 10 * Math.log10(r); }
+
+  function renderDb(db) {
+    var r = ratioFromDb(db);
+    var txt;
+    if (r >= 1) {
+      txt = fmt(db, 1) + ' dB は <strong>' + fmt(r, 2) + '倍</strong>（' + fmt(r * 100, 1) + '%）';
+    } else {
+      var inv = 1 / r;
+      txt = fmt(db, 1) + ' dB で残る光は <strong>' + fmt(r * 100, r < 0.01 ? 3 : 1) + '%</strong>'
+          + '（約 1/' + fmt(inv, inv >= 100 ? 0 : 1) + '）';
+    }
+    el('dbResult').innerHTML = txt;
+  }
+  function syncFromDb() {
+    var db = parseFloat(el('dbIn').value);
+    if (isNaN(db)) return;
+    el('pctIn').value = fmt(ratioFromDb(db) * 100, 3);
+    renderDb(db);
+  }
+  function syncFromPct() {
+    var pct = parseFloat(el('pctIn').value);
+    if (isNaN(pct) || pct <= 0) return;
+    var db = dbFromRatio(pct / 100);
+    el('dbIn').value = fmt(db, 2);
+    renderDb(db);
+  }
+  el('dbIn').addEventListener('input', syncFromDb);
+  el('pctIn').addEventListener('input', syncFromPct);
+  Array.prototype.forEach.call(el('dbChips').querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () { el('dbIn').value = b.dataset.db; syncFromDb(); });
+  });
+
+  // --- 2. 損失バジェット ---
+  var SPLICE_DB = 0.05, CONN_DB = 0.5;
+  var PRESETS = {
+    // GE-PON（PX20+級の目安）
+    gepon:  { tx: 2,  rx: -27, len: 5,   fiberLoss: '0.35', splices: 4, conns: 3, splitter: '17.1', margin: 3 },
+    // 10GBASE-LR（10km）
+    p2p10g: { tx: 0,  rx: -14.4, len: 10, fiberLoss: '0.35', splices: 4, conns: 4, splitter: '0', margin: 2 },
+    // 400G-DR4（500m）
+    dc:     { tx: 1,  rx: -4.5,  len: 0.5, fiberLoss: '0.35', splices: 0, conns: 4, splitter: '0', margin: 1 }
+  };
+
+  function calcBudget() {
+    var tx = parseFloat(el('tx').value) || 0;
+    var rx = parseFloat(el('rx').value) || 0;
+    var len = Math.max(0, parseFloat(el('len').value) || 0);
+    var perKm = parseFloat(el('fiberLoss').value);
+    var splices = Math.max(0, parseInt(el('splices').value, 10) || 0);
+    var conns = Math.max(0, parseInt(el('conns').value, 10) || 0);
+    var splitter = parseFloat(el('splitter').value);
+    var margin = Math.max(0, parseFloat(el('margin').value) || 0);
+
+    var fiber = len * perKm;
+    var spliceLoss = splices * SPLICE_DB;
+    var connLoss = conns * CONN_DB;
+    var total = fiber + spliceLoss + connLoss + splitter + margin;
+    var budget = tx - rx;
+    var slack = budget - total;
+
+    var rows = [
+      ['ファイバ損失', len + ' km × ' + perKm + ' dB/km', fiber],
+      ['融着接続', splices + ' 点 × ' + SPLICE_DB + ' dB', spliceLoss],
+      ['コネクタ接続', conns + ' 点 × ' + CONN_DB + ' dB', connLoss],
+      ['光スプリッタ', splitter ? '分岐損（代表値）' : 'なし', splitter],
+      ['設計マージン', '経年劣化・将来の修理融着ぶん', margin]
+    ];
+    var html = '<tr><th>項目</th><th>内訳</th><th style="text-align:right">損失</th></tr>';
+    rows.forEach(function (r) {
+      html += '<tr><td>' + r[0] + '</td><td style="color:var(--sub)">' + r[1] + '</td>'
+            + '<td class="num">' + fmt(r[2]) + ' dB</td></tr>';
+    });
+    html += '<tr><td><strong>合計損失</strong></td><td></td><td class="num"><strong>' + fmt(total) + ' dB</strong></td></tr>';
+    html += '<tr><td>損失バジェット</td><td style="color:var(--sub)">送信 ' + fmt(tx, 1) + ' dBm − 受信感度 ' + fmt(rx, 1) + ' dBm</td>'
+          + '<td class="num">' + fmt(budget) + ' dB</td></tr>';
+    el('breakdown').innerHTML = html;
+
+    var v = el('verdict');
+    var expectedRx = tx - (total - margin);
+    if (slack >= 0) {
+      v.className = 'verdict ok';
+      v.innerHTML = '⭕ <strong>リンク成立</strong>　余裕 ' + fmt(slack) + ' dB'
+        + '（マージン込み）。想定受光レベルは約 ' + fmt(expectedRx, 1) + ' dBm。';
+    } else {
+      v.className = 'verdict ng';
+      v.innerHTML = '❌ <strong>バジェット超過</strong>　' + fmt(-slack) + ' dB 足りません。'
+        + '分岐数を減らす／低損失ファイバ（1550nm・G.654）にする／中継・高出力品を検討（→②⑦）。';
+    }
+    var pct = budget > 0 ? Math.max(0, Math.min(100, total / budget * 100)) : 100;
+    var bar = el('budgetBar');
+    bar.style.width = pct + '%';
+    bar.style.background = slack >= 0 ? 'var(--accent)' : 'var(--ng)';
+  }
+
+  ['tx','rx','len','fiberLoss','splices','conns','splitter','margin'].forEach(function (id) {
+    el(id).addEventListener('input', calcBudget);
+    el(id).addEventListener('change', calcBudget);
+  });
+  Array.prototype.forEach.call(el('presetChips').querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () {
+      var p = PRESETS[b.dataset.preset];
+      el('tx').value = p.tx; el('rx').value = p.rx; el('len').value = p.len;
+      el('fiberLoss').value = p.fiberLoss; el('splices').value = p.splices;
+      el('conns').value = p.conns; el('splitter').value = p.splitter; el('margin').value = p.margin;
+      calcBudget();
+    });
+  });
+
+  syncFromDb();
+  calcBudget();
+})();
+</script>
+</body>
+</html>
