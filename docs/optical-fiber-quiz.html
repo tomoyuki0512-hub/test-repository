@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光ファイバー・光通信 理解度クイズ</title>
+<style>
+  :root {
+    --bg: #f6f8fa; --card: #ffffff; --text: #1f2933; --sub: #616e7c;
+    --accent: #0b6aa8; --accent-soft: #e0edf6; --border: #d9e2ec;
+    --ok: #2f855a; --ok-soft: #e6f4ea; --ng: #c53030; --ng-soft: #fdecea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15191e; --card: #1f252c; --text: #e4e9ee; --sub: #9aa5b1;
+      --accent: #4aa3dd; --accent-soft: #12303f; --border: #323c46;
+      --ok: #48bb78; --ok-soft: #1c3527; --ng: #f56565; --ng-soft: #3b2023;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.7; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  header p { color: var(--sub); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+          padding: 20px; margin-top: 20px; }
+  .modes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .modes button, .btn { border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 8px; padding: 10px 16px; font-size: 0.95rem; cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .meta { display: flex; justify-content: space-between; font-size: 0.85rem;
+          color: var(--sub); margin-bottom: 10px; }
+  .q { font-size: 1.05rem; font-weight: 700; margin-bottom: 14px; }
+  ul.choices { list-style: none; }
+  ul.choices li { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    margin-bottom: 8px; cursor: pointer; }
+  ul.choices li:hover { border-color: var(--accent); }
+  ul.choices li.correct { background: var(--ok-soft); border-color: var(--ok); font-weight: 700; }
+  ul.choices li.wrong { background: var(--ng-soft); border-color: var(--ng); }
+  ul.choices li.disabled { pointer-events: none; }
+  .feedback { display: none; margin-top: 14px; border-radius: 10px; padding: 14px; font-size: 0.95rem; }
+  .feedback.ok { display: block; background: var(--ok-soft); border: 1px solid var(--ok); }
+  .feedback.ng { display: block; background: var(--ng-soft); border: 1px solid var(--ng); }
+  .feedback .verdict { font-weight: 700; margin-bottom: 6px; }
+  .feedback a { color: var(--accent); font-weight: 600; }
+  .nav { margin-top: 16px; text-align: right; }
+  .bar { height: 8px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+  .bar > div { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s; }
+  .result h2 { font-size: 1.3rem; margin-bottom: 8px; }
+  .result .score { font-size: 2.4rem; font-weight: 800; color: var(--accent); }
+  .result p { color: var(--sub); font-size: 0.95rem; margin-top: 6px; }
+  .result .advice { margin-top: 14px; color: var(--text); font-size: 0.95rem;
+    background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; }
+  .review { margin-top: 16px; font-size: 0.9rem; }
+  .review li { margin-bottom: 6px; margin-left: 1.2em; }
+  .review a { color: var(--accent); }
+  .hidden { display: none; }
+  footer { margin-top: 32px; font-size: 0.85rem; color: var(--sub); text-align: center; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>✅ 光ファイバー・光通信 理解度クイズ</h1>
+    <p>4択×即時解説。間違えた問題には復習すべき章へのリンクが付きます。ベストスコアはこのブラウザに保存されます。</p>
+  </header>
+
+  <div class="card" id="startCard">
+    <div class="q">出題範囲を選んでください</div>
+    <div class="modes">
+      <button data-mode="basic">基礎編（①〜③）12問</button>
+      <button data-mode="deep">実務編（④〜⑥）12問</button>
+      <button data-mode="all">全範囲シャッフル 24問</button>
+      <button data-mode="random10">おまかせ10問</button>
+    </div>
+    <p id="best" style="margin-top:14px; color:var(--sub); font-size:0.9rem;"></p>
+  </div>
+
+  <div class="card hidden" id="quizCard">
+    <div class="meta"><span id="qnum"></span><span id="qcat"></span></div>
+    <div class="q" id="qtext"></div>
+    <ul class="choices" id="choices"></ul>
+    <div class="feedback" id="feedback"></div>
+    <div class="nav"><button class="btn primary hidden" id="nextBtn">次の問題 →</button></div>
+    <div class="bar"><div id="qbar"></div></div>
+  </div>
+
+  <div class="card hidden result" id="resultCard">
+    <h2>結果</h2>
+    <div class="score" id="scoreText"></div>
+    <p id="scoreSub"></p>
+    <div class="advice" id="advice"></div>
+    <div class="review" id="reviewBox"></div>
+    <div class="nav" style="text-align:left; margin-top:20px;">
+      <button class="btn primary" id="retryBtn">もう一度</button>
+      <button class="btn" id="homeBtn">範囲選択へ戻る</button>
+    </div>
+  </div>
+
+  <footer><a href="optical-fiber-overview.md">📚 総合インデックス</a> ｜ <a href="optical-fiber-guide.md">① 入門ガイド</a></footer>
+</div>
+
+<script>
+(function () {
+  // q: 問題文 / c: 選択肢 / a: 正解index / e: 解説 / ch: 章リンク / cat: basic|deep
+  var QS = [
+    {cat:"basic", ch:["optical-fiber-guide.md","① 入門（仕組み）"],
+     q:"光がガラスの糸の外に漏れず、曲がった線の中でも進めるのはなぜ？",
+     c:["ガラスが光を吸収するから","全反射がコアとクラッドの境界で起きるから","光が電気に変わるから","糸の外側が金属メッキだから"], a:1,
+     e:"屈折率の高いコアを屈折率の低いクラッドで包むと、境界で光が100%はね返る「全反射」が起き、光はコアの中だけをジグザグに進む。"},
+    {cat:"basic", ch:["optical-fiber-guide.md","① 入門（仕組み）"],
+     q:"光ファイバーの3層構造のうち、光が実際に通るのは？",
+     c:["コア","クラッド","被覆（ジャケット）","テンションメンバ"], a:0,
+     e:"中心のコア（SMFで約9µm）が光の通り道。クラッドははね返す壁、被覆は保護の「服」。"},
+    {cat:"basic", ch:["optical-fiber-guide.md","① 入門（仕組み）"],
+     q:"シングルモードファイバ（SMF）の特徴として正しいのは？",
+     c:["コアが太く短距離向け","コアが細く長距離・大容量向け","プラスチック製で曲げ放題","電力も一緒に送れる"], a:1,
+     e:"SMFは約9µmの細いコアを光がほぼ一直線に通るため信号が乱れにくく、幹線・海底・FTTHで使われる。太いコアで短距離向けなのがマルチモード。"},
+    {cat:"basic", ch:["optical-fiber-guide.md","① 入門（仕組み）"],
+     q:"通信に1310nm・1550nmの波長が使われる主な理由は？",
+     c:["目に見えて安全だから","ガラス中の損失が谷（窓）になる波長だから","LEDが安く作れるから","国際法で決まっているから"], a:1,
+     e:"レイリー散乱や吸収による損失が小さくなる「窓」を選んでいる。特に1550nm（Cバンド）は損失最小で長距離の主役。"},
+    {cat:"basic", ch:["optical-fiber-network-guide.md","② ネットワーク全体像"],
+     q:"PONで使われる光スプリッタの特徴は？",
+     c:["電源が必要な高性能ルーター","電源不要で1本の光を4〜64分岐する部品","光を電気に変換する装置","波長を増幅する装置"], a:1,
+     e:"Passive（受動）の名の通り電源なしで光を分けるだけ。だから電柱の上に置けて、故障も少なく低コスト。"},
+    {cat:"basic", ch:["optical-fiber-network-guide.md","② ネットワーク全体像"],
+     q:"国際通信（大陸間）のデータの大部分を運んでいるのは？",
+     c:["通信衛星","海底ケーブル","短波無線","航空機で運ぶハードディスク"], a:1,
+     e:"国際通信の99%は海底ケーブル。衛星は容量・遅延で遠く及ばず、ファイバを引けない場所の補完役。"},
+    {cat:"basic", ch:["optical-fiber-network-guide.md","② ネットワーク全体像"],
+     q:"家の壁ぎわに置かれる「ONU」の役割は？",
+     c:["Wi-Fiの電波を強くする","光信号と電気信号を相互に変換する","ウイルスを検査する","電気をためる"], a:1,
+     e:"ONU（Optical Network Unit）は光⇄電気の変換器。その先のWi-Fiルーターが家中に電波を飛ばす。役割分担に注意。"},
+    {cat:"basic", ch:["optical-fiber-network-guide.md","② ネットワーク全体像"],
+     q:"「10ギガプラン」で実際に10Gbpsが出ない最大の理由は？",
+     c:["ONUの故障","PONは最大32〜64世帯で帯域を共有するベストエフォートだから","光が夜は遅くなるから","法律の上限があるから"], a:1,
+     e:"PONは1本の光を多世帯で分け合う構成＋プロトコルのオーバーヘッドがあるため理論的にも10Gは出ない。それが「ベストエフォート」の意味。"},
+    {cat:"basic", ch:["optical-fiber-cable-types.md","③ ケーブル・部材"],
+     q:"テープスロット型ケーブルの強みは？",
+     c:["単心の識別がしやすい","超多心・高密度に詰められ、テープ単位の一括融着で接続が速い","柔らかく宅内向き","電磁ノイズを出さない"], a:1,
+     e:"テープ心線（4/8心）をスロット（溝）に積層する構造。数百〜数千心の幹線ケーブルに向く。単心の扱いやすさは層より型の強み。"},
+    {cat:"basic", ch:["optical-fiber-cable-types.md","③ ケーブル・部材"],
+     q:"「メガネコード」と呼ばれるのはどんなコード？",
+     c:["1心の丸いコード","2心を8の字型に連結した双方向用コード","12心のテープコード","金属補強入りの屋外コード"], a:1,
+     e:"断面がメガネ（8の字）型の2心コード。送信・受信のペア（デュプレックス）配線に使い、中央から裂いて2本に分けられる。"},
+    {cat:"basic", ch:["optical-fiber-cable-types.md","③ ケーブル・部材"],
+     q:"FOコードの「FO」の意味は？",
+     c:["Fiber Optic","Fan-Out（扇状に展開）","Fast Order","Full Option"], a:1,
+     e:"ひっかけ注意。テープ心線の端を1心ずつのコネクタに「ばらして」成端するファンアウト（Fan-Out）コードのこと。"},
+    {cat:"basic", ch:["optical-fiber-cable-types.md","③ ケーブル・部材"],
+     q:"成端箱とクロージャの違いとして正しいのは？",
+     c:["成端箱＝屋外、クロージャ＝屋内","成端箱＝ケーブル端末でコネクタ化、クロージャ＝途中の接続分岐を防水保護","同じものの別名","成端箱は電源が必要"], a:1,
+     e:"「端でコネクタ化＝成端箱（屋内寄り）」「途中の接続・分岐を守る＝クロージャ（屋外・防水）」と覚える。"},
+    {cat:"deep", ch:["optical-fiber-fieldwork-guide.md","④ 施工・測定"],
+     q:"接続損失が最も小さい恒久接続の方法は？",
+     c:["メカニカルスプライス","融着接続","テープで巻く","現場組立コネクタ"], a:1,
+     e:"アーク放電でガラス同士を溶かして一体化する融着接続は損失0.02〜0.1dB程度で反射もほぼゼロ。恒久接続の第一選択。"},
+    {cat:"deep", ch:["optical-fiber-fieldwork-guide.md","④ 施工・測定"],
+     q:"緑色のAPCコネクタと青色のUPCコネクタ。正しい扱いは？",
+     c:["自由に混ぜてよい","APCとUPCを直接つないではいけない","緑は屋外専用","青は古い規格なので廃棄"], a:1,
+     e:"APCは端面を8°斜めに研磨して反射を逃がす構造。角度の違うUPCと嵌合すると空隙ができて大損失になる。「青は青と、緑は緑と」。"},
+    {cat:"deep", ch:["optical-fiber-fieldwork-guide.md","④ 施工・測定"],
+     q:"光の損失で「-3dB」はどういう意味？",
+     c:["光が約半分になる","光が3%減る","光が1/3になる","光が3倍になる"], a:0,
+     e:"dBは対数表現。-3dBで約1/2、-10dBで1/10。掛け算を足し算で扱えるので損失バジェット計算が簡単になる。"},
+    {cat:"deep", ch:["optical-fiber-fieldwork-guide.md","④ 施工・測定"],
+     q:"OTDR（光パルス試験器）にできて、パワーメータにできないことは？",
+     c:["トータル損失の合否判定","「どの距離で・何dBの損失/断線が起きているか」の場所特定","光の色の測定","電圧の測定"], a:1,
+     e:"OTDRは戻り光を時間分解して距離ごとの損失を波形化する「光のレーダー」。障害点を「局から3.2km地点」のように特定できる。"},
+    {cat:"deep", ch:["optical-fiber-vendors.md","⑤ メーカー比較"],
+     q:"ITU-T G.657規格のファイバの特徴は？",
+     c:["超低損失で海底向け","曲げに強くFTTH・宅内向け","マルチモード","プラスチック製"], a:1,
+     e:"G.657はBIF（曲げ耐性ファイバ）。A1で半径15mm、A2で7.5mm、B級で5mmまで曲げられ、宅内・高密度配線で活躍。海底・幹線向けの超低損失はG.654。"},
+    {cat:"deep", ch:["optical-fiber-vendors.md","⑤ メーカー比較"],
+     q:"G.654.E（超低損失・大有効断面積）ファイバの主な用途は？",
+     c:["宅内配線","陸上長距離幹線・データセンタ間の大容量伝送","建物内LAN","車載配線"], a:1,
+     e:"損失を極限まで下げ有効断面積を広げて非線形を抑えた規格。400G超の長距離伝送で採用される（住友PureAdvance、Corning ULLなど）。"},
+    {cat:"deep", ch:["optical-fiber-vendors.md","⑤ メーカー比較"],
+     q:"光ファイバを世界で初めて実用化した「元祖」メーカーは？",
+     c:["フジクラ","Corning（コーニング）","YOFC","Prysmian"], a:1,
+     e:"米Corningが1970年に実用レベルの低損失ファイバを開発。SMF-28シリーズは業界の代名詞的存在。"},
+    {cat:"deep", ch:["optical-fiber-vendors.md","⑤ メーカー比較"],
+     q:"日本の光ファイバ大手3社の組み合わせとして正しいのは？",
+     c:["住友電工・古河電工・フジクラ","ソニー・パナソニック・シャープ","NTT・KDDI・ソフトバンク","トヨタ・ホンダ・日産"], a:0,
+     e:"国内3社は素線からケーブル・接続機器・測定器まで一気通貫で揃えるのが強み。NTT等は「使う側」の通信事業者。"},
+    {cat:"deep", ch:["sumitomo-electric-optical-fiber.md","⑥ 住友電工"],
+     q:"住友電工の光ファイバ関連製品の総合ブランド名は？",
+     c:["PureBand","Optigate","SumiMPO","MJC"], a:1,
+     e:"Optigate®が光ファイバ・ケーブル・コネクタ・収容部材まで含む製品体系の総称。PureBand等はその中のファイバ品種名。"},
+    {cat:"deep", ch:["sumitomo-electric-optical-fiber.md","⑥ 住友電工"],
+     q:"住友電工「PureAdvance」が準拠する規格は？",
+     c:["G.652.D","G.657.A2","G.654.E","OM4"], a:2,
+     e:"PureAdvanceは超低損失・大有効断面積のG.654.E準拠で、陸上幹線・DC間の400G超向け。標準SMはPureBand（G.652.D）、曲げ耐性はPureAccess（G.657）。"},
+    {cat:"deep", ch:["sumitomo-electric-optical-fiber.md","⑥ 住友電工"],
+     q:"融着接続機の「コア調心」方式の特徴は？",
+     c:["安価で高速、アクセス網向け","コアを直接見て合わせるため低損失だが高価で、幹線向け","電源不要","多心接続はできない"], a:1,
+     e:"コア調心はコアを画像認識で直接合わせる＝低損失・高価（幹線向け）。外径（クラッド）調心は経済的でFTTH向け。"},
+    {cat:"deep", ch:["sumitomo-electric-optical-fiber.md","⑥ 住友電工"],
+     q:"住友電工「MJCシリーズ」はどんな製品？",
+     c:["屋外用の光クロージャ","融着接続機","光ファイバ素線","データセンタ用MPOコネクタ"], a:0,
+     e:"MJCは架空・地下で接続分岐点を防水保護するクロージャのシリーズ。主力のMJC-KD3は出荷100万台超。"}
+  ];
+
+  var BEST_KEY = 'optical-quiz-best-v1';
+  var order = [], idx = 0, score = 0, mode = 'all', wrongs = [];
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function pool(m) {
+    var idxs = QS.map(function (_, i) { return i; });
+    if (m === 'basic') idxs = idxs.filter(function (i) { return QS[i].cat === 'basic'; });
+    if (m === 'deep') idxs = idxs.filter(function (i) { return QS[i].cat === 'deep'; });
+    shuffle(idxs);
+    if (m === 'random10') idxs = idxs.slice(0, 10);
+    return idxs;
+  }
+  function el(id) { return document.getElementById(id); }
+  function show(id, on) { el(id).classList.toggle('hidden', !on); }
+
+  function renderBest() {
+    var best = {};
+    try { best = JSON.parse(localStorage.getItem(BEST_KEY)) || {}; } catch (e) {}
+    var names = { basic: '基礎編', deep: '実務編', all: '全範囲', random10: 'おまかせ10問' };
+    var parts = Object.keys(best).map(function (k) { return names[k] + ' ' + best[k] + '%'; });
+    el('best').textContent = parts.length ? '🏆 ベストスコア: ' + parts.join(' ／ ') : '';
+  }
+
+  function start(m) {
+    mode = m; order = pool(m); idx = 0; score = 0; wrongs = [];
+    show('startCard', false); show('resultCard', false); show('quizCard', true);
+    renderQ();
+  }
+
+  function renderQ() {
+    var q = QS[order[idx]];
+    el('qnum').textContent = '問 ' + (idx + 1) + ' / ' + order.length;
+    el('qcat').textContent = q.ch[1];
+    el('qtext').textContent = q.q;
+    el('qbar').style.width = Math.round(idx / order.length * 100) + '%';
+    var fb = el('feedback'); fb.className = 'feedback'; fb.innerHTML = '';
+    show('nextBtn', false);
+    var ul = el('choices'); ul.innerHTML = '';
+    q.c.forEach(function (text, i) {
+      var li = document.createElement('li');
+      li.textContent = text;
+      li.addEventListener('click', function () { answer(i, li); });
+      ul.appendChild(li);
+    });
+  }
+
+  function answer(i, li) {
+    var q = QS[order[idx]];
+    var lis = el('choices').children;
+    for (var k = 0; k < lis.length; k++) lis[k].classList.add('disabled');
+    lis[q.a].classList.add('correct');
+    var ok = (i === q.a);
+    if (ok) { score++; } else { li.classList.add('wrong'); wrongs.push(q); }
+    var fb = el('feedback');
+    fb.className = 'feedback ' + (ok ? 'ok' : 'ng');
+    fb.innerHTML = '<div class="verdict">' + (ok ? '⭕ 正解！' : '❌ 不正解') + '</div>' +
+      '<div>' + q.e + '</div>' +
+      '<div style="margin-top:6px;">📖 詳しくは <a href="' + q.ch[0] + '">' + q.ch[1] + '</a></div>';
+    el('nextBtn').textContent = (idx === order.length - 1) ? '結果を見る →' : '次の問題 →';
+    show('nextBtn', true);
+  }
+
+  el('nextBtn').addEventListener('click', function () {
+    idx++;
+    if (idx < order.length) { renderQ(); } else { finish(); }
+  });
+
+  function finish() {
+    show('quizCard', false); show('resultCard', true);
+    var pct = Math.round(score / order.length * 100);
+    el('scoreText').textContent = pct + '点';
+    el('scoreSub').textContent = order.length + '問中 ' + score + '問正解';
+    var adv;
+    if (pct === 100) adv = '💯 完璧です！ 次は⑥の選定早見表で、知識を実際の製品選定に使ってみましょう。';
+    else if (pct >= 80) adv = '🎉 合格ラインです。間違えた章だけ読み直せば盤石です。';
+    else if (pct >= 60) adv = '📖 基礎はできています。下の復習リンクの章をもう一度読んでから再挑戦を。';
+    else adv = '🌱 まずは①→②の順にじっくり読み直すのがおすすめです。焦らずいきましょう。';
+    el('advice').textContent = adv;
+    var rb = el('reviewBox');
+    if (wrongs.length) {
+      var seen = {}, html = '<strong>復習リンク（間違えた問題の章）</strong><ul>';
+      wrongs.forEach(function (q) {
+        if (!seen[q.ch[0]]) { seen[q.ch[0]] = 1;
+          html += '<li><a href="' + q.ch[0] + '">' + q.ch[1] + '</a></li>'; }
+      });
+      rb.innerHTML = html + '</ul>';
+    } else { rb.innerHTML = ''; }
+    var best = {};
+    try { best = JSON.parse(localStorage.getItem(BEST_KEY)) || {}; } catch (e) {}
+    if (!(mode in best) || pct > best[mode]) {
+      best[mode] = pct; localStorage.setItem(BEST_KEY, JSON.stringify(best));
+    }
+  }
+
+  el('retryBtn').addEventListener('click', function () { start(mode); });
+  el('homeBtn').addEventListener('click', function () {
+    show('resultCard', false); show('startCard', true); renderBest();
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.modes button'), function (b) {
+    b.addEventListener('click', function () { start(b.dataset.mode); });
+  });
+
+  renderBest();
+})();
+</script>
+</body>
+</html>
