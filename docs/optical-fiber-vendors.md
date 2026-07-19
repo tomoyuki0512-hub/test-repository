@@ -4,7 +4,7 @@ title: 光ファイバー 大手各社の製品ラインナップまとめ
 
 # ⑤ 光ファイバー 大手各社の製品ラインナップまとめ
 
-> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [① 入門](optical-fiber-guide.md) ｜ [② ネットワーク全体像](optical-fiber-network-guide.md) ｜ [③ ケーブル・部材](optical-fiber-cable-types.md) ｜ [④ 施工・測定](optical-fiber-fieldwork-guide.md) ｜ **⑤ メーカー比較** ｜ [⑥ 住友電工](sumitomo-electric-optical-fiber.md) ｜ [✅ クイズ](optical-fiber-quiz.html)
+> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [🏠 ポータル](optical-fiber-portal.html) ｜ [①](optical-fiber-guide.md) [②](optical-fiber-network-guide.md) [③](optical-fiber-cable-types.md) [④](optical-fiber-fieldwork-guide.md) **⑤** [⑥](sumitomo-electric-optical-fiber.md) [⑦](optical-fiber-transmission-deep-dive.md) [⑧](optical-fiber-transceiver-guide.md) [⑨](optical-fiber-career-guide.md) ｜ [✅ クイズ](optical-fiber-quiz.html) ｜ [🧮 計算機](optical-fiber-calculator.html)
 
 光ファイバー業界の主要メーカーと、その代表的な製品ラインナップを整理したガイド。
 「どの会社が何を作っているのか」「製品名の意味」をゼロから把握できるようにまとめた。
