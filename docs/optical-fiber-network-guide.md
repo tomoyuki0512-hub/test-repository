@@ -4,7 +4,7 @@ title: 光通信ネットワークの全体像（FTTH・PON・海底ケーブル
 
 # ② 光通信ネットワークの全体像（FTTH・PON・海底ケーブル）
 
-> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [① 入門](optical-fiber-guide.md) ｜ **② ネットワーク全体像** ｜ [③ ケーブル・部材](optical-fiber-cable-types.md) ｜ [④ 施工・測定](optical-fiber-fieldwork-guide.md) ｜ [⑤ メーカー比較](optical-fiber-vendors.md) ｜ [⑥ 住友電工](sumitomo-electric-optical-fiber.md) ｜ [✅ クイズ](optical-fiber-quiz.html)
+> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [🏠 ポータル](optical-fiber-portal.html) ｜ [①](optical-fiber-guide.md) **②** [③](optical-fiber-cable-types.md) [④](optical-fiber-fieldwork-guide.md) [⑤](optical-fiber-vendors.md) [⑥](sumitomo-electric-optical-fiber.md) [⑦](optical-fiber-transmission-deep-dive.md) [⑧](optical-fiber-transceiver-guide.md) [⑨](optical-fiber-career-guide.md) ｜ [✅ クイズ](optical-fiber-quiz.html) ｜ [🧮 計算機](optical-fiber-calculator.html)
 
 ①では「1本のガラスの糸の中で何が起きているか」を見た。
 この章では視点をぐっと引いて、**その糸が世界中でどうつながっているか** ——
