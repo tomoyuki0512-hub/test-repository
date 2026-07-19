@@ -4,7 +4,7 @@ title: 光ファイバー ゼロからわかる完全ガイド
 
 # ① 光ファイバー ゼロからわかる完全ガイド
 
-> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ **① 入門** ｜ [② ネットワーク全体像](optical-fiber-network-guide.md) ｜ [③ ケーブル・部材](optical-fiber-cable-types.md) ｜ [④ 施工・測定](optical-fiber-fieldwork-guide.md) ｜ [⑤ メーカー比較](optical-fiber-vendors.md) ｜ [⑥ 住友電工](sumitomo-electric-optical-fiber.md) ｜ [✅ クイズ](optical-fiber-quiz.html)
+> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [🏠 ポータル](optical-fiber-portal.html) ｜ **①** [②](optical-fiber-network-guide.md) [③](optical-fiber-cable-types.md) [④](optical-fiber-fieldwork-guide.md) [⑤](optical-fiber-vendors.md) [⑥](sumitomo-electric-optical-fiber.md) [⑦](optical-fiber-transmission-deep-dive.md) [⑧](optical-fiber-transceiver-guide.md) [⑨](optical-fiber-career-guide.md) ｜ [✅ クイズ](optical-fiber-quiz.html) ｜ [🧮 計算機](optical-fiber-calculator.html)
 
 「光ファイバーって名前は聞くけど、結局なに？」という人のためのガイド。
 むずかしい言葉はたとえ話でかみくだきつつ、仕組み・種類・身近な使われ方までひととおりわかるようにまとめた。
