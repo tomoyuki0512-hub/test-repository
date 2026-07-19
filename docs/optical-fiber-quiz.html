@@ -72,7 +72,8 @@
     <div class="modes">
       <button data-mode="basic">基礎編（①〜③）12問</button>
       <button data-mode="deep">実務編（④〜⑥）12問</button>
-      <button data-mode="all">全範囲シャッフル 24問</button>
+      <button data-mode="adv">深掘り編（⑦〜⑨）12問</button>
+      <button data-mode="all">全範囲シャッフル 36問</button>
       <button data-mode="random10">おまかせ10問</button>
     </div>
     <p id="best" style="margin-top:14px; color:var(--sub); font-size:0.9rem;"></p>
@@ -104,7 +105,7 @@
 
 <script>
 (function () {
-  // q: 問題文 / c: 選択肢 / a: 正解index / e: 解説 / ch: 章リンク / cat: basic|deep
+  // q: 問題文 / c: 選択肢 / a: 正解index / e: 解説 / ch: 章リンク / cat: basic|deep|adv
   var QS = [
     {cat:"basic", ch:["optical-fiber-guide.md","① 入門（仕組み）"],
      q:"光がガラスの糸の外に漏れず、曲がった線の中でも進めるのはなぜ？",
@@ -201,7 +202,55 @@
     {cat:"deep", ch:["sumitomo-electric-optical-fiber.md","⑥ 住友電工"],
      q:"住友電工「MJCシリーズ」はどんな製品？",
      c:["屋外用の光クロージャ","融着接続機","光ファイバ素線","データセンタ用MPOコネクタ"], a:0,
-     e:"MJCは架空・地下で接続分岐点を防水保護するクロージャのシリーズ。主力のMJC-KD3は出荷100万台超。"}
+     e:"MJCは架空・地下で接続分岐点を防水保護するクロージャのシリーズ。主力のMJC-KD3は出荷100万台超。"},
+    {cat:"adv", ch:["optical-fiber-transmission-deep-dive.md","⑦ 伝送技術の深掘り"],
+     q:"「波長分散」が長距離伝送で問題になる理由は？",
+     c:["光が突然消えるから","波長ごとに速度が違いパルスが時間方向に広がるから","ファイバが熱くなるから","電磁ノイズが混入するから"], a:1,
+     e:"レーザー光もわずかな波長幅を持ち、速い成分と遅い成分がばらけてパルスがにじむ。高速信号ほどパルス間隔が詰まるので致命的になる。"},
+    {cat:"adv", ch:["optical-fiber-transmission-deep-dive.md","⑦ 伝送技術の深掘り"],
+     q:"現代（100G以降）の分散対策の主流は？",
+     c:["分散補償ファイバを足す","コヒーレント受信＋DSPでデジタル的に巻き戻す","送信パワーを上げる","ケーブルを冷やす"], a:1,
+     e:"位相ごと受信できるコヒーレント方式なら、分散もPMDも受信後の計算で補償できる。物理補償（DCF）は過去のものになった。"},
+    {cat:"adv", ch:["optical-fiber-transmission-deep-dive.md","⑦ 伝送技術の深掘り"],
+     q:"「光のパワーを上げれば上げるほど遠くまで届く」が成り立たない理由は？",
+     c:["法律で上限があるから","強い光は非線形効果（カー効果）で自他の信号を歪ませるから","レーザーが壊れるから","dBの計算が合わなくなるから"], a:1,
+     e:"強い光はガラスの屈折率をわずかに変え、自分や隣の波長を歪ませる。だから最適パワーで運転し、実効断面積の大きいG.654.Eファイバで光の密度を下げる。"},
+    {cat:"adv", ch:["optical-fiber-transmission-deep-dive.md","⑦ 伝送技術の深掘り"],
+     q:"シャノン限界が近づいた現在、容量を伸ばす本命のアプローチは？",
+     c:["変調を無限に多値化する","空間の多重（マルチコアファイバ等のSDM）や帯域拡張（C+L帯）","電気通信に戻す","中継器を全部撤去する"], a:1,
+     e:"1本の通信路の効率はすでに理論限界近く。だから通信路の「数」を増やす空間分割多重（マルチコア・超多心）や帯域拡張に投資が向かっている。"},
+    {cat:"adv", ch:["optical-fiber-transceiver-guide.md","⑧ トランシーバ・DC機器"],
+     q:"QSFP-DDの「DD」の意味は？",
+     c:["Direct Drive","Double Density（電気レーンが8レーン）","Dual Duplex","Deep Dive"], a:1,
+     e:"従来QSFPの4レーンを8レーンに倍増したのがDouble Density。後方互換を保ちつつ400G/800Gを実現した。"},
+    {cat:"adv", ch:["optical-fiber-transceiver-guide.md","⑧ トランシーバ・DC機器"],
+     q:"トランシーバの「SR」と「LR」の違いは？",
+     c:["色が違うだけ","SR=マルチモードで〜100m、LR=シングルモードで〜10km","SRのほうが高価","LRは無線用"], a:1,
+     e:"SR（Short Reach）はMMF＋VCSELで安く短距離、LR（Long Reach）はSMFで10km。ファイバ種別（①③）とセットで決まっている。"},
+    {cat:"adv", ch:["optical-fiber-transceiver-guide.md","⑧ トランシーバ・DC機器"],
+     q:"PAM4変調の特徴として正しいのは？",
+     c:["光を4色に分ける","光の強さを4段階にして1シンボルで2ビット運ぶ","4本のファイバを束ねる","位相を4回転させる"], a:1,
+     e:"ON/OFF（NRZ）の2段階を4段階にすることで同じ部品速度で2倍のデータを運ぶ。DC内の400G/800G世代の標準技術。"},
+    {cat:"adv", ch:["optical-fiber-transceiver-guide.md","⑧ トランシーバ・DC機器"],
+     q:"CPO（Co-Packaged Optics）の狙いは？",
+     c:["モジュールを大きくして冷やしやすくする","光エンジンをスイッチASICと同一パッケージに収め、電力と密度を根本改善する","銅配線に戻す","抜き差しを簡単にする"], a:1,
+     e:"51.2Tbps級スイッチでは電力の過半が光モジュール関連。ASICのすぐ隣に光を置いて電気配線を極小化するのがCPO。代償は交換運用の難しさ。"},
+    {cat:"adv", ch:["optical-fiber-career-guide.md","⑨ 資格・業界・キャリア"],
+     q:"光回線の宅内工事など「端末設備の接続」に必要な国家資格は？",
+     c:["電気工事士","工事担任者","宅地建物取引士","危険物取扱者"], a:1,
+     e:"工事担任者（デジタル通信）が通信回線への端末設備接続の工事・監督を担う国家資格。第二級が入門の定番。"},
+    {cat:"adv", ch:["optical-fiber-career-guide.md","⑨ 資格・業界・キャリア"],
+     q:"電気通信主任技術者はどんな役割の資格？",
+     c:["個々の工事現場の交通整理","通信事業者のネットワーク全体の工事・維持・運用の監督責任者","無線局のアナウンサー","データセンターの警備"], a:1,
+     e:"事業用電気通信設備には選任義務がある「設備側の監督責任者」。現場単位の監督は電気通信工事施工管理技士の領分。"},
+    {cat:"adv", ch:["optical-fiber-career-guide.md","⑨ 資格・業界・キャリア"],
+     q:"光通信業界の構造として正しい発注の流れは？",
+     c:["メーカー→キャリア→工事会社","通信キャリア→通信建設会社→機器・部材メーカー","工事会社→キャリア→素材メーカー","素材メーカー→キャリア→通建"], a:1,
+     e:"キャリア（NTT・KDDI等）が発注し、通建（エクシオ・ミライト・コムシス等）が施工、機器・部材はメーカー（住友電工・フジクラ等）から調達される4層構造。"},
+    {cat:"adv", ch:["optical-fiber-career-guide.md","⑨ 資格・業界・キャリア"],
+     q:"1990年代に光通信の容量を飛躍させた「EDFA」の革命的な点は？",
+     c:["光を電気に戻さず、全波長まとめて光のまま増幅できる","ガラスを不要にした","電力を光で送れるようにした","ファイバを無色透明にした"], a:0,
+     e:"従来は中継のたび電気に戻す必要があった。EDFAはWDMの全波長を一括で光増幅でき、DWDM時代（②⑦）の扉を開いた。"}
   ];
 
   var BEST_KEY = 'optical-quiz-best-v1';
@@ -217,6 +266,7 @@
     var idxs = QS.map(function (_, i) { return i; });
     if (m === 'basic') idxs = idxs.filter(function (i) { return QS[i].cat === 'basic'; });
     if (m === 'deep') idxs = idxs.filter(function (i) { return QS[i].cat === 'deep'; });
+    if (m === 'adv') idxs = idxs.filter(function (i) { return QS[i].cat === 'adv'; });
     shuffle(idxs);
     if (m === 'random10') idxs = idxs.slice(0, 10);
     return idxs;
@@ -227,7 +277,7 @@
   function renderBest() {
     var best = {};
     try { best = JSON.parse(localStorage.getItem(BEST_KEY)) || {}; } catch (e) {}
-    var names = { basic: '基礎編', deep: '実務編', all: '全範囲', random10: 'おまかせ10問' };
+    var names = { basic: '基礎編', deep: '実務編', adv: '深掘り編', all: '全範囲', random10: 'おまかせ10問' };
     var parts = Object.keys(best).map(function (k) { return names[k] + ' ' + best[k] + '%'; });
     el('best').textContent = parts.length ? '🏆 ベストスコア: ' + parts.join(' ／ ') : '';
   }
