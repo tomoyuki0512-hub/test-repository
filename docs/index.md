@@ -71,6 +71,7 @@ title: ガイド一覧
 
 ## ネットワーク・通信のしくみ
 
+- [🏠 光ファイバー・光通信 学習ポータル（HTML）](optical-fiber-portal.html) ← 全教材の読了チェック＋読者別ルート表示
 - [光ファイバー・光通信 完全ガイド（総合インデックス）](optical-fiber-overview.md) ← まずはここから（30秒サマリ・全体マップ・読者別ルート・統合用語集）
   - [① 光ファイバー ゼロからわかる完全ガイド](optical-fiber-guide.md) ← 全反射・コア/クラッド・SMF/MMF・損失と波長をたとえ話で
   - [② 光通信ネットワークの全体像](optical-fiber-network-guide.md) ← FTTH/PON・DWDM幹線・海底ケーブル・DC/モバイル・遅延の物理学
@@ -78,7 +79,11 @@ title: ガイド一覧
   - [④ 施工・接続・測定・保守ガイド](optical-fiber-fieldwork-guide.md) ← 融着/メカスプ・PC/UPC/APC・dB/損失バジェット・OTDR・障害切り分け
   - [⑤ 大手各社の製品ラインナップまとめ](optical-fiber-vendors.md) ← ITU-T規格の共通言語とCorning・Prysmian・YOFC・国内3社比較
   - [⑥ 住友電工 光ファイバー製品 完全網羅ガイド（実務担当者向け）](sumitomo-electric-optical-fiber.md) ← Optigate製品体系・選定早見表
-  - [✅ 理解度クイズ（HTML）](optical-fiber-quiz.html) ← 24問の4択・即時解説・間違えた章への復習リンク付き
+  - [⑦ 光伝送技術の深掘り（深掘り編）](optical-fiber-transmission-deep-dive.md) ← 分散・非線形・コヒーレント＋DSP・シャノン限界・マルチコア/ホローコア
+  - [⑧ 光トランシーバとDC機器（深掘り編）](optical-fiber-transceiver-guide.md) ← QSFP/OSFP・PAM4・シリコンフォトニクス・CPO・AIクラスタの光配線
+  - [⑨ 資格・業界・キャリアガイド（深掘り編）](optical-fiber-career-guide.md) ← 工事担任者/主任技術者・業界4層構造・産業史・キャリアパス
+  - [✅ 理解度クイズ（HTML）](optical-fiber-quiz.html) ← 36問の4択・基礎/実務/深掘りの3モード・復習リンク付き
+  - [🧮 光リンク設計 計算機（HTML）](optical-fiber-calculator.html) ← dB電卓・損失バジェット合否判定・PON/10G/400Gプリセット
 
 ## システム設計・運用
 
