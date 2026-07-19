@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光ファイバー・光通信 学習ポータル</title>
+<style>
+  :root {
+    --bg: #f6f8fa; --card: #ffffff; --text: #1f2933; --sub: #616e7c;
+    --accent: #0b6aa8; --accent-soft: #e0edf6; --border: #d9e2ec;
+    --basic: #2b6cb0; --deep: #0e7c66; --practice: #805ad5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15191e; --card: #1f252c; --text: #e4e9ee; --sub: #9aa5b1;
+      --accent: #4aa3dd; --accent-soft: #12303f; --border: #323c46;
+      --basic: #63a4e0; --deep: #34b096; --practice: #b794f4;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.7; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  header p { color: var(--sub); font-size: 0.95rem; }
+  .progress-box { background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; margin: 20px 0; }
+  .progress-box .label { display: flex; justify-content: space-between;
+    font-size: 0.9rem; color: var(--sub); margin-bottom: 8px; }
+  .bar { height: 12px; background: var(--accent-soft); border-radius: 6px; overflow: hidden; }
+  .bar > div { height: 100%; width: 0%; background: var(--accent); border-radius: 6px;
+    transition: width 0.4s ease; }
+  .routes { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px; margin: 20px 0; }
+  .routes h2 { font-size: 1.05rem; margin-bottom: 10px; }
+  .route-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .route-btns button { border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 20px; padding: 6px 14px; font-size: 0.85rem; cursor: pointer; }
+  .route-btns button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .route-note { font-size: 0.85rem; color: var(--sub); margin-top: 10px; min-height: 1.4em; }
+  section.phase { margin-top: 28px; }
+  .phase-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .phase-head .tag { font-size: 0.75rem; font-weight: 700; color: #fff;
+    border-radius: 6px; padding: 2px 10px; }
+  .tag.basic { background: var(--basic); } .tag.deep { background: var(--deep); }
+  .tag.practice { background: var(--practice); }
+  .phase-head h2 { font-size: 1.15rem; }
+  .phase-head .sub { font-size: 0.85rem; color: var(--sub); }
+  ul.items { list-style: none; }
+  ul.items li { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  ul.items li.done { opacity: 0.65; }
+  ul.items li.done .t { text-decoration: line-through; }
+  ul.items input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent);
+    cursor: pointer; flex-shrink: 0; }
+  ul.items .body { flex: 1; min-width: 0; }
+  ul.items a { color: var(--text); font-weight: 600; text-decoration: none; }
+  ul.items a:hover { color: var(--accent); text-decoration: underline; }
+  ul.items .d { font-size: 0.82rem; color: var(--sub); }
+  ul.items li.highlight { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .reset { margin-top: 28px; text-align: center; }
+  .reset button { border: 1px solid var(--border); background: var(--card); color: var(--sub);
+    border-radius: 8px; padding: 8px 18px; font-size: 0.85rem; cursor: pointer; }
+  footer { margin-top: 32px; font-size: 0.85rem; color: var(--sub); text-align: center; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🏠 光ファイバー・光通信 学習ポータル</h1>
+    <p>全12教材のフェーズ別ナビ。読み終えたらチェック — 進捗はこのブラウザに保存されます。</p>
+  </header>
+
+  <div class="progress-box">
+    <div class="label"><span>読了進捗</span><span id="ptext">0 / 0</span></div>
+    <div class="bar"><div id="pbar"></div></div>
+  </div>
+
+  <div class="routes">
+    <h2>🧭 読者別ルート（選ぶと該当章が光ります）</h2>
+    <div class="route-btns" id="routeBtns">
+      <button data-route="all" class="active">すべて</button>
+      <button data-route="beginner">はじめての人</button>
+      <button data-route="itops">情シス・DC担当</button>
+      <button data-route="field">設計・施工実務</button>
+      <button data-route="buyer">調達・発注側</button>
+      <button data-route="career">就活・業界研究</button>
+    </div>
+    <div class="route-note" id="routeNote"></div>
+  </div>
+
+  <section class="phase">
+    <div class="phase-head"><span class="tag basic">基礎編</span>
+      <h2>仕組みとネットワークの全体像</h2><span class="sub">まずここから順番に</span></div>
+    <ul class="items">
+      <li data-id="overview" data-routes="beginner itops field buyer career"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-overview.md">総合インデックス</a>
+        <div class="d">30秒サマリ・全体マップ・統合用語集・逆引き表</div></div></li>
+      <li data-id="c01" data-routes="beginner itops field buyer career"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-guide.md">① 光ファイバー ゼロからわかる完全ガイド</a>
+        <div class="d">全反射・コア/クラッド・SMF/MMF・損失と波長・歴史</div></div></li>
+      <li data-id="c02" data-routes="beginner itops career"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-network-guide.md">② 光通信ネットワークの全体像</a>
+        <div class="d">FTTH/PON・DWDM幹線・海底ケーブル・遅延の物理学</div></div></li>
+      <li data-id="c03" data-routes="field buyer"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-cable-types.md">③ ケーブル・コードと接続部材</a>
+        <div class="d">テープスロット/層より・単心/メガネ/FO・成端箱とクロージャ</div></div></li>
+    </ul>
+  </section>
+
+  <section class="phase">
+    <div class="phase-head"><span class="tag deep">実務編</span>
+      <h2>現場・製品選定</h2><span class="sub">仕事で使う人はここを厚めに</span></div>
+    <ul class="items">
+      <li data-id="c04" data-routes="field itops"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-fieldwork-guide.md">④ 施工・接続・測定・保守</a>
+        <div class="d">融着/メカスプ・PC/UPC/APC・dB/損失バジェット・OTDR・障害切り分け</div></div></li>
+      <li data-id="c05" data-routes="buyer career"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-vendors.md">⑤ 大手各社の製品ラインナップ</a>
+        <div class="d">ITU-T規格の共通言語・Corning/Prysmian/YOFC・国内3社</div></div></li>
+      <li data-id="c06" data-routes="buyer field"><input type="checkbox">
+        <div class="body"><a href="sumitomo-electric-optical-fiber.md">⑥ 住友電工 完全網羅ガイド</a>
+        <div class="d">Optigate製品体系・Pureシリーズ・選定早見表</div></div></li>
+    </ul>
+  </section>
+
+  <section class="phase">
+    <div class="phase-head"><span class="tag practice">深掘り編</span>
+      <h2>最前線とキャリア</h2><span class="sub">技術の「なぜ」と業界の「これから」</span></div>
+    <ul class="items">
+      <li data-id="c07" data-routes="itops career"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-transmission-deep-dive.md">⑦ 光伝送技術の深掘り</a>
+        <div class="d">分散・非線形・コヒーレント・FEC・シャノン限界・マルチコア</div></div></li>
+      <li data-id="c08" data-routes="itops career"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-transceiver-guide.md">⑧ 光トランシーバとDC機器</a>
+        <div class="d">QSFP/OSFP・PAM4・シリコンフォトニクス・CPO・AIクラスタ</div></div></li>
+      <li data-id="c09" data-routes="career beginner"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-career-guide.md">⑨ 資格・業界・キャリア</a>
+        <div class="d">工事担任者/主任技術者・業界4層構造・産業史・キャリアパス</div></div></li>
+      <li data-id="quiz" data-routes="beginner itops field buyer career"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-quiz.html">✅ 理解度クイズ（HTML）</a>
+        <div class="d">36問・即時解説・間違えた章への復習リンク・ベストスコア保存</div></div></li>
+      <li data-id="calculator" data-routes="field itops"><input type="checkbox">
+        <div class="body"><a href="optical-fiber-calculator.html">🧮 光リンク設計 計算機（HTML）</a>
+        <div class="d">dB⇄倍率電卓・損失バジェット計算・PON設計シミュレータ</div></div></li>
+    </ul>
+  </section>
+
+  <div class="reset"><button id="resetBtn">進捗をリセット</button></div>
+
+  <footer><a href="optical-fiber-overview.md">📚 総合インデックス（Markdown版）</a> ｜ <a href="index.md">ガイド一覧へ戻る</a></footer>
+</div>
+
+<script>
+(function () {
+  var KEY = 'optical-portal-progress-v1';
+  var items = Array.prototype.slice.call(document.querySelectorAll('ul.items li'));
+  var routeNotes = {
+    all: '',
+    beginner: '①→②で仕組みと全体像をつかみ、⑨で業界を見てからクイズへ、が最短コースです。',
+    itops: '①②の土台の上に、④の測定と⑦⑧のDC技術がそのまま実務知識になります。',
+    field: '③④が本丸。計算機で損失バジェットを体で覚え、⑥の選定早見表を現場の相棒に。',
+    buyer: '③で部材の言葉を覚え、⑤⑥で「規格→製品」の選定ロジックを押さえるのが近道です。',
+    career: '①②⑤⑨の順で読むと業界研究レポートがそのまま書けます。仕上げに⑦⑧で技術トレンドを。'
+  };
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function save(state) { localStorage.setItem(KEY, JSON.stringify(state)); }
+
+  function render() {
+    var state = load(), done = 0;
+    items.forEach(function (li) {
+      var checked = !!state[li.dataset.id];
+      li.querySelector('input').checked = checked;
+      li.classList.toggle('done', checked);
+      if (checked) done++;
+    });
+    document.getElementById('ptext').textContent = done + ' / ' + items.length;
+    document.getElementById('pbar').style.width =
+      (items.length ? Math.round(done / items.length * 100) : 0) + '%';
+  }
+
+  items.forEach(function (li) {
+    li.querySelector('input').addEventListener('change', function () {
+      var state = load();
+      if (this.checked) { state[li.dataset.id] = true; } else { delete state[li.dataset.id]; }
+      save(state); render();
+    });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    if (confirm('読了チェックをすべてリセットしますか？')) {
+      localStorage.removeItem(KEY); render();
+    }
+  });
+
+  var btns = Array.prototype.slice.call(document.querySelectorAll('#routeBtns button'));
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btns.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var route = btn.dataset.route;
+      items.forEach(function (li) {
+        var routes = (li.dataset.routes || '').split(' ');
+        li.classList.toggle('highlight', route !== 'all' && routes.indexOf(route) !== -1);
+      });
+      document.getElementById('routeNote').textContent = routeNotes[route] || '';
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
