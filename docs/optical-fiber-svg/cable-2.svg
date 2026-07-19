@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" font-family="'Hiragino Sans','Noto Sans JP',Meiryo,sans-serif">
+  <rect width="760" height="340" fill="white"/>
+  <text x="380" y="30" text-anchor="middle" font-size="17" font-weight="bold" fill="#333">層より型ケーブル（輪切り）</text>
+  <!-- 外被 -->
+  <circle cx="240" cy="190" r="115" fill="#4a4a4a"/>
+  <circle cx="240" cy="190" r="102" fill="#e9e9e9"/>
+  <!-- 心線 外層 (12) -->
+  <g fill="#f5d94e" stroke="#b3982a" stroke-width="1.5">
+    <circle cx="240" cy="112" r="17"/><circle cx="279" cy="122" r="17"/><circle cx="308" cy="151" r="17"/>
+    <circle cx="318" cy="190" r="17"/><circle cx="308" cy="229" r="17"/><circle cx="279" cy="258" r="17"/>
+    <circle cx="240" cy="268" r="17"/><circle cx="201" cy="258" r="17"/><circle cx="172" cy="229" r="17"/>
+    <circle cx="162" cy="190" r="17"/><circle cx="172" cy="151" r="17"/><circle cx="201" cy="122" r="17"/>
+  </g>
+  <!-- 心線 内層 (6) -->
+  <g fill="#f7e58f" stroke="#b3982a" stroke-width="1.5">
+    <circle cx="240" cy="152" r="17"/><circle cx="273" cy="171" r="17"/><circle cx="273" cy="209" r="17"/>
+    <circle cx="240" cy="228" r="17"/><circle cx="207" cy="209" r="17"/><circle cx="207" cy="171" r="17"/>
+  </g>
+  <!-- テンションメンバ -->
+  <circle cx="240" cy="190" r="15" fill="#8a8a8a" stroke="#555" stroke-width="2"/>
+  <!-- ラベル -->
+  <g stroke="#888" stroke-width="1.2"><line x1="255" y1="190" x2="475" y2="110"/><line x1="308" y1="151" x2="475" y2="175"/><line x1="342" y1="265" x2="475" y2="250"/></g>
+  <g font-size="14.5">
+    <text x="482" y="114" fill="#555" font-weight="bold">テンションメンバ（抗張力体）</text>
+    <text x="482" y="179" fill="#8c7a1f" font-weight="bold">心線を層状にらせん撚り</text>
+    <text x="482" y="198" fill="#666" font-size="12">→ 1本ずつ識別・分岐しやすい</text>
+    <text x="482" y="254" fill="#333" font-weight="bold">シース（外被）</text>
+  </g>
+  <text x="380" y="326" text-anchor="middle" font-size="12.5" fill="#666">「より縄」のように巻くので柔軟。中小心数向け</text>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" font-family="'Hiragino Sans','Noto Sans JP',Meiryo,sans-serif">
+  <rect width="760" height="320" fill="white"/>
+  <text x="380" y="30" text-anchor="middle" font-size="17" font-weight="bold" fill="#333">光ファイバーの3層構造（輪切り）</text>
+  <!-- 被覆 -->
+  <circle cx="250" cy="180" r="115" fill="#f3c98b" stroke="#c99a4e" stroke-width="2"/>
+  <!-- クラッド -->
+  <circle cx="250" cy="180" r="72" fill="#cfe4f7" stroke="#7aaed6" stroke-width="2"/>
+  <!-- コア -->
+  <circle cx="250" cy="180" r="16" fill="#f5d94e" stroke="#c9a92c" stroke-width="2"/>
+  <!-- 引き出し線 -->
+  <g stroke="#888" stroke-width="1.2">
+    <line x1="266" y1="180" x2="470" y2="110"/>
+    <line x1="316" y1="150" x2="470" y2="170"/>
+    <line x1="356" y1="130" x2="470" y2="235"/>
+  </g>
+  <g font-size="15">
+    <text x="478" y="105" fill="#8c7a1f" font-weight="bold">コア（芯）　約9µm（SMF）</text>
+    <text x="478" y="124" fill="#666" font-size="12.5">光が実際に通る道。屈折率が少し高い</text>
+    <text x="478" y="170" fill="#33618c" font-weight="bold">クラッド　外径125µm</text>
+    <text x="478" y="189" fill="#666" font-size="12.5">光をはね返す層。屈折率が少し低い</text>
+    <text x="478" y="235" fill="#8a5b16" font-weight="bold">被覆（ジャケット）</text>
+    <text x="478" y="254" fill="#666" font-size="12.5">傷・水・曲げから守る「服」。約250µm</text>
+  </g>
+  <text x="250" y="308" text-anchor="middle" font-size="12.5" fill="#666">全体でも髪の毛ほどの細さ（コアはその1/10以下）</text>
+</svg>

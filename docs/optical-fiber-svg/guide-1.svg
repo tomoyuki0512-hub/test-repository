@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 260" font-family="'Hiragino Sans','Noto Sans JP',Meiryo,sans-serif">
+  <rect width="760" height="260" fill="white"/>
+  <text x="380" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#333">全反射：光はクラッドの壁に跳ね返りながらコアの中を進む</text>
+  <!-- クラッド上下 -->
+  <rect x="60" y="60" width="560" height="30" fill="#cfe4f7" stroke="#7aaed6"/>
+  <rect x="60" y="170" width="560" height="30" fill="#cfe4f7" stroke="#7aaed6"/>
+  <!-- コア -->
+  <rect x="60" y="90" width="560" height="80" fill="#fff8dc" stroke="#d8c878"/>
+  <!-- 光のジグザグ -->
+  <polyline points="70,130 140,95 210,165 280,95 350,165 420,95 490,165 560,110" fill="none" stroke="#e8842c" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="560,110 545,100 549,118" fill="#e8842c"/>
+  <!-- 反射点マーク -->
+  <g fill="none" stroke="#e05555" stroke-width="1.5">
+    <circle cx="140" cy="95" r="7"/><circle cx="210" cy="165" r="7"/>
+    <circle cx="280" cy="95" r="7"/><circle cx="350" cy="165" r="7"/>
+    <circle cx="420" cy="95" r="7"/><circle cx="490" cy="165" r="7"/>
+  </g>
+  <!-- ラベル -->
+  <text x="632" y="80" font-size="14" fill="#33618c">クラッド</text>
+  <text x="632" y="97" font-size="12" fill="#33618c">（光をはね返す壁）</text>
+  <text x="632" y="134" font-size="14" fill="#8c7a1f">コア</text>
+  <text x="632" y="151" font-size="12" fill="#8c7a1f">（光が通る道）</text>
+  <text x="340" y="228" text-anchor="middle" font-size="13" fill="#c1490f">○ ＝ 全反射している点：ある角度より浅く当たると光は100%はね返る</text>
+  <text x="120" y="52" font-size="13" fill="#e8842c">光 →</text>
+</svg>

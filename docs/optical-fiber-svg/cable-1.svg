@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" font-family="'Hiragino Sans','Noto Sans JP',Meiryo,sans-serif">
+  <rect width="760" height="340" fill="white"/>
+  <text x="380" y="30" text-anchor="middle" font-size="17" font-weight="bold" fill="#333">テープスロット型ケーブル（輪切り）</text>
+  <!-- 外被 -->
+  <circle cx="240" cy="190" r="125" fill="#4a4a4a"/>
+  <circle cx="240" cy="190" r="112" fill="#e9e9e9"/>
+  <!-- スロットロッド -->
+  <circle cx="240" cy="190" r="104" fill="#bfd8bf" stroke="#7ba87b" stroke-width="2"/>
+  <!-- スロット（溝）5つ：くさび形の切り欠き -->
+  <g fill="#e9e9e9" stroke="#7ba87b" stroke-width="1.5">
+    <path d="M240,190 L198,96 A104,104 0 0 1 282,96 Z"/>
+    <path d="M240,190 L330,140 A104,104 0 0 1 340,208 Z"/>
+    <path d="M240,190 L296,278 A104,104 0 0 1 228,293 Z"/>
+    <path d="M240,190 L166,263 A104,104 0 0 1 138,200 Z"/>
+    <path d="M240,190 L142,157 A104,104 0 0 1 178,105 Z"/>
+  </g>
+  <!-- テープ心線（積層） -->
+  <g fill="#f5d94e" stroke="#b3982a">
+    <g transform="translate(240,120)"><rect x="-22" y="-24" width="44" height="9"/><rect x="-22" y="-12" width="44" height="9"/><rect x="-22" y="0" width="44" height="9"/></g>
+    <g transform="translate(300,180) rotate(72)"><rect x="-22" y="-24" width="44" height="9"/><rect x="-22" y="-12" width="44" height="9"/><rect x="-22" y="0" width="44" height="9"/></g>
+    <g transform="translate(262,255) rotate(144)"><rect x="-22" y="-24" width="44" height="9"/><rect x="-22" y="-12" width="44" height="9"/><rect x="-22" y="0" width="44" height="9"/></g>
+    <g transform="translate(178,238) rotate(216)"><rect x="-22" y="-24" width="44" height="9"/><rect x="-22" y="-12" width="44" height="9"/><rect x="-22" y="0" width="44" height="9"/></g>
+    <g transform="translate(172,150) rotate(288)"><rect x="-22" y="-24" width="44" height="9"/><rect x="-22" y="-12" width="44" height="9"/><rect x="-22" y="0" width="44" height="9"/></g>
+  </g>
+  <!-- テンションメンバ -->
+  <circle cx="240" cy="190" r="14" fill="#8a8a8a" stroke="#555" stroke-width="2"/>
+  <!-- ラベル -->
+  <g stroke="#888" stroke-width="1.2"><line x1="240" y1="106" x2="475" y2="88"/><line x1="252" y1="190" x2="475" y2="152"/><line x1="322" y1="216" x2="475" y2="216"/><line x1="352" y1="278" x2="475" y2="278"/></g>
+  <g font-size="14.5">
+    <text x="482" y="92" fill="#8c7a1f" font-weight="bold">テープ心線（4/8心）を溝に積層</text>
+    <text x="482" y="111" fill="#666" font-size="12">→ 多心一括融着で接続が速い</text>
+    <text x="482" y="156" fill="#555" font-weight="bold">テンションメンバ（抗張力体）</text>
+    <text x="482" y="220" fill="#4a7a4a" font-weight="bold">スロットロッド（溝付きの棒）</text>
+    <text x="482" y="282" fill="#333" font-weight="bold">シース（外被）</text>
+  </g>
+  <text x="380" y="326" text-anchor="middle" font-size="12.5" fill="#666">きっちり整列して詰めるので超多心・高密度（数百〜数千心）が得意</text>
+</svg>
