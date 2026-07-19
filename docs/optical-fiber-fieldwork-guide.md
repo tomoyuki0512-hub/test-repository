@@ -4,7 +4,7 @@ title: 光ファイバー 施工・接続・測定・保守ガイド
 
 # ④ 光ファイバー 施工・接続・測定・保守ガイド
 
-> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [① 入門](optical-fiber-guide.md) ｜ [② ネットワーク全体像](optical-fiber-network-guide.md) ｜ [③ ケーブル・部材](optical-fiber-cable-types.md) ｜ **④ 施工・測定** ｜ [⑤ メーカー比較](optical-fiber-vendors.md) ｜ [⑥ 住友電工](sumitomo-electric-optical-fiber.md) ｜ [✅ クイズ](optical-fiber-quiz.html)
+> **光ファイバー・光通信 完全ガイド**：[総合インデックス](optical-fiber-overview.md) ｜ [🏠 ポータル](optical-fiber-portal.html) ｜ [①](optical-fiber-guide.md) [②](optical-fiber-network-guide.md) [③](optical-fiber-cable-types.md) **④** [⑤](optical-fiber-vendors.md) [⑥](sumitomo-electric-optical-fiber.md) [⑦](optical-fiber-transmission-deep-dive.md) [⑧](optical-fiber-transceiver-guide.md) [⑨](optical-fiber-career-guide.md) ｜ [✅ クイズ](optical-fiber-quiz.html) ｜ [🧮 計算機](optical-fiber-calculator.html)
 
 「融着とメカスプはどう使い分ける？」「APCの緑コネクタは何が違う？」「OTDRの波形ってどう読む？」——
 線材と部材（③）を実際に**つなぎ・測り・守る**、現場作業の視点で光ファイバーを整理する章。
