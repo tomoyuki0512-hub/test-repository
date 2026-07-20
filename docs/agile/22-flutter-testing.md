@@ -148,4 +148,4 @@ await expectLater(find.byType(PriceCard), matchesGoldenFile('goldens/price_card.
 
 ---
 
-[← 総合インデックスに戻る](README.md) ｜ 前章: [㉑ 並行案件とブランチ戦略](21-parallel-projects.md) ｜ 関連: [⑩アジャイルテスト](10-agile-testing.md)・[⑭レガシーコード](14-legacy-code.md)・[Flutterサブスク テスト・QAガイド](../flutter-subscription-testing.md)
+次章: [㉓ ハイブリッド開発の技術構成](23-hybrid-tech-stack.md) ｜ [← 総合インデックスに戻る](README.md) ｜ 前章: [㉑ 並行案件とブランチ戦略](21-parallel-projects.md) ｜ 関連: [⑩アジャイルテスト](10-agile-testing.md)・[⑭レガシーコード](14-legacy-code.md)・[Flutterサブスク テスト・QAガイド](../flutter-subscription-testing.md)

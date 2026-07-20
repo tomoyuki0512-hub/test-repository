@@ -144,6 +144,7 @@ title: 用語集・チートシート
 | ウォーターフォールと組み合わせたい（新規構築＋保守改善） | スマホ: [⑲](19-hybrid-waterfall-agile.md) / Web: [⑳](20-hybrid-web.md) |
 | 並行案件で同じ画面・ソースが被って困っている | [㉑](21-parallel-projects.md) |
 | Flutterでテストを始めたい（既存テストなし） | [㉒](22-flutter-testing.md) |
+| ハイブリッドの技術構成・スタックを決めたい | [㉓](23-hybrid-tech-stack.md) |
 
 ### 会話で使う判断基準ワンライナー
 
