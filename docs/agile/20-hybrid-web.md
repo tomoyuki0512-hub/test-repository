@@ -119,4 +119,4 @@ title: ⑳ Webアプリでのハイブリッド開発【実践編】
 
 ---
 
-[← 総合インデックスに戻る](README.md) ｜ 前章: [⑲ ハイブリッド開発（スマホアプリ）](19-hybrid-waterfall-agile.md) ｜ 関連: [⑤CI/CD](05-engineering-practices.md)・[⑨ディスカバリー](09-product-discovery.md)
+次章: [㉑ 並行案件とブランチ戦略](21-parallel-projects.md) ｜ [← 総合インデックスに戻る](README.md) ｜ 前章: [⑲ ハイブリッド開発（スマホアプリ）](19-hybrid-waterfall-agile.md) ｜ 関連: [⑤CI/CD](05-engineering-practices.md)・[⑨ディスカバリー](09-product-discovery.md)
