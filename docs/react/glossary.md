@@ -106,10 +106,10 @@ title: React 用語集・チートシート
 | 条件で表示を切り替えたい | [② 条件分岐](02-jsx-components-props.md#4-条件分岐--出し分ける) |
 | リストを表示したい | [② リスト表示とkey](02-jsx-components-props.md#5-リスト表示と-key) |
 | ボタンで値を変えたい | [③ state](03-state-events.md#1-state-とは--コンポーネントが持つ記憶) |
-| **画面が更新されない** | [③ イミュータブル](03-state-events.md#ルール3stateは書き換えず新しい値を作るイミュータブル) |
+| **画面が更新されない** | [③ イミュータブル](03-state-events.md#ルール3-stateは書き換えず新しい値を作るイミュータブル) |
 | フォームを作りたい | [③ フォーム](03-state-events.md#4-フォームの扱い) |
 | 子から親のデータを変えたい | [③ リフトアップ](03-state-events.md#5-stateをどこに置くか--リフトアップ) |
-| stateにすべきか迷う | [③ stateにすべきでないもの](03-state-events.md#-stateにすべきでないもの) |
+| stateにすべきか迷う | [③ stateにすべきでないもの](03-state-events.md#6--stateにすべきでないもの) |
 | useEffectの使い方を知りたい | [④ useEffect](04-hooks.md#3-useeffect--最も誤用されるフック) |
 | **useEffectが無限ループする** | [⑤ 無限ループ](05-rendering-mechanism.md#5-無限ループの原因と対処) |
 | DOMを直接触りたい | [④ useRef](04-hooks.md#4-useref--再レンダリングを起こさない箱) |
@@ -125,7 +125,7 @@ title: React 用語集・チートシート
 | 状態の置き場所に迷う | [⑥ 判断フロー](06-state-design.md#判断フロー) |
 | API取得データの扱いに迷う | [⑥ 状態の分類](06-state-design.md#1-まず状態を分類する) |
 | 検索条件を保持したい | [⑥ URL状態](06-state-design.md#2-url状態を活用する見落とされがち) |
-| Server Componentsを知りたい | [⑦ RSC](07-react19-features.md#2-server-componentsrsc--最大の変化) |
+| Server Componentsを知りたい | [⑦ RSC](07-react19-features.md#2-server-componentsrsc-最大の変化) |
 | フォーム送信を楽に書きたい | [⑦ Actions](07-react19-features.md#3-actions--非同期処理の定型文をなくす) |
 | React 18から移行したい | [⑦ 移行](07-react19-features.md#7-react-18-からの移行) |
 | コンポーネント設計を学びたい | [⑧ 設計パターン](08-practice-patterns.md#1-コンポーネント設計パターン) |

@@ -251,7 +251,7 @@ function UserProfile({ userId }: { userId: string }) {
 }
 ```
 
-キャッシュ・重複排除・再取得・競合状態の対策が**全部入っています**。[④](04-hooks.md#-useeffectを使うべきでない場面) で書いた `useEffect` での自前実装は、これらを全部自分で書くことになります。
+キャッシュ・重複排除・再取得・競合状態の対策が**全部入っています**。[④](04-hooks.md#useeffectを使うべきでない場面) で書いた `useEffect` での自前実装は、これらを全部自分で書くことになります。
 
 > 💡 **Next.js（App Router）を使う場合**、初期表示のデータはServer Componentで取れるため、TanStack Query の出番は「無限スクロール」「ポーリング」など**クライアント主導の場面だけ**に減ります（→ [Next.js⑤](../nextjs/05-data-fetching-caching.md)）。
 

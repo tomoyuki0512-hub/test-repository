@@ -205,4 +205,12 @@ npx @next/codemod@canary upgrade latest
 
 ---
 
+## 6. 関連シリーズ
+
+- 📖 [JavaScript・Node.js・React・Next.js の関係](../js-stack-relations.md) ← 全体像
+- 🔵 [React 完全ガイド](../react/README.md) ← 画面を作る土台
+- 🟢 [Node.js 完全ガイド](../nodejs/README.md) ← 実行環境・サーバー側
+
+---
+
 [← 総合インデックスに戻る](README.md)

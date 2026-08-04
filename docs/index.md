@@ -25,6 +25,29 @@ title: ガイド一覧
 - [データベースの種類まとめ](database-types-guide.md)
 - [問い合わせページの作り方](contact-guide.md)
 
+## JavaScript / React / Node.js / Next.js
+
+- [📖 JavaScript・Node.js・React・Next.jsの関係](js-stack-relations.md) ← **まずはここから**。4つの違いと積み重なる関係・学習順序を1ページで
+- [🟢 Node.js 完全ガイド（総合インデックス）](nodejs/README.md) ← ブラウザ外でJSを動かす実行環境。サーバー側の土台
+  - [① Node.jsとは何か](nodejs/01-what-is-nodejs.md) ← 実行環境とは・ブラウザとの違い・得意不得意・Deno/Bun比較
+  - [② イベントループと非同期](nodejs/02-event-loop.md) ← シングルスレッド・実行順序・ブロッキング・複数コア活用
+  - [③ モジュールとnpm](nodejs/03-modules-packages.md) ← CommonJS/ESM・package.json・lockファイル・依存トラブル
+  - [④ 標準APIを使う](nodejs/04-core-apis.md) ← fs・path・process・fetch・stream・crypto・環境変数
+  - [⑤ 非同期処理を書きこなす](nodejs/05-async-patterns.md) ← 並列化・Promiseメソッド・エラー処理・リトライ
+  - [⑥ サーバーとフレームワーク](nodejs/06-server-frameworks.md) ← Express/Fastify/Hono/NestJS・REST設計・認証認可
+  - [⑦ 実務・運用](nodejs/07-practice-operations.md) ← 構造化ログ・セキュリティ・性能計測・Docker・監視
+  - [用語集・チートシート](nodejs/glossary.md) ← 用語辞典・逆引き表・頻出エラー早見表
+- [🔵 React 完全ガイド（総合インデックス）](react/README.md) ← 画面を部品に分けて組み立てるライブラリ
+  - [① Reactとは何か](react/01-what-is-react.md) ← 宣言的UI・仮想DOM・環境構築・他ライブラリ比較
+  - [② JSX・コンポーネント・props](react/02-jsx-components-props.md) ← JSXの正体・条件分岐・リスト表示とkey
+  - [③ stateとイベント](react/03-state-events.md) ← イミュータブル更新・フォーム・リフトアップ
+  - [④ フック（Hooks）体系](react/04-hooks.md) ← ルール・useEffectの正しい使い方・useRef/Context/Reducer
+  - [⑤ レンダリングの仕組み](react/05-rendering-mechanism.md) ← 最重要章。再レンダリング条件・無限ループ・React Compiler
+  - [⑥ 状態設計と状態管理](react/06-state-design.md) ← 状態の分類・URL状態・Zustand/TanStack Query
+  - [⑦ React 19の新機能](react/07-react19-features.md) ← Server Components・Actions・use・Activity
+  - [⑧ 実践パターンとアンチパターン](react/08-practice-patterns.md) ← 設計パターン・エラー処理・a11y・テスト
+  - [用語集・チートシート](react/glossary.md) ← 用語辞典・逆引き表・頻出エラー早見表
+
 ## Next.js（React系フレームワーク）
 
 - [Next.js 完全ガイド（総合インデックス）](nextjs/README.md) ← まずはここから（30秒サマリ・全体マップ・読者別ルート）

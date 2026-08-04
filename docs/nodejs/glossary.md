@@ -112,18 +112,18 @@ title: Node.js 用語集・チートシート
 | インストール・バージョン管理 | [① インストール](01-what-is-nodejs.md#6-インストールと最初の一歩) |
 | Deno/Bunと比較したい | [① 比較](01-what-is-nodejs.md#7-deno-と-bun--後発の選択肢) |
 | **実行順序が理解できない** | [② イベントループ](02-event-loop.md#2-イベントループの仕組み) |
-| **サーバーが固まる** | [② ブロッキング](02-event-loop.md#-イベントループを止めてはいけない) |
-| CPU使用率が100%になる | [② ブロッキング](02-event-loop.md#-イベントループを止めてはいけない) |
+| **サーバーが固まる** | [② ブロッキング](02-event-loop.md#4--イベントループを止めてはいけない) |
+| CPU使用率が100%になる | [② ブロッキング](02-event-loop.md#4--イベントループを止めてはいけない) |
 | 重い処理を逃がしたい | [② 逃がし方](02-event-loop.md#重い処理の逃がし方) |
 | 複数コアを使いたい | [② 複数コア](02-event-loop.md#7-複数コアを活用する) |
 | `forEach` 内の `await` が効かない | [② forEachの罠](02-event-loop.md#foreach-の罠) |
 | `import` と `require` の違い | [③ モジュール方式](03-modules-packages.md#1-2つのモジュール方式) |
-| `ERR_REQUIRE_ESM` が出る | [③ ESMの注意点](03-modules-packages.md#-esmの注意点) |
-| `__dirname` が使えない | [③ ESMの注意点](03-modules-packages.md#-esmの注意点) |
+| `ERR_REQUIRE_ESM` が出る | [③ ESMの注意点](03-modules-packages.md#️-esmの注意点) |
+| `__dirname` が使えない | [③ ESMの注意点](03-modules-packages.md#️-esmの注意点) |
 | package.jsonの読み方 | [③ package.json](03-modules-packages.md#3-packagejson-の読み方) |
 | CIで動かない・環境差が出る | [③ lockファイル](03-modules-packages.md#4-lockファイルが最重要) |
 | `Cannot find module` が出る | [③ トラブル対処](03-modules-packages.md#6-依存関係のトラブル対処) |
-| パッケージの安全性を確認したい | [③ セキュリティ](03-modules-packages.md#-npmパッケージのセキュリティ) |
+| パッケージの安全性を確認したい | [③ セキュリティ](03-modules-packages.md#7--npmパッケージのセキュリティ) |
 | ファイルを読み書きしたい | [④ fs](04-core-apis.md#1-fs--ファイル操作) |
 | パスを組み立てたい | [④ path](04-core-apis.md#2-path--パス操作) |
 | 環境変数を扱いたい | [④ process](04-core-apis.md#3-process--プロセスと環境変数) |
@@ -131,10 +131,10 @@ title: Node.js 用語集・チートシート
 | 巨大ファイルでメモリ不足 | [④ stream](04-core-apis.md#5-stream--大きなデータを扱う) |
 | デプロイ時にリクエストが切れる | [④ シャットダウン](04-core-apis.md#グレースフルシャットダウン) |
 | トークンを生成したい | [④ crypto](04-core-apis.md#crypto--ハッシュ乱数) |
-| **APIが遅い** | [⑤ 直列と並列](05-async-patterns.md#-直列と並列--最も効く高速化) |
-| 相手のAPIを落としてしまった | [⑤ 並列数制限](05-async-patterns.md#-ただし並列にしすぎない) |
+| **APIが遅い** | [⑤ 直列と並列](05-async-patterns.md#2--直列と並列--最も効く高速化) |
+| 相手のAPIを落としてしまった | [⑤ 並列数制限](05-async-patterns.md#️-ただし並列にしすぎない) |
 | 一部失敗でも続行したい | [⑤ allSettled](05-async-patterns.md#allsettled--部分的な失敗を許す) |
-| **エラーが捕まらない** | [⑤ エラー処理](05-async-patterns.md#-エラーハンドリング) |
+| **エラーが捕まらない** | [⑤ エラー処理](05-async-patterns.md#4--エラーハンドリング) |
 | プロセスが突然落ちる | [⑤ エラー処理](05-async-patterns.md#プロセス全体の保険) |
 | リトライを実装したい | [⑤ リトライ](05-async-patterns.md#5-リトライとタイムアウト) |
 | APIサーバーを作りたい | [⑥ Express](06-server-frameworks.md#2-express-の基本) |

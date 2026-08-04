@@ -92,7 +92,7 @@ npm audit fix                # 自動修正
 
 - **Dependabot / Renovate** で自動更新PRを作る
 - 使っていないパッケージは削除する
-- 導入前にダウンロード数・更新状況を確認（→ [③](03-modules-packages.md#-npmパッケージのセキュリティ)）
+- 導入前にダウンロード数・更新状況を確認（→ [③](03-modules-packages.md#7--npmパッケージのセキュリティ)）
 
 ### 主要な脆弱性と対策
 

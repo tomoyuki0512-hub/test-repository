@@ -150,7 +150,7 @@ const c = calcC(b)
 const d = calcD(c)
 ```
 
-詳しくは [④ useEffectを使うべきでない場面](04-hooks.md#-useeffectを使うべきでない場面)。
+詳しくは [④ useEffectを使うべきでない場面](04-hooks.md#useeffectを使うべきでない場面)。
 
 ### ❌ 早すぎる最適化
 

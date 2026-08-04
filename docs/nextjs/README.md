@@ -9,6 +9,11 @@ title: Next.js 完全ガイド 総合インデックス
 - 対象：React/Next.js をこれから学ぶ人、Pages Router 時代の知識を App Router に更新したい人、業務でNext.jsの採用を判断するリード・PM
 - 前提バージョン：**Next.js 16 系（執筆時点の最新は 16.3）／ React 19 系 / TypeScript**
 - Next.js 15 以前との違いは各章の「**⚠️ バージョン差分**」ブロックにまとめています
+- 関連：[React 完全ガイド](../react/README.md) ／ [Node.js 完全ガイド](../nodejs/README.md)
+
+> 📖 **はじめに読むと理解が早まります** → [JavaScript・Node.js・React・Next.js の関係](../js-stack-relations.md)
+>
+> Next.js は **React（画面）** と **Node.js（実行環境）** の上に成り立っています。特に [④ Server/Client Components](04-server-client-components.md) は、Reactの基礎とNode.jsの前提知識がないと理解が難しい章です。詰まったら関係ガイドに戻ってください。
 
 > このページだけ読めば「全体像」と「どこに何が書いてあるか」がわかります。詳細は各章へ。
 
