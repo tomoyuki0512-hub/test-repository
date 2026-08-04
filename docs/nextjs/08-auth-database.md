@@ -254,7 +254,7 @@ const post = await db.post.findFirst({ where: { id, authorId: user.id } })
 
 ### 認可チェックの置き場所チェックリスト
 
-- [ ] Server Action の**冒頭**で認証・認可を確認しているか（→ [⑥](06-server-actions-forms.md#7--セキュリティ--この章で最も重要)）
+- [ ] Server Action の**冒頭**で認証・認可を確認しているか（→ [⑥](06-server-actions-forms.md#6--セキュリティ--この章で最も重要)）
 - [ ] Route Handler（`route.ts`）でも確認しているか（→ [⑨](09-route-handlers-api.md)）
 - [ ] DBクエリに**所有者条件**が入っているか
 - [ ] 管理者判定を**クライアントから渡された値**で行っていないか

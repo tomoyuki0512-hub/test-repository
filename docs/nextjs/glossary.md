@@ -121,7 +121,7 @@ title: Next.js 用語集・チートシート
 | フォームを作りたい | [⑥ Server Actions](06-server-actions-forms.md) |
 | バリデーションエラーを表示したい | [⑥ `useActionState`](06-server-actions-forms.md#3-実務レベルのフォームuseactionstate) |
 | 「いいね」を即座に反映したい | [⑥ `useOptimistic`](06-server-actions-forms.md#5-楽観的更新useoptimistic) |
-| Server Actionsのセキュリティが不安 | [⑥ セキュリティ](06-server-actions-forms.md#7--セキュリティ--この章で最も重要) |
+| Server Actionsのセキュリティが不安 | [⑥ セキュリティ](06-server-actions-forms.md#6--セキュリティ--この章で最も重要) |
 | CSSをどう書くか決めたい | [⑦ 選択肢の比較](07-styling-ui.md#1-選択肢の比較) |
 | ボタンやモーダルを楽に作りたい | [⑦ shadcn/ui](07-styling-ui.md#4-uiコンポーネントライブラリ) |
 | ダークモードを付けたい | [⑦ ダークモード](07-styling-ui.md#ダークモード) |
