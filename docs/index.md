@@ -25,6 +25,28 @@ title: ガイド一覧
 - [データベースの種類まとめ](database-types-guide.md)
 - [問い合わせページの作り方](contact-guide.md)
 
+## Next.js（React系フレームワーク）
+
+- [Next.js 完全ガイド（総合インデックス）](nextjs/README.md) ← まずはここから（30秒サマリ・全体マップ・読者別ルート）
+  - **基礎編**
+  - [① Next.jsとは何か](nextjs/01-what-is-nextjs.md) ← Reactとの違い・CSR/SSR/SSG/ISR/PPR・他フレームワーク比較
+  - [② 環境構築とプロジェクト構造](nextjs/02-setup-and-structure.md) ← create-next-app・設定ファイル・環境変数・Pages Router対応表
+  - [③ ルーティング（App Router）](nextjs/03-routing.md) ← 特殊ファイル・動的ルート・ルートグループ・並列/インターセプト
+  - [④ Server ComponentsとClient Components](nextjs/04-server-client-components.md) ← 最重要章。'use client'の境界設計と頻出エラー
+  - **応用編**
+  - [⑤ データ取得とキャッシュ](nextjs/05-data-fetching-caching.md) ← use cache・cacheLife・cacheTag・PPR・N+1対策
+  - [⑥ Server Actionsとフォーム](nextjs/06-server-actions-forms.md) ← useActionState・楽観的更新・セキュリティ3原則
+  - [⑦ スタイリングとUI](nextjs/07-styling-ui.md) ← Tailwind v4・CSS Modules・shadcn/ui・フォント/画像
+  - [⑧ 認証とデータベース](nextjs/08-auth-database.md) ← Prisma vs Drizzle・Auth.js/Clerk・認可の多層防御
+  - [⑨ Route HandlersとAPI連携](nextjs/09-route-handlers-api.md) ← route.ts・proxy.ts移行・Webhook・外部API
+  - **実践編**
+  - [⑩ パフォーマンス最適化とSEO](nextjs/10-performance-seo.md) ← Core Web Vitals・next/image・メタデータ・構造化データ
+  - [⑪ テストと品質管理](nextjs/11-testing-quality.md) ← Vitest・Playwright・RSCのテスト戦略・ESLint 9
+  - [⑫ デプロイと運用](nextjs/12-deploy-operations.md) ← Vercel・Docker・監視・リリース前チェックリスト
+  - [⑬ 実践アーキテクチャ](nextjs/13-architecture-practice.md) ← 規模別ディレクトリ構成・状態管理の判断・アンチパターン集
+  - [⑭ 併用フレームワーク・ライブラリ総覧](nextjs/14-ecosystem-frameworks.md) ← **一緒に使う技術の全体像**。用途別定番・目的別スタック4種
+  - [用語集・チートシート](nextjs/glossary.md) ← 全章横断の用語辞典・「困った時どの章？」逆引き表・頻出エラー早見表
+
 ## アジャイル開発
 
 - [🏃 アジャイル開発 学習ポータル（HTML）](agile/portal.html) ← 全教材のフェーズ別ナビ＋読了チェック・読者別ルート
