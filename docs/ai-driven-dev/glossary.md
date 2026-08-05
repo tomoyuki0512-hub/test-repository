@@ -111,7 +111,7 @@ title: AI駆動開発 用語集・チートシート
 | レビューで何を見るべきか | [⑤ レビュー観点](05-ai-workflow.md#6-人間がレビューで見るべき点) |
 | チームの役割分担を決めたい | [⑤ 役割分担](05-ai-workflow.md#8-チームでの役割分担) |
 | AI利用コストを下げたい | [⑤ コスト管理](05-ai-workflow.md#9-コスト管理) |
-| **git連携にMCPが要るか知りたい** | [⑥ MCP不要の境界](06-git-github-mcp.md#-git操作にmcpは不要) |
+| **git連携にMCPが要るか知りたい** | [⑥ MCP不要の境界](06-git-github-mcp.md#1--git操作にmcpは不要) |
 | PRを自動作成したい | [⑥ Gitフロー](06-git-github-mcp.md#3-標準的なgitフロー) |
 | CI失敗を自動修正したい | [⑥ CI自動修正](06-git-github-mcp.md#5-ci失敗の自動修正) |
 | AIの権限をどこまで許すか | [⑥ 権限設計](06-git-github-mcp.md#7-権限設計--どこまでaiに許すか) |

@@ -101,6 +101,18 @@ title: ガイド一覧
   - [✅ 理解度クイズ（HTML）](agile/quiz.html) ← 28問の4択・即時解説・間違えた章への復習リンク付き
   - [⏱️ ファシリテーションタイマー（HTML）](agile/facilitator.html) ← スクラムイベント別アジェンダ付きタイマー・チャイム/超過警告
 
+## AI駆動開発（Figma × MCP × AI）
+
+- [Figma × MCP × AI駆動開発 完全ガイド（総合インデックス）](ai-driven-dev/README.md) ← まずはここから。**Code Connectの有無で品質がほぼ決まる**話と4層アーキテクチャ
+  - [① 全体像と導入判断](ai-driven-dev/01-overview.md) ← できること/できないこと・プラン要件・費用対効果・ガバナンス
+  - [② デザイントークン連携](ai-driven-dev/02-design-tokens.md) ← Figma Variables・Tokens Studio・Style Dictionary・Tailwind v4・CI
+  - [③ Code Connect](ai-driven-dev/03-code-connect.md) ← **最重要章**。書き方・プロパティ対応・CI自動公開・どこから張るか
+  - [④ Figma MCPの接続と使い方](ai-driven-dev/04-figma-mcp.md) ← リモート/デスクトップの違い・Claude Code接続・指示設計・検証
+  - [⑤ AI駆動開発のワークフロー](ai-driven-dev/05-ai-workflow.md) ← CLAUDE.md設計・品質ゲート・レビュー観点・役割分担・コスト
+  - [⑥ GitとGitHub MCP連携](ai-driven-dev/06-git-github-mcp.md) ← **git操作にMCPは不要**・PR自動化・CI自動修正・権限設計
+  - [⑦ 段階導入とアンチパターン](ai-driven-dev/07-adoption-roadmap.md) ← 6フェーズのロードマップ・失敗10パターン・効果測定
+  - [用語集・チートシート](ai-driven-dev/glossary.md) ← 用語辞典・逆引き表・コマンド集・設定ひな形
+
 ## Claude Codeを使ったアプリ開発
 
 - [Claude Codeでアプリ開発する方法](claude-code-dev-guide.md)
