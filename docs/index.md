@@ -131,6 +131,24 @@ title: ガイド一覧
 
 ## ネットワーク・通信のしくみ
 
+- [🌐 ネットワーク技術 完全ガイド（総合インデックス）](network/README.md) ← **まずはここから**。ゼロから応用まで＋**小/中/大規模 × オンプレ/クラウド/ハイブリッドの9構成パターン**
+  - **基礎編**
+  - [① ネットワークの基礎](network/01-network-basics.md) ← パケット交換・OSI 7層とTCP/IP 4層・カプセル化・機器の役割・帯域と遅延
+  - [② 物理層とデータリンク層](network/02-physical-datalink.md) ← ケーブル規格/PoE・スイッチのMAC学習・**VLAN**・STP・LAG・Wi-Fi設計
+  - [③ ネットワーク層（IPとルーティング）](network/03-ip-routing.md) ← **サブネット計算**・ARP・ロンゲストマッチ・OSPF/BGP・NAT・IPv6・MTU障害
+  - [④ トランスポート層（TCP/UDP）](network/04-transport-tcp-udp.md) ← ポート・3wayハンドシェイク・**帯域遅延積**・輻輳制御・QUIC・ポート枯渇
+  - [⑤ アプリケーション層（DNS・HTTP・TLS）](network/05-application-dns-http.md) ← DHCP・スプリットDNS・HTTP/1.1→3・証明書運用・**L4/L7 LBとヘルスチェック**・CDN
+  - **設計編**
+  - [⑥ ネットワークセキュリティ](network/06-security.md) ← NGFW/IPS/WAFの守備範囲・VPNの弱点・**ゼロトラスト/SASE**・セグメンテーション・DDoS
+  - [⑦ ネットワーク設計の基礎](network/07-design-basics.md) ← 要件定義・**可用性の計算**・SPOFと冗長化・**IPアドレス設計**・帯域とQoS・レビュー観点
+  - **構成パターン編（規模別・形態別）**
+  - [⑧ オンプレミス構成パターン](network/08-onpremise-patterns.md) ← **小/中/大の3構成図**・VLAN設計・機器リスト・概算コスト・落とし穴
+  - [⑨ クラウド構成パターン](network/09-cloud-patterns.md) ← VPC基礎とAWS/Azure/GCP対応表・**小/中/大の3構成図**・DR戦略4段階・課金の罠
+  - [⑩ ハイブリッド構成パターン](network/10-hybrid-patterns.md) ← VPN/専用線/SD-WANの選定・**小/中/大の3構成図**・**ハイブリッドDNS**・ID統合
+  - [⑪ 規模別・形態別 総合比較と選定](network/11-scale-comparison.md) ← **9パターン早見表**・選定フローチャート・**5年TCO試算**・移行アンチパターン10選
+  - **運用編**
+  - [⑫ 運用・監視・トラブルシュート](network/12-operations-troubleshooting.md) ← 監視項目とNetFlow・**下位層から切り分ける手順**・コマンド集・変更管理・IaC
+  - [用語集・チートシート](network/glossary.md) ← 層別用語辞典・逆引き表・**ポート番号一覧**・サブネット早見表・頻出エラー早見表
 - [🏠 光ファイバー・光通信 学習ポータル（HTML）](optical-fiber-portal.html) ← 全教材の読了チェック＋読者別ルート表示
 - [光ファイバー・光通信 完全ガイド（総合インデックス）](optical-fiber-overview.md) ← まずはここから（30秒サマリ・全体マップ・読者別ルート・統合用語集）
   - [① 光ファイバー ゼロからわかる完全ガイド](optical-fiber-guide.md) ← 全反射・コア/クラッド・SMF/MMF・損失と波長をたとえ話で
