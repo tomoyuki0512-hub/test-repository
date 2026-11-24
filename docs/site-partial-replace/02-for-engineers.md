@@ -23,11 +23,12 @@ Webサイトの一部機能を新システムへリプレイスする際に、**
 5. [対応案の詳細（A〜D）](#5-対応案の詳細ad)
 6. [比較と選定フロー](#6-比較と選定フロー)
 7. [推奨構成](#7-推奨構成)
-8. [落とし穴チェックリスト](#8-落とし穴チェックリスト)
-9. [テスト](#9-テスト)
-10. [切替手順とロールバック](#10-切替手順とロールバック)
-11. [運用・撤去](#11-運用撤去)
-12. [確認・決定事項](#12-確認決定事項)
+8. [Akamai での実装手順](#8-akamai-での実装手順)
+9. [落とし穴チェックリスト](#9-落とし穴チェックリスト)
+10. [テスト](#10-テスト)
+11. [切替手順とロールバック](#11-切替手順とロールバック)
+12. [運用・撤去](#12-運用撤去)
+13. [確認・決定事項](#13-確認決定事項)
 
 ---
 
@@ -38,7 +39,7 @@ Webサイトの一部機能を新システムへリプレイスする際に、**
 | 1 | **基本は 案A（内部リンクの一括書き換え）＋ 案B（旧URL→新URLのリダイレクト）** の併用。A をどこまでやるかは件数ではなく **一括置換できるか** で決める（[6.3](#63-規模と編集方法による判断a案をどこまでやるか)） |
 | 2 | 新システムを旧URLと同じパスで提供できるなら **案C（パスベースルーティング）** が最良。リンク改修ゼロ |
 | 3 | 段階移行で今後も行き先が変わるなら **案D（リンクの間接参照化）** を追加 |
-| 4 | リダイレクトは **CDN／LB などエッジに置く**。廃止予定の旧システム上に置かない |
+| 4 | リダイレクトは **CDN／LB などエッジに置く**。廃止予定の旧システム上に置かない。Akamai の場合は **Edge Redirector Cloudlet**（[§8](#8-akamai-での実装手順)） |
 | 5 | 切替は「設定の有効化」で行い、**直後は 302（または短いキャッシュの 301）→ 安定後に 301**。ロールバック＝設定を戻すだけにする |
 | 6 | 工数の大半は実装ではなく **リンク棚卸しと URL マッピング表の作成・合意**。マッピング表を唯一の正（Single Source of Truth）として設定・テストを自動生成する |
 
@@ -126,6 +127,8 @@ zcat access.log*.gz | awk '$7 ~ /^\/products\// {print $7}' | sort | uniq -c | s
 zcat access.log*.gz | awk -F'"' '$2 ~ /^GET \/products\// && $4 !~ /example\.com/ {print $4}' \
   | sort | uniq -c | sort -rn | head -50
 ```
+
+> CDN 経由で配信している場合、**キャッシュヒットはオリジンに届かない**ため、オリジンのログだけでは件数が少なく出ます。CDN のログ（Akamai なら DataStream 2。[§8.7](#87-ログ監視datastream-2)）で集計してください。
 
 **④ Search Console**：「リンク」レポートで外部から被リンクの多いページ、「ページ」レポートでインデックス済み URL を取得。
 
@@ -340,6 +343,7 @@ RewriteRule ^/?products/item\.html$ https://www.example.com/catalog/items/%1? [R
 | Cloudflare | Bulk Redirects ／ Single Redirects | 大量 1:1 は Bulk、パターンは Single |
 | AWS ALB | リスナールールの redirect アクション | **少数のパターンのみ**（ルール数に上限あり） |
 | Amazon S3 静的ウェブサイト | ルーティングルール | **50件まで**のため小規模のみ |
+| **Akamai** | Edge Redirector Cloudlet ／ Redirect 挙動 ／ EdgeWorkers ＋ EdgeKV | 大量 1:1 は Edge Redirector。手順は [§8](#8-akamai-での実装手順) |
 
 CloudFront Functions（JavaScript ランタイム 2.0、ビューワーリクエストに関連付け）：
 
@@ -509,7 +513,9 @@ flowchart TD
      | sort | uniq -c | sort -rn | head -30
    ```
 
-3. **残りは B で受け、ページ更新のついでに直す**：§11 の CI チェックを「失敗」ではなく「警告」にして、新規・更新ページから順に解消する
+   CDN で転送している場合、転送はオリジンのログに残らないため CDN のログで集計する（Akamai は [§8.7](#87-ログ監視datastream-2)）
+
+3. **残りは B で受け、ページ更新のついでに直す**：§12 の CI チェックを「失敗」ではなく「警告」にして、新規・更新ページから順に解消する
 
 ---
 
@@ -535,7 +541,182 @@ flowchart LR
 
 ---
 
-## 8. 落とし穴チェックリスト
+## 8. Akamai での実装手順
+
+既存サイトを Akamai（Property Manager のプロパティ）経由で配信している場合の手順です。
+
+> ⚠️ 使える機能は**契約モジュールによって異なります**。最初に Akamai Control Center（ACC）で契約内容と権限を確認してください。画面名・項目名は ACC の更新で変わることがあります。
+
+### 8.1 使う機能の選び方
+
+| やりたいこと | Akamai の機能 | 目安・注意 |
+| --- | --- | --- |
+| 旧URL→新URLの転送（案B）を大量に | **Edge Redirector Cloudlet** | 本命。CSV で一括登録できる。301／302／303／307／308 に対応 |
+| 転送が数件〜数十件だけ | Property Manager の Redirect／Redirect Plus 挙動 | 件数が増えるとプロパティが肥大化するので少数のみ |
+| 転送が数千〜数万件 | EdgeWorkers ＋ EdgeKV | 別契約・開発が必要。EdgeKV の読み込みレート上限を確認 |
+| パス単位で新システムへ振り分け（案C） | Property Manager のルール（パス条件 ＋ Origin Server 挙動） | |
+| 割合を決めて段階的に新システムへ（案C） | **Phased Release Cloudlet** | 例：10%→50%→100%。Cookie で同じ利用者は同じ行き先に固定 |
+| 書き換え後 HTML のキャッシュ削除 | **Fast Purge**（invalidate 推奨） | 通常数秒で反映 |
+| ログ（404 監視・参照元の集計） | **DataStream 2** | [§8.7](#87-ログ監視datastream-2) |
+
+> ⚠️ **Edge Redirector のルール数**：1ポリシーあたり最大 5,000 ルールですが、リクエストごとの**処理コストに上限**があり、ルールの複雑さによっては **1,000 ルールを超えたあたりで上限に達する**ことがあります。リンクが 1,000 件でも旧 URL の種類が数百なら収まることが多いものの、**ステージングで必ずコストを測定**してください（[§8.5](#85-ステージングでのテスト)）。
+> 収まらない場合：規則的なものはパターン（正規表現）1ルールにまとめる／パスごとにポリシーを分ける／EdgeWorkers ＋ EdgeKV を検討。
+
+### 8.2 全体の流れ
+
+```mermaid
+flowchart LR
+    P1["① 事前確認<br/>契約・権限"] --> P2["② Edge Redirector<br/>ポリシー作成・CSV投入"]
+    P2 --> P3["③ プロパティに<br/>挙動を追加"]
+    P3 --> P4["④ ステージングで<br/>アクティベート・テスト"]
+    P4 --> P5["⑤ 本番切替<br/>（T日）"]
+    P5 --> P6["⑥ 監視<br/>DataStream 2"]
+    P6 --> P7["⑦ 301 に切替"]
+```
+
+- **プロパティと Cloudlet ポリシーは別々にバージョン管理・アクティベート**します（どちらもステージング → 本番の順）
+- どちらも**前のバージョンを再アクティベートすればロールバック**できます
+
+### 8.3 Edge Redirector ポリシーの作成とルール登録
+
+1. ACC の **Cloudlets Policy Manager** で新規ポリシーを作成（タイプ：Edge Redirector）
+2. ルールを登録（手入力または CSV アップロード）
+   - CSV アップロード時、「Overwrite existing?（既存を上書き）」にチェックすると全置換、外すと末尾に追加
+   - ルールは**上から順に評価され、最初に一致したものが適用**される → 個別ルールを上、パターンルールを下に
+3. ポリシーのバージョンを**ステージングにアクティベート**
+
+**各ルールの主な設定**：
+
+| 項目 | 設定 |
+| --- | --- |
+| 一致条件 | 旧URL（**プロトコル・ホスト込み**の完全な URL）。パターンは正規表現などの詳細条件で |
+| 転送先 | 新URL。https・正規ホストの**最終URL**を指定し、チェーンを作らない |
+| ステータス | 切替直後は **302**、安定後に **301**（フォームの POST 先は 307／308） |
+| クエリ | 元のクエリ文字列（`utm_*` 等）を引き継ぐオプションを有効にする |
+
+**マッピング表から取り込み用 CSV を生成**（[§4.1](#41-マッピング表唯一の正) の表を唯一の正にする）：
+
+```python
+#!/usr/bin/env python3
+"""マッピング表 → Edge Redirector 取り込み用CSV（1:1 と N:1 のみ。pattern・gone は別途）
+使い方: python3 to_er_csv.py mapping.csv er-rules.csv 302   # 切替直後は302、安定後は301で再生成
+※ 列名は ACC でポリシーからダウンロードした CSV の見出しに合わせること"""
+import csv
+import sys
+
+SITE = "https://www.example.com"   # 一致条件はプロトコル・ホスト込みで指定する
+src, dst, status = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(src, encoding="utf-8") as f, open(dst, "w", encoding="utf-8", newline="") as o:
+    w = csv.writer(o)
+    w.writerow(["ruleName", "matchURL", "result.redirectURL", "result.statusCode"])
+    for i, r in enumerate(csv.DictReader(f), 1):
+        if r["type"] in ("1:1", "N:1") and r["new_url"]:
+            w.writerow([f"r{i:04d}", SITE + r["old_path"], r["new_url"], status])
+```
+
+- `pattern` 型：正規表現の詳細条件で手登録する（件数は少ないはず）
+- `gone`（410）：Edge Redirector は転送専用 → オリジンで 410 を返すか、Property Manager の Construct Response 挙動で返す（選べるステータスコードは要確認）
+- Terraform（Akamai Provider）で管理する場合は、マッピング表から `akamai_cloudlets_edge_redirector_match_rule` を生成して Git 管理できる
+
+### 8.4 プロパティへの組み込み（Property Manager）
+
+**案B（転送）**：
+
+1. 現在の本番バージョンをもとに**新しいバージョンを作成**
+2. ルールを追加：条件「Path が `/products/*` に一致」→ 挙動「**Edge Redirector Cloudlet**」（有効化し、§8.3 のポリシーを選択）
+   - 条件で対象パスに絞ると、他のページで無駄な評価が走らず、誤った転送も防げる
+3. 既存の `http→https`・`www` 付与のリダイレクトとの順序を確認し、**1ホップで最終URLに届く**ようにする
+4. 新しいバージョンを**ステージングにアクティベート**
+
+**案C（パスで新システムへ振り分け）の場合**は、さらに次を設定：
+
+| 設定 | 内容 |
+| --- | --- |
+| ルール条件 | Path が新システムに渡すパス（例：`/products/*`）に一致 |
+| Origin Server 挙動 | 新システムのホスト名。Forward Host Header（受信した Host を渡すか、新システムのホスト名を渡すか）と Cache Key Hostname を新システムの要件に合わせる |
+| Caching 挙動 | 動的ページはキャッシュしない |
+| Allow POST 挙動 | フォームを扱う場合は POST が許可されていることを確認 |
+| Rewrite URL 挙動 | 新システム側のパスが異なる場合に、オリジンへ渡すパスを書き換える |
+| 段階切替 | 新システムを **Conditional Origin（条件付きオリジン）** として定義し、**Phased Release Cloudlet** で割合を指定（例：10%→50%→100%） |
+
+### 8.5 ステージングでのテスト
+
+Akamai には本番と同じ設定を試せる**ステージングネットワーク**があります。エッジホスト名の末尾 `.net` の前に `-staging` を入れたホストに接続します（例：`www.example.com.edgekey.net` → `www.example.com.edgekey-staging.net`）。
+
+```bash
+STG=www.example.com.edgekey-staging.net
+
+# 1件確認：URL は本番のまま、接続先だけステージングに向ける（hosts の書き換え不要）
+curl -sI --connect-to www.example.com:443:$STG:443 \
+  -H 'Pragma: akamai-x-cache-on, akamai-x-get-cache-key' \
+  https://www.example.com/products/a.html
+#  → X-Akamai-Staging ヘッダーがあればステージング経由。ステータスと Location を確認
+
+# Edge Redirector の処理コストを確認（ステージングのみ。レスポンスヘッダーでコストを確認）
+curl -sI --connect-to www.example.com:443:$STG:443 \
+  -H 'X-Akamai-Cloudlet-Cost: True' \
+  https://www.example.com/products/a.html
+
+# 全件テスト：§10.1 のスクリプトをステージングに向けて実行
+CURL_OPTS="--connect-to www.example.com:443:$STG:443" \
+  ./check_redirects.sh mapping.csv https://www.example.com
+```
+
+- ACC の **Policy Analysis Tool**（Edge Redirector で利用可）でも、ルールごとのコストを確認できる
+- ブラウザで確認する場合は、ステージングの IP アドレスを hosts に書く。IP は変わることがあるため、**テストのたびに名前解決し直す**
+
+### 8.6 本番切替（T日の Akamai 作業）
+
+| 時期 | 作業 |
+| --- | --- |
+| T-数日 | プロパティの新バージョン（Edge Redirector 挙動を含む）を**本番にアクティベート**。ポリシーは本番に未アクティベートのままにし、**既存の動作が変わらないこと**を確認する（ポリシー未アクティベートの間は転送されないことを、事前にステージングで確認しておく）。案C は Phased Release の割合 0% で反映しておく |
+| **T日** | ①新システム公開・直接アクセスで確認 → ②Edge Redirector ポリシー（302版）を**本番にアクティベート**（案C は Phased Release の割合を上げる）→ ③書き換え済み HTML をオリジンへデプロイ → ④**Fast Purge** で書き換えたページを invalidate → ⑤本番で全件テスト（`CURL_OPTS` なしで §10.1 を実行） |
+| T+2〜4週 | ポリシーの新バージョン（301版）を作成 → ステージング → 本番 |
+
+> プロパティを事前に反映できない場合は、T日にプロパティとポリシーの両方をアクティベートします。**プロパティの本番反映は数分〜十数分程度かかる**ことがあるため、その前提で当日の工程を組んでください。
+
+**Fast Purge（Akamai CLI の purge プラグイン。初回のみ `akamai install purge`）**：
+
+```bash
+# 書き換えで変更したファイル → URL 一覧（/about/index.html と /about/ は別キャッシュなので両方含める）
+git diff --name-only <切替前のリリースタグ> -- htdocs/ \
+  | sed 's#^htdocs/#https://www.example.com/#' \
+  | sed -E 'p; s#/index\.html$#/#' | sort -u > changed-urls.txt
+
+# まとめて invalidate（delete より invalidate を推奨。オプションは akamai purge --help で確認）
+cat changed-urls.txt | akamai purge invalidate
+```
+
+- 対象が多い場合は CP コード単位の invalidate も可能。ただし一時的にオリジンへのリクエストが増える点に注意
+
+**ロールバック（Akamai 側）**：
+
+| 対象 | 戻し方 |
+| --- | --- |
+| Edge Redirector | ポリシーの前バージョンを本番に再アクティベート |
+| Phased Release（案C） | 割合を 0% に戻す |
+| プロパティ | 前バージョンを本番に再アクティベート（反映に数分〜十数分程度） |
+| HTML | 前リリースに戻して Fast Purge |
+
+### 8.7 ログ・監視（DataStream 2）
+
+- Akamai が返した転送や**キャッシュヒットは、オリジンのアクセスログに残りません**。[§3.2](#32-棚卸しの手順) ③・[§6.3](#63-規模と編集方法による判断a案をどこまでやるか) の集計や 404 監視は、**DataStream 2** で Akamai のログ（ステータスコード・リクエストパス・Referer を含める）を S3 などの保存先に送って行う
+- ACC の **Edge Redirector レポート**でルール別のヒット数を確認できる → 使われていないルールの把握・撤去判断（§12）に使う
+
+### 8.8 Akamai 固有のチェックリスト
+
+- [ ] 契約に Edge Redirector（必要に応じて Phased Release・EdgeWorkers・DataStream 2）が含まれている
+- [ ] ACC の権限（Property Manager・Cloudlets・Fast Purge）がある
+- [ ] Edge Redirector の処理コストをステージングで測定した（1,000 ルール超は特に）
+- [ ] ルールの順序が「個別 → パターン」になっている
+- [ ] 一致条件の URL のゆれ（http／https、www の有無、末尾スラッシュ）を考慮した
+- [ ] 転送先は最終URL（既存の https・www リダイレクトと合わせて1ホップ）
+- [ ] 旧パスのキャッシュが残っていない（必要なら invalidate）
+- [ ] DataStream 2 のログに Referer・ステータスコードが含まれている
+
+---
+
+## 9. 落とし穴チェックリスト
 
 **転送の品質**
 
@@ -573,9 +754,9 @@ flowchart LR
 
 ---
 
-## 9. テスト
+## 10. テスト
 
-### 9.1 リダイレクトの全件自動テスト
+### 10.1 リダイレクトの全件自動テスト
 
 マッピング表の全行について、「1ホップ目のステータス・転送先」と「転送先が 200 を返すこと」を検証します。
 
@@ -583,15 +764,16 @@ flowchart LR
 #!/usr/bin/env bash
 # マッピング表の全行で「旧URL → 期待ステータス・転送先（1ホップ）」と「転送先が200」を検証する
 # 使い方: ./check_redirects.sh mapping.csv https://stg.example.com
+#   CDN のステージングに向ける場合は CURL_OPTS で接続先を指定（例は §8.5）
 set -u
 map="$1"; base="$2"; ng=0
 while IFS=, read -r old new type status owner note; do
-  read -r code loc < <(curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' "$base$old")
+  read -r code loc < <(curl -s ${CURL_OPTS:-} -o /dev/null -w '%{http_code} %{redirect_url}\n' "$base$old")
   if [[ "$code" != "$status" || "$loc" != "$new" ]]; then
     echo "NG  $old  期待: $status $new / 実際: $code $loc"; ng=$((ng+1)); continue
   fi
   if [[ -n "$new" ]]; then
-    final=$(curl -s -o /dev/null -w '%{http_code}' "$new")
+    final=$(curl -s ${CURL_OPTS:-} -o /dev/null -w '%{http_code}' "$new")
     [[ "$final" == "200" ]] || { echo "NG  $old  転送先 $new が $final"; ng=$((ng+1)); }
   fi
 done < <(tail -n +2 "$map")
@@ -601,7 +783,7 @@ echo "NG件数: $ng"; exit $(( ng > 0 ))
 - `pattern` 型は実在 URL のサンプルを別 CSV に展開してテストする
 - 切替直後に 302 で運用する期間は、`status` 列の期待値をその期間の値に合わせる
 
-### 9.2 テスト観点
+### 10.2 テスト観点
 
 | 区分 | 観点 |
 | --- | --- |
@@ -617,9 +799,9 @@ echo "NG件数: $ng"; exit $(( ng > 0 ))
 
 ---
 
-## 10. 切替手順とロールバック
+## 11. 切替手順とロールバック
 
-### 10.1 タイムライン
+### 11.1 タイムライン
 
 | 時期 | 作業 |
 | --- | --- |
@@ -632,9 +814,9 @@ echo "NG件数: $ng"; exit $(( ng > 0 ))
 | T+2〜4週 | 恒久 301 に切替、sitemap 送信、更新凍結の解除 |
 | T+1年〜 | アクセス状況を見て撤去を判断 |
 
-> T日の順序が重要です。**新システムが応答できる状態になる前に、リンクやリダイレクトを向けない**こと。
+> T日の順序が重要です。**新システムが応答できる状態になる前に、リンクやリダイレクトを向けない**こと。Akamai での具体的な作業は [§8.6](#86-本番切替t日の-akamai-作業) を参照。
 
-### 10.2 ロールバック
+### 11.2 ロールバック
 
 | 手順 | 内容 |
 | --- | --- |
@@ -647,7 +829,7 @@ echo "NG件数: $ng"; exit $(( ng > 0 ))
 
 ---
 
-## 11. 運用・撤去
+## 12. 運用・撤去
 
 | 項目 | 内容 |
 | --- | --- |
@@ -665,7 +847,7 @@ fi
 
 ---
 
-## 12. 確認・決定事項
+## 13. 確認・決定事項
 
 | # | 事項 | 確認先 | 影響 |
 | --- | --- | --- | --- |
@@ -680,5 +862,6 @@ fi
 | 9 | リダイレクトの保持期間 | 業務部門・SEO 担当 | 運用コスト |
 | 10 | 計測方針（GA4 クロスドメイン、`utm_*`） | マーケティング | 計測の連続性 |
 | 11 | 外部への連絡（取引先・広告・印刷物） | 各部門 | 外部リンクの更新 |
+| 12 | Akamai の契約モジュール（Edge Redirector・Phased Release・EdgeWorkers・DataStream 2）と ACC の権限 | インフラ・Akamai 窓口 | 使える方式と手順（[§8](#8-akamai-での実装手順)） |
 
 👉 業務部門向けの説明資料には [誰でもわかる版](01-for-everyone.md) を使ってください。
